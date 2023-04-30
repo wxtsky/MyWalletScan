@@ -25,7 +25,7 @@ npm run dev (or vite)
 ```
 
 ## 预览
-![](C:\\Users\\55245\\Desktop\\zks.png)
+http://150.158.27.95
 
 
 
