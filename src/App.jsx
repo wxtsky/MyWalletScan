@@ -1,4 +1,4 @@
-import {Button, Input, Space, Table, Modal, Form, notification, Spin} from 'antd';
+import {Button, Input, Space, Table, Modal, Form, notification, Spin, Tag} from 'antd';
 import {
     getEthBalance,
     getTxCount,
@@ -14,7 +14,7 @@ import {Layout, Card} from 'antd';
 
 const {Content} = Layout;
 import MyFooter from "../components/MyFooter/index.jsx";
-import {DownloadOutlined} from "@ant-design/icons";
+import {DownloadOutlined, EditOutlined, SearchOutlined} from "@ant-design/icons";
 
 const {TextArea} = Input;
 const {Column, ColumnGroup} = Table;
@@ -412,11 +412,11 @@ function App() {
     const handleBatchCancel = () => {
         setIsBatchModalVisible(false);
     };
-
+    const [editingKey, setEditingKey] = useState(null);
     return (
-        <>
+        <div>
             <Layout style={{minHeight: "100vh"}}>
-                <Content style={{padding: "30px"}}>
+                <Content style={{padding: "1px"}}>
                     <Modal title="批量添加地址" open={isBatchModalVisible} onOk={handleBatchOk}
                            onCancel={handleBatchCancel}
                            okButtonProps={{loading: isLoading}}
@@ -451,32 +451,58 @@ function App() {
                         style={{marginBottom: "20px"}}
                         size={"small"}
                     >
-                        <Column title="我的地址" dataIndex="address" key="address" align={"center"}
+                        <Column
+                            title="备注"
+                            dataIndex="name"
+                            key="name"
+                            align={"center"}
+                            className={"name"}
+                            render={(text, record) => {
+                                const isEditing = record.key === editingKey; // Check if this row is being edited
+                                return isEditing ? (
+                                    <Input
+                                        placeholder="请输入备注"
+                                        defaultValue={text}
+                                        onPressEnter={(e) => {
+                                            record.name = e.target.value;
+                                            setData([...data]);
+                                            localStorage.setItem('addresses', JSON.stringify(data));
+                                            setEditingKey(null); // Stop editing when Enter is pressed
+                                        }}
+                                    />
+                                ) : (
+                                    <>
+                                        <Tag color="blue">{text}</Tag>
+                                        <Button
+                                            shape="circle"
+                                            icon={<EditOutlined/>}
+                                            size={"small"}
+                                            onClick={() => setEditingKey(record.key)} // Start editing when the button is clicked
+                                        />
+                                    </>
+                                );
+                            }}
+                        />
+                        <Column title="钱包地址" dataIndex="address" key="address" align={"center"}
                                 className={"address"}/>
                         <ColumnGroup title="ETH" className={"eth"}>
                             <Column title="ETH" dataIndex="eth_balance" key="eth_balance" align={"center"}
-                                    sorter={(a, b) => a.eth_balance - b.eth_balance}
                                     render={(text, record) => (text === null ? <Spin/> : text)} className={"eth_son"}/>
                             <Column title="Tx" dataIndex="eth_tx_amount" key="eth_tx_amount" align={"center"}
-                                    sorter={(a, b) => a.eth_tx_amount - b.eth_tx_amount}
                                     render={(text, record) => (text === null ? <Spin/> : text)} className={"eth_son"}/>
                         </ColumnGroup>
                         <ColumnGroup title="zkSyncLite" className={"zksync1"}>
                             <Column title="ETH" dataIndex="zks1_balance" key="zks1_balance" align={"center"}
-                                    sorter={(a, b) => a.zks1_balance - b.zks1_balance}
                                     render={(text, record) => (text === null ? <Spin/> : text)} className={"zks1_son"}/>
                             <Column title="Tx" dataIndex="zks1_tx_amount" key="zks1_tx_amount" align={"center"}
-                                    sorter={(a, b) => a.zks1_tx_amount - b.zks1_tx_amount}
                                     render={
                                         (text, record) => (text === null ? <Spin/> : text)
                                     } className={"zks1_son"}/>
                         </ColumnGroup>
                         <ColumnGroup title="zkSyncEra" className={"zksync2"}>
                             <Column title="ETH" dataIndex="zks2_balance" key="zks2_balance" align={"center"}
-                                    sorter={(a, b) => a.zks2_balance - b.zks2_balance}
                                     render={(text, record) => (text === null ? <Spin/> : text)} className={"zks2_son"}/>
                             <Column title="Tx" dataIndex="zks2_tx_amount" key="zks2_tx_amount" align={"center"}
-                                    sorter={(a, b) => a.zks2_tx_amount - b.zks2_tx_amount}
                                     render={(text, record) => (text === null ? <Spin/> : text)} className={"zks2_son"}/>
                             <Column title="最后交易" dataIndex="zks2_last_tx" key="zks2_last_tx" align={"center"}
                                     render={(text, record) => (text === null ? <Spin/> :
@@ -506,7 +532,7 @@ function App() {
                             key="action"
                             align={"center"}
                             render={(text, record) => (
-                                <Space size="middle">
+                                <Space size="small">
                                     <Button
                                         type="primary"
                                         danger
@@ -544,7 +570,7 @@ function App() {
                 </Content>
                 <MyFooter/>
             </Layout>
-        </>
+        </div>
     );
 }
 

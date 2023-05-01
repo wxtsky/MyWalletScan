@@ -1,3 +1,8 @@
+.ant-table-thead > tr > th.name {
+  background-color: #ecd35d;
+  color: white;
+}
+
 .ant-table-thead > tr > th.eth {
   background-color: #4CAF50;
   color: white;
