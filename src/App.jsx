@@ -5,7 +5,8 @@ import {
     getZksEra,
     getZksLite,
     getZkSyncLastTX,
-    getZkSyncBridge
+    getZkSyncBridge,
+    exportToExcel
 } from "./utils"
 import {useEffect, useState} from "react";
 import './App.css';
@@ -13,7 +14,6 @@ import {Layout, Card} from 'antd';
 
 const {Content} = Layout;
 import MyFooter from "../components/MyFooter/index.jsx";
-import {exportToExcel} from "./utils/save_excel.js";
 import {DownloadOutlined} from "@ant-design/icons";
 
 const {TextArea} = Input;

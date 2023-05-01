@@ -9,4 +9,4 @@ function exportToExcel(data, fileName = 'export.xlsx') {
     const blob = new Blob([excelBuffer], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8'});
     saveAs(blob, fileName);
 }
-export {exportToExcel};
+export default exportToExcel;
