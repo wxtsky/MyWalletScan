@@ -6,7 +6,7 @@ import {
     getZksLite,
     getZkSyncLastTX,
     getZkSyncBridge
-} from "./utils/get_balance_tx.js";
+} from "./utils"
 import {useEffect, useState} from "react";
 import './App.css';
 import {Layout, Card} from 'antd';
@@ -15,7 +15,6 @@ const {Content} = Layout;
 import MyFooter from "../components/MyFooter/index.jsx";
 import {exportToExcel} from "./utils/save_excel.js";
 import {DownloadOutlined} from "@ant-design/icons";
-import {Footer} from "antd/es/layout/layout.js";
 
 const {TextArea} = Input;
 const {Column, ColumnGroup} = Table;
