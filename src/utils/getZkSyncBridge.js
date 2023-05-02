@@ -64,8 +64,8 @@ async function getZkSyncBridge(address) {
                         l2Tol1Amount
                     );
                 if (ListLength === 100) {
-                    fromBlockNumber = response.data.list[0].blockNumber;
-                    fromTxIndex = response.data.list[0].indexInBlock;
+                    // fromBlockNumber = response.data.list[0].blockNumber;
+                    // fromTxIndex = response.data.list[0].indexInBlock;
                     offset += ListLength;
                 } else {
                     break;
