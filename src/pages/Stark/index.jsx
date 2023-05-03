@@ -49,6 +49,9 @@ const Stark = () => {
                 }, 2);
                 return;
             }
+            if (!values.address.startsWith('0x')) {
+                values.address = '0x' + values.address;
+            }
             setIsModalVisible(false);
             const index = data.findIndex(item => item.address === values.address);
             if (index !== -1) {
@@ -221,6 +224,9 @@ const Stark = () => {
                         description: "请输入正确的地址",
                     });
                     continue;
+                }
+                if (!address.startsWith("0x")) {
+                    address = "0x" + address;
                 }
                 const index = newData.findIndex(item => item.address === address);
                 if (index !== -1) {
