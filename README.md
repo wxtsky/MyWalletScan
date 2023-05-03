@@ -1,8 +1,8 @@
-# WalletScan(zkSync)
+# MyWalletScan
 
 ## 关于
 
-闲着无事写的一款方便查看管理地址的工具，目前支持查看zkSync1.0和zkSync2.0，starkWare的地址信息，包括余额，哈希数量，官方桥跨链次数和金额等。
+一款方便查看管理地址的工具，目前支持查看zkSync1.0和zkSync2.0，starkWare的地址信息，包括余额，哈希数量，官方桥跨链次数和金额等。
 
 ## 安装和使用
 
