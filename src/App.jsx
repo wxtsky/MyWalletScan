@@ -1,10 +1,11 @@
-import Zksync from "@pages/Zksync/index.jsx";
+import WrapperRouter from "@routes";
 
 function App() {
     return (
-        <>
-            <Zksync/>
-        </>
+        <div className="App">
+            <WrapperRouter/>
+        </div>
     )
 }
+
 export default App;

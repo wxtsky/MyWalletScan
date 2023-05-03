@@ -1,29 +1,24 @@
-import {Layout, Button} from 'antd';
+import {Button} from 'antd';
 import {GithubOutlined, TwitterOutlined} from '@ant-design/icons';
 
-const {Footer} = Layout;
 const MyFooter = () => {
     return (
-        <Footer
-            style={{
-                textAlign: 'center',
-            }}
-        >
+        <>
             <Button
                 type="link"
                 href="https://twitter.com/jingluo0"
                 target="_blank"
                 icon={<TwitterOutlined/>}
-                size={"large"}
+                size={"middle"}
             />
             <Button
                 type="link"
-                href="https://github.com/wxtsky"
+                href="https://github.com/wxtsky/MyWalletScan"
                 target="_blank"
                 icon={<GithubOutlined/>}
-                size={"large"}
+                size={"middle"}
             />
-        </Footer>
+        </>
     )
 }
 export default MyFooter
