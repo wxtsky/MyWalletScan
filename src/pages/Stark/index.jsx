@@ -23,6 +23,7 @@ const Stark = () => {
     const [batchForm] = Form.useForm();
     const [isLoading, setIsLoading] = useState(false);
     const [selectedKeys, setSelectedKeys] = useState([]);
+    const [tableLoading, setTableLoading] = useState(false);
     const [form] = Form.useForm();
     const rowSelection = {
         onChange: (selectedRowKeys, selectedRows) => {
@@ -30,7 +31,11 @@ const Stark = () => {
         },
     };
     useEffect(() => {
+        setTableLoading(true)
         const storedAddresses = localStorage.getItem('stark_addresses');
+        setTimeout(() => {
+            setTableLoading(false);
+        }, 500);
         if (storedAddresses) {
             setData(JSON.parse(storedAddresses));
         }
@@ -501,7 +506,7 @@ const Stark = () => {
     const [editingKey, setEditingKey] = useState(null);
     return (
         <div>
-            <Content style={{padding: "1px"}}>
+            <Content>
                 <Modal title="批量添加地址" open={isBatchModalVisible} onOk={handleBatchOk}
                        onCancel={() => {
                            setIsBatchModalVisible(false)
@@ -532,204 +537,206 @@ const Stark = () => {
                         </Form.Item>
                     </Form>
                 </Modal>
-                <Table
-                    rowSelection={{
-                        type: 'checkbox',
-                        ...rowSelection,
-                    }}
-                    dataSource={data}
-                    pagination={false}
-                    bordered={true}
-                    style={{marginBottom: "20px"}}
-                    size={"small"}
-                    scroll={{
-                        x: 3500,
-                    }}
-                >
-                    <Column
-                        title="备注"
-                        dataIndex="name"
-                        key="name"
-                        align={"center"}
-                        className={"name"}
-                        fixed={"left"}
-                        render={(text, record) => {
-                            const isEditing = record.key === editingKey; // Check if this row is being edited
-                            return isEditing ? (
-                                <Input
-                                    placeholder="请输入备注"
-                                    defaultValue={text}
-                                    onPressEnter={(e) => {
-                                        record.name = e.target.value;
-                                        setData([...data]);
-                                        localStorage.setItem('stark_addresses', JSON.stringify(data));
-                                        setEditingKey(null); // Stop editing when Enter is pressed
-                                    }}
-                                />
-                            ) : (
-                                <>
-                                    <Tag color="blue">{text}</Tag>
-                                    <Button
-                                        shape="circle"
-                                        icon={<EditOutlined/>}
-                                        size={"small"}
-                                        onClick={() => setEditingKey(record.key)} // Start editing when the button is clicked
-                                    />
-                                </>
-                            );
+                <Spin spinning={tableLoading}>
+                    <Table
+                        rowSelection={{
+                            type: 'checkbox',
+                            ...rowSelection,
                         }}
-                    />
-                    <Column title="钱包地址" dataIndex="address" key="address" align={"center"}
-                            className={"address"}
-                            render={(text, record) => (
-                                text === null ? <Spin/> : text.slice(0, 4) + "..." + text.slice(-4)
-                            )}
+                        dataSource={data}
+                        pagination={false}
+                        bordered={true}
+                        style={{marginBottom: "20px"}}
+                        size={"small"}
+                        scroll={{
+                            x: 3500,
+                        }}
+                    >
+                        <Column
+                            title="备注"
+                            dataIndex="name"
+                            key="name"
+                            align={"center"}
+                            className={"name"}
                             fixed={"left"}
-                    />
-                    <Column title="创建时间" dataIndex="create_time" key="create_time" align={"center"}
-                            className={"create_time"}
                             render={(text, record) => {
-                                if (text === null) {
-                                    return <Spin/>;
-                                } else {
-                                    let date = new Date(text * 1000);
-                                    let year = date.getFullYear();
-                                    let month = (date.getMonth() + 1).toString().padStart(2, '0'); // month is 0-based
-                                    let day = date.getDate().toString().padStart(2, '0');
-                                    return `${year}/${month}/${day}`;
-                                }
+                                const isEditing = record.key === editingKey; // Check if this row is being edited
+                                return isEditing ? (
+                                    <Input
+                                        placeholder="请输入备注"
+                                        defaultValue={text}
+                                        onPressEnter={(e) => {
+                                            record.name = e.target.value;
+                                            setData([...data]);
+                                            localStorage.setItem('stark_addresses', JSON.stringify(data));
+                                            setEditingKey(null); // Stop editing when Enter is pressed
+                                        }}
+                                    />
+                                ) : (
+                                    <>
+                                        <Tag color="blue">{text}</Tag>
+                                        <Button
+                                            shape="circle"
+                                            icon={<EditOutlined/>}
+                                            size={"small"}
+                                            onClick={() => setEditingKey(record.key)} // Start editing when the button is clicked
+                                        />
+                                    </>
+                                );
                             }}
+                        />
+                        <Column title="钱包地址" dataIndex="address" key="address" align={"center"}
+                                className={"address"}
+                                render={(text, record) => (
+                                    text === null ? <Spin/> : text.slice(0, 4) + "..." + text.slice(-4)
+                                )}
+                                fixed={"left"}
+                        />
+                        <Column title="创建时间" dataIndex="create_time" key="create_time" align={"center"}
+                                className={"create_time"}
+                                render={(text, record) => {
+                                    if (text === null) {
+                                        return <Spin/>;
+                                    } else {
+                                        let date = new Date(text * 1000);
+                                        let year = date.getFullYear();
+                                        let month = (date.getMonth() + 1).toString().padStart(2, '0'); // month is 0-based
+                                        let day = date.getDate().toString().padStart(2, '0');
+                                        return `${year}/${month}/${day}`;
+                                    }
+                                }}
 
-                    />
+                        />
 
-                    <Column title="StarkId" dataIndex="stark_id" key="stark_id" align={"center"}
-                            className={"stark_id"}
-                            render={(text, record) => (text === null ? <Spin/> : text)}
-                    />
-                    <ColumnGroup title="StarkWare" className={"zksync2"}>
-                        <Column title="ETH" dataIndex="stark_eth_balance" key="stark_eth_balance" align={"center"}
-                                render={(text, record) => (text === null ? <Spin/> : text)} className={"zks2_son"}/>
-                        <Column title="Tx" dataIndex="stark_tx_amount" key="stark_tx_amount" align={"center"}
-                                render={(text, record) => (text === null ? <Spin/> : text)} className={"zks2_son"}/>
-                        <ColumnGroup title="官方桥Tx" className={"cross"}>
-                            <ColumnGroup title="L1->L2" className={"cross12"}>
-                                <Column title="ETH"
-                                        dataIndex="d_eth_count"
-                                        key="12cross_eth_tx" align={"center"}
-                                        render={(text, record) => (text === null ? <Spin/> : text)}
-                                        className={"cross_son"}/>
-                                <Column title="DAI" dataIndex="d_dai_count" key="12cross_dai_tx" align={"center"}
-                                        render={(text, record) => (text === null ? <Spin/> : text)}
-                                        className={"cross_son"}/>
-                                <Column title="USDC" dataIndex="d_usdc_count" key="12cross_usdc_tx"
-                                        align={"center"}
-                                        render={(text, record) => (text === null ? <Spin/> : text)}
-                                        className={"cross_son"}/>
-                                <Column title="WBTC" dataIndex="d_wbtc_count" key="12cross_wbtc_tx"
-                                        align={"center"}
-                                        render={(text, record) => (text === null ? <Spin/> : text)}
-                                        className={"cross_son"}/>
-                                <Column title="USDT" dataIndex="d_usdt_count" key="12cross_usdt_tx"
-                                        align={"center"}
-                                        render={(text, record) => (text === null ? <Spin/> : text)}
-                                        className={"cross_son"}/>
-                                <Column title="总共" dataIndex="total_deposit_count" key="12cross_total_tx"
-                                        align={"center"}
-                                        render={(text, record) => (text === null ? <Spin/> : text)}
-                                        className={"cross_son"}/>
+                        <Column title="StarkId" dataIndex="stark_id" key="stark_id" align={"center"}
+                                className={"stark_id"}
+                                render={(text, record) => (text === null ? <Spin/> : text)}
+                        />
+                        <ColumnGroup title="StarkWare" className={"zksync2"}>
+                            <Column title="ETH" dataIndex="stark_eth_balance" key="stark_eth_balance" align={"center"}
+                                    render={(text, record) => (text === null ? <Spin/> : text)} className={"zks2_son"}/>
+                            <Column title="Tx" dataIndex="stark_tx_amount" key="stark_tx_amount" align={"center"}
+                                    render={(text, record) => (text === null ? <Spin/> : text)} className={"zks2_son"}/>
+                            <ColumnGroup title="官方桥Tx" className={"cross"}>
+                                <ColumnGroup title="L1->L2" className={"cross12"}>
+                                    <Column title="ETH"
+                                            dataIndex="d_eth_count"
+                                            key="12cross_eth_tx" align={"center"}
+                                            render={(text, record) => (text === null ? <Spin/> : text)}
+                                            className={"cross_son"}/>
+                                    <Column title="DAI" dataIndex="d_dai_count" key="12cross_dai_tx" align={"center"}
+                                            render={(text, record) => (text === null ? <Spin/> : text)}
+                                            className={"cross_son"}/>
+                                    <Column title="USDC" dataIndex="d_usdc_count" key="12cross_usdc_tx"
+                                            align={"center"}
+                                            render={(text, record) => (text === null ? <Spin/> : text)}
+                                            className={"cross_son"}/>
+                                    <Column title="WBTC" dataIndex="d_wbtc_count" key="12cross_wbtc_tx"
+                                            align={"center"}
+                                            render={(text, record) => (text === null ? <Spin/> : text)}
+                                            className={"cross_son"}/>
+                                    <Column title="USDT" dataIndex="d_usdt_count" key="12cross_usdt_tx"
+                                            align={"center"}
+                                            render={(text, record) => (text === null ? <Spin/> : text)}
+                                            className={"cross_son"}/>
+                                    <Column title="总共" dataIndex="total_deposit_count" key="12cross_total_tx"
+                                            align={"center"}
+                                            render={(text, record) => (text === null ? <Spin/> : text)}
+                                            className={"cross_son"}/>
+                                </ColumnGroup>
+                                <ColumnGroup title="L2->L1" className={"cross21"}>
+                                    <Column title="ETH" dataIndex="w_eth_count" key="21cross_eth_tx" align={"center"}
+                                            render={(text, record) => (text === null ? <Spin/> : text)}
+                                            className={"cross_son"}/>
+                                    <Column title="DAI" dataIndex="w_dai_count" key="21cross_dai_tx" align={"center"}
+                                            render={(text, record) => (text === null ? <Spin/> : text)}
+                                            className={"cross_son"}/>
+                                    <Column title="USDC" dataIndex="w_usdc_count" key="21cross_usdc_tx"
+                                            align={"center"}
+                                            render={(text, record) => (text === null ? <Spin/> : text)}
+                                            className={"cross_son"}/>
+                                    <Column title="WBTC" dataIndex="w_wbtc_count" key="21cross_wbtc_tx"
+                                            align={"center"}
+                                            render={(text, record) => (text === null ? <Spin/> : text)}
+                                            className={"cross_son"}/>
+                                    <Column title="USDT" dataIndex="w_usdt_count" key="21cross_usdt_tx"
+                                            align={"center"}
+                                            render={(text, record) => (text === null ? <Spin/> : text)}
+                                            className={"cross_son"}/>
+                                    <Column title="总共" dataIndex="total_widthdraw_count" key="21cross_total_tx"
+                                            align={"center"}
+                                            render={(text, record) => (text === null ? <Spin/> : text)}
+                                            className={"cross_son"}/>
+                                </ColumnGroup>
                             </ColumnGroup>
-                            <ColumnGroup title="L2->L1" className={"cross21"}>
-                                <Column title="ETH" dataIndex="w_eth_count" key="21cross_eth_tx" align={"center"}
-                                        render={(text, record) => (text === null ? <Spin/> : text)}
-                                        className={"cross_son"}/>
-                                <Column title="DAI" dataIndex="w_dai_count" key="21cross_dai_tx" align={"center"}
-                                        render={(text, record) => (text === null ? <Spin/> : text)}
-                                        className={"cross_son"}/>
-                                <Column title="USDC" dataIndex="w_usdc_count" key="21cross_usdc_tx"
-                                        align={"center"}
-                                        render={(text, record) => (text === null ? <Spin/> : text)}
-                                        className={"cross_son"}/>
-                                <Column title="WBTC" dataIndex="w_wbtc_count" key="21cross_wbtc_tx"
-                                        align={"center"}
-                                        render={(text, record) => (text === null ? <Spin/> : text)}
-                                        className={"cross_son"}/>
-                                <Column title="USDT" dataIndex="w_usdt_count" key="21cross_usdt_tx"
-                                        align={"center"}
-                                        render={(text, record) => (text === null ? <Spin/> : text)}
-                                        className={"cross_son"}/>
-                                <Column title="总共" dataIndex="total_widthdraw_count" key="21cross_total_tx"
-                                        align={"center"}
-                                        render={(text, record) => (text === null ? <Spin/> : text)}
-                                        className={"cross_son"}/>
+                            <ColumnGroup title="官方桥跨链额" className={"cross"}>
+                                <ColumnGroup title="L1->L2" className={"cross12a"}>
+                                    <Column title="ETH" dataIndex="d_eth_amount"
+                                            key="12cross_eth_amount"
+                                            align={"center"}
+                                            render={(text, record) => (text === null ? <Spin/> : text)}
+                                            className={"cross_son"}/>
+                                    <Column title="DAI" dataIndex="d_dai_amount" key="12cross_dai_amount"
+                                            align={"center"}
+                                            render={(text, record) => (text === null ? <Spin/> : text)}
+                                            className={"cross_son"}/>
+                                    <Column title="USDC" dataIndex="d_usdc_amount" key="12cross_usdc_amount"
+                                            align={"center"}
+                                            render={(text, record) => (text === null ? <Spin/> : text)}
+                                            className={"cross_son"}/>
+                                    <Column title="WBTC" dataIndex="d_wbtc_amount" key="12cross_wbtc_amount"
+                                            align={"center"}
+                                            render={(text, record) => (text === null ? <Spin/> : text)}
+                                            className={"cross_son"}/>
+                                    <Column title="USDT" dataIndex="d_usdt_amount" key="12cross_usdt_amount"
+                                            align={"center"}
+                                            render={(text, record) => (text === null ? <Spin/> : text)}
+                                            className={"cross_son"}/>
+                                </ColumnGroup>
+                                <ColumnGroup title="L2->L1" className={"cross21a"}>
+                                    <Column title="ETH" dataIndex="w_eth_amount" key="21cross_eth_amount"
+                                            align={"center"}
+                                            render={(text, record) => (text === null ? <Spin/> : text)}
+                                            className={"cross_son"}/>
+                                    <Column title="DAI" dataIndex="w_dai_amount" key="21cross_dai_amount"
+                                            align={"center"}
+                                            render={(text, record) => (text === null ? <Spin/> : text)}
+                                            className={"cross_son"}/>
+                                    <Column title="USDC" dataIndex="w_usdc_amount" key="21cross_usdc_amount"
+                                            align={"center"}
+                                            render={(text, record) => (text === null ? <Spin/> : text)}
+                                            className={"cross_son"}/>
+                                    <Column title="WBTC" dataIndex="w_wbtc_amount" key="21cross_wbtc_amount"
+                                            align={"center"}
+                                            render={(text, record) => (text === null ? <Spin/> : text)}
+                                            className={"cross_son"}/>
+                                    <Column title="USDT" dataIndex="w_usdt_amount" key="21cross_usdt_amount"
+                                            align={"center"}
+                                            render={(text, record) => (text === null ? <Spin/> : text)}
+                                            className={"cross_son"}/>
+                                </ColumnGroup>
                             </ColumnGroup>
                         </ColumnGroup>
-                        <ColumnGroup title="官方桥跨链额" className={"cross"}>
-                            <ColumnGroup title="L1->L2" className={"cross12a"}>
-                                <Column title="ETH" dataIndex="d_eth_amount"
-                                        key="12cross_eth_amount"
-                                        align={"center"}
-                                        render={(text, record) => (text === null ? <Spin/> : text)}
-                                        className={"cross_son"}/>
-                                <Column title="DAI" dataIndex="d_dai_amount" key="12cross_dai_amount"
-                                        align={"center"}
-                                        render={(text, record) => (text === null ? <Spin/> : text)}
-                                        className={"cross_son"}/>
-                                <Column title="USDC" dataIndex="d_usdc_amount" key="12cross_usdc_amount"
-                                        align={"center"}
-                                        render={(text, record) => (text === null ? <Spin/> : text)}
-                                        className={"cross_son"}/>
-                                <Column title="WBTC" dataIndex="d_wbtc_amount" key="12cross_wbtc_amount"
-                                        align={"center"}
-                                        render={(text, record) => (text === null ? <Spin/> : text)}
-                                        className={"cross_son"}/>
-                                <Column title="USDT" dataIndex="d_usdt_amount" key="12cross_usdt_amount"
-                                        align={"center"}
-                                        render={(text, record) => (text === null ? <Spin/> : text)}
-                                        className={"cross_son"}/>
-                            </ColumnGroup>
-                            <ColumnGroup title="L2->L1" className={"cross21a"}>
-                                <Column title="ETH" dataIndex="w_eth_amount" key="21cross_eth_amount"
-                                        align={"center"}
-                                        render={(text, record) => (text === null ? <Spin/> : text)}
-                                        className={"cross_son"}/>
-                                <Column title="DAI" dataIndex="w_dai_amount" key="21cross_dai_amount"
-                                        align={"center"}
-                                        render={(text, record) => (text === null ? <Spin/> : text)}
-                                        className={"cross_son"}/>
-                                <Column title="USDC" dataIndex="w_usdc_amount" key="21cross_usdc_amount"
-                                        align={"center"}
-                                        render={(text, record) => (text === null ? <Spin/> : text)}
-                                        className={"cross_son"}/>
-                                <Column title="WBTC" dataIndex="w_wbtc_amount" key="21cross_wbtc_amount"
-                                        align={"center"}
-                                        render={(text, record) => (text === null ? <Spin/> : text)}
-                                        className={"cross_son"}/>
-                                <Column title="USDT" dataIndex="w_usdt_amount" key="21cross_usdt_amount"
-                                        align={"center"}
-                                        render={(text, record) => (text === null ? <Spin/> : text)}
-                                        className={"cross_son"}/>
-                            </ColumnGroup>
-                        </ColumnGroup>
-                    </ColumnGroup>
-                    <Column
-                        className={"action"}
-                        title="操作"
-                        key="action"
-                        align={"center"}
-                        render={(text, record) => (
-                            <Space size="small">
-                                <Button
-                                    type="primary"
-                                    danger
-                                    onClick={() => handleDelete(record.key)}
-                                >
-                                    删除
-                                </Button>
-                            </Space>
-                        )}
-                        fixed={"right"}
-                    />
-                </Table>
+                        <Column
+                            className={"action"}
+                            title="操作"
+                            key="action"
+                            align={"center"}
+                            render={(text, record) => (
+                                <Space size="small">
+                                    <Button
+                                        type="primary"
+                                        danger
+                                        onClick={() => handleDelete(record.key)}
+                                    >
+                                        删除
+                                    </Button>
+                                </Space>
+                            )}
+                            fixed={"right"}
+                        />
+                    </Table>
+                </Spin>
                 <Card>
                     <div style={{width: '100%', display: 'flex', justifyContent: 'space-between'}}>
                         <Button type="primary" onClick={() => {

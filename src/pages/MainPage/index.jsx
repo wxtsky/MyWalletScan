@@ -11,60 +11,70 @@ import MyFooter from "@components/MyFooter/index.jsx";
 
 function MainPage() {
     const location = useLocation();
-    const [loading, setLoading] = useState(false);
     const antIcon = (
         <LoadingOutlined
             style={{
-                fontSize: 24,
+                fontSize: 50,
             }}
             spin
         />
     );
-    useEffect(() => {
-        setLoading(true);
-        setTimeout(() => {
-            setLoading(false);
-        }, 500);
-    }, [location.pathname]);
+
     return (
-        <div>
+        <div
+            style={{
+                backgroundColor: "#f0f2f5",
+                minHeight: "100vh",
+            }}
+        >
             <Layout>
-                <div style={{
-                    position: 'fixed',
-                    top: 0,
-                    width: '100%',
-                    zIndex: 1000,
-                }}>
-                    <MenuHeader/>
-                </div>
-                <div style={{paddingTop: '60px', paddingBottom: '60px'}}>
-                    {loading ?
-                        <Spin size="large" style={{
-                            position: 'absolute',
-                            top: '50%',
-                            left: '50%',
-                            transform: 'translate(-50%, -50%)'
+                <div
+                    style={{
+                        position: "fixed",
+                        top: 0,
+                        width: "100%",
+                        zIndex: 1000,
+                    }}
+                >
+                    <MenuHeader
+                        style={{
+                            backgroundColor: "#f0f2f5",
+                            borderBottom: "1px solid #e8e8e8",
+                            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.06)",
                         }}
-                              indicator={antIcon}
-                        /> :
-                        <div style={{minHeight: "80vh"}}>
-                            {location.pathname === '/' && <Zksync/>}
-                            {location.pathname === '/zksync' && <Zksync/>}
-                            {location.pathname === '/stark' && <Stark/>}
-                        </div>
-                    }
+                    />
+                </div>
+                <div
+                    style={{
+                        paddingTop: "25px",
+                        minHeight: "95vh",
+                        backgroundColor: "#fff",
+                        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.06)",
+                        borderRadius: "4px",
+                        marginTop: "20px",
+                    }}
+                >
+                    <div>
+                        {location.pathname === "/" && <Zksync/>}
+                        {location.pathname === "/zksync" && <Zksync/>}
+                        {location.pathname === "/stark" && <Stark/>}
+                    </div>
                 </div>
                 <Footer
                     style={{
-                        textAlign: 'center',
-                        width: '100%',
+                        backgroundColor: "#f0f2f5",
+                        // borderTop: "1px solid #e8e8e8",
+                        // boxShadow: "0 -2px 8px rgba(0, 0, 0, 0.06)",
+                        // padding: "20px",
+                        textAlign: "center",
+                        width: "100%",
                     }}
                 >
                     <MyFooter/>
                 </Footer>
             </Layout>
         </div>
-    )
+    );
 }
 
 export default MainPage;

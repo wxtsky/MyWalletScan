@@ -26,6 +26,7 @@ function Zksync() {
     const [form] = Form.useForm();
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [tableLoading, setTableLoading] = useState(false);
     const handleOk = async () => {
         try {
             const values = await form.validateFields();
@@ -394,7 +395,11 @@ function Zksync() {
         exportToExcel(data, 'walletInfo');
     }
     useEffect(() => {
+        setTableLoading(true);
         const storedAddresses = localStorage.getItem('addresses');
+        setTimeout(() => {
+            setTableLoading(false);
+        }, 500);
         if (storedAddresses) {
             setData(JSON.parse(storedAddresses));
         }
@@ -424,7 +429,7 @@ function Zksync() {
     const [editingKey, setEditingKey] = useState(null);
     return (
         <div>
-            <Content style={{padding: "1px"}}>
+            <Content>
                 <Modal title="批量添加地址" open={isBatchModalVisible} onOk={handleBatchOk}
                        onCancel={handleBatchCancel}
                        okButtonProps={{loading: isLoading}}
@@ -451,110 +456,112 @@ function Zksync() {
                         </Form.Item>
                     </Form>
                 </Modal>
-                <Table
-                    rowSelection={{
-                        type: 'checkbox',
-                        ...rowSelection,
-                    }}
-                    dataSource={data}
-                    pagination={false}
-                    bordered={true}
-                    style={{marginBottom: "20px"}}
-                    size={"small"}
-                >
-                    <Column
-                        title="备注"
-                        dataIndex="name"
-                        key="name"
-                        align={"center"}
-                        className={"name"}
-                        render={(text, record) => {
-                            const isEditing = record.key === editingKey; // Check if this row is being edited
-                            return isEditing ? (
-                                <Input
-                                    placeholder="请输入备注"
-                                    defaultValue={text}
-                                    onPressEnter={(e) => {
-                                        record.name = e.target.value;
-                                        setData([...data]);
-                                        localStorage.setItem('addresses', JSON.stringify(data));
-                                        setEditingKey(null); // Stop editing when Enter is pressed
-                                    }}
-                                />
-                            ) : (
-                                <>
-                                    <Tag color="blue">{text}</Tag>
-                                    <Button
-                                        shape="circle"
-                                        icon={<EditOutlined/>}
-                                        size={"small"}
-                                        onClick={() => setEditingKey(record.key)} // Start editing when the button is clicked
-                                    />
-                                </>
-                            );
+                <Spin spinning={tableLoading}>
+                    <Table
+                        rowSelection={{
+                            type: 'checkbox',
+                            ...rowSelection,
                         }}
-                    />
-                    <Column title="钱包地址" dataIndex="address" key="address" align={"center"}
-                            className={"address"}/>
-                    <ColumnGroup title="ETH" className={"eth"}>
-                        <Column title="ETH" dataIndex="eth_balance" key="eth_balance" align={"center"}
-                                render={(text, record) => (text === null ? <Spin/> : text)} className={"eth_son"}/>
-                        <Column title="Tx" dataIndex="eth_tx_amount" key="eth_tx_amount" align={"center"}
-                                render={(text, record) => (text === null ? <Spin/> : text)} className={"eth_son"}/>
-                    </ColumnGroup>
-                    <ColumnGroup title="zkSyncLite" className={"zksync1"}>
-                        <Column title="ETH" dataIndex="zks1_balance" key="zks1_balance" align={"center"}
-                                render={(text, record) => (text === null ? <Spin/> : text)} className={"zks1_son"}/>
-                        <Column title="Tx" dataIndex="zks1_tx_amount" key="zks1_tx_amount" align={"center"}
-                                render={
-                                    (text, record) => (text === null ? <Spin/> : text)
-                                } className={"zks1_son"}/>
-                    </ColumnGroup>
-                    <ColumnGroup title="zkSyncEra" className={"zksync2"}>
-                        <Column title="ETH" dataIndex="zks2_balance" key="zks2_balance" align={"center"}
-                                render={(text, record) => (text === null ? <Spin/> : text)} className={"zks2_son"}/>
-                        <Column title="Tx" dataIndex="zks2_tx_amount" key="zks2_tx_amount" align={"center"}
-                                render={(text, record) => (text === null ? <Spin/> : text)} className={"zks2_son"}/>
-                        <Column title="最后交易" dataIndex="zks2_last_tx" key="zks2_last_tx" align={"center"}
-                                render={(text, record) => (text === null ? <Spin/> :
-                                    <a href={"https://explorer.zksync.io/address/" + record.address}
-                                       target={"_blank"}>{text}</a>)}
-                                className={"zks2_son"}/>
-                        <ColumnGroup title="官方桥跨链Tx数" className={"cross"}>
-                            <Column title="L1->L2" dataIndex="l1Tol2Times" key="l1Tol2Tx" align={"center"}
-                                    render={(text, record) => (text === null ? <Spin/> : text)}
-                                    className={"cross_son"}/>
-                            <Column title="L2->L1" dataIndex="l2Tol1Times" key="l2Tol1Tx" align={"center"}
-                                    render={(text, record) => (text === null ? <Spin/> : text)}
-                                    className={"cross_son"}/>
+                        dataSource={data}
+                        pagination={false}
+                        bordered={true}
+                        style={{marginBottom: "20px"}}
+                        size={"small"}
+                    >
+                        <Column
+                            title="备注"
+                            dataIndex="name"
+                            key="name"
+                            align={"center"}
+                            className={"name"}
+                            render={(text, record) => {
+                                const isEditing = record.key === editingKey; // Check if this row is being edited
+                                return isEditing ? (
+                                    <Input
+                                        placeholder="请输入备注"
+                                        defaultValue={text}
+                                        onPressEnter={(e) => {
+                                            record.name = e.target.value;
+                                            setData([...data]);
+                                            localStorage.setItem('addresses', JSON.stringify(data));
+                                            setEditingKey(null); // Stop editing when Enter is pressed
+                                        }}
+                                    />
+                                ) : (
+                                    <>
+                                        <Tag color="blue">{text}</Tag>
+                                        <Button
+                                            shape="circle"
+                                            icon={<EditOutlined/>}
+                                            size={"small"}
+                                            onClick={() => setEditingKey(record.key)} // Start editing when the button is clicked
+                                        />
+                                    </>
+                                );
+                            }}
+                        />
+                        <Column title="钱包地址" dataIndex="address" key="address" align={"center"}
+                                className={"address"}/>
+                        <ColumnGroup title="ETH" className={"eth"}>
+                            <Column title="ETH" dataIndex="eth_balance" key="eth_balance" align={"center"}
+                                    render={(text, record) => (text === null ? <Spin/> : text)} className={"eth_son"}/>
+                            <Column title="Tx" dataIndex="eth_tx_amount" key="eth_tx_amount" align={"center"}
+                                    render={(text, record) => (text === null ? <Spin/> : text)} className={"eth_son"}/>
                         </ColumnGroup>
-                        <ColumnGroup title="官方桥跨链金额(ETH)" className={"cross"}>
-                            <Column title="L1->L2" dataIndex="l1Tol2Amount" key="l1Tol2Amount" align={"center"}
-                                    render={(text, record) => (text === null ? <Spin/> : text)}
-                                    className={"cross_son"}/>
-                            <Column title="L2->L1" dataIndex="l2Tol1Amount" key="l2Tol1Amount" align={"center"}
-                                    render={(text, record) => (text === null ? <Spin/> : text)}
-                                    className={"cross_son"}/>
+                        <ColumnGroup title="zkSyncLite" className={"zksync1"}>
+                            <Column title="ETH" dataIndex="zks1_balance" key="zks1_balance" align={"center"}
+                                    render={(text, record) => (text === null ? <Spin/> : text)} className={"zks1_son"}/>
+                            <Column title="Tx" dataIndex="zks1_tx_amount" key="zks1_tx_amount" align={"center"}
+                                    render={
+                                        (text, record) => (text === null ? <Spin/> : text)
+                                    } className={"zks1_son"}/>
                         </ColumnGroup>
-                    </ColumnGroup>
-                    <Column
-                        className={"action"}
-                        title="操作"
-                        key="action"
-                        align={"center"}
-                        render={(text, record) => (
-                            <Space size="small">
-                                <Button
-                                    type="primary"
-                                    danger
-                                    onClick={() => handleDelete(record.key)}
-                                >
-                                    删除
-                                </Button>
-                            </Space>
-                        )}
-                    />
-                </Table>
+                        <ColumnGroup title="zkSyncEra" className={"zksync2"}>
+                            <Column title="ETH" dataIndex="zks2_balance" key="zks2_balance" align={"center"}
+                                    render={(text, record) => (text === null ? <Spin/> : text)} className={"zks2_son"}/>
+                            <Column title="Tx" dataIndex="zks2_tx_amount" key="zks2_tx_amount" align={"center"}
+                                    render={(text, record) => (text === null ? <Spin/> : text)} className={"zks2_son"}/>
+                            <Column title="最后交易" dataIndex="zks2_last_tx" key="zks2_last_tx" align={"center"}
+                                    render={(text, record) => (text === null ? <Spin/> :
+                                        <a href={"https://explorer.zksync.io/address/" + record.address}
+                                           target={"_blank"}>{text}</a>)}
+                                    className={"zks2_son"}/>
+                            <ColumnGroup title="官方桥跨链Tx数" className={"cross"}>
+                                <Column title="L1->L2" dataIndex="l1Tol2Times" key="l1Tol2Tx" align={"center"}
+                                        render={(text, record) => (text === null ? <Spin/> : text)}
+                                        className={"cross_son"}/>
+                                <Column title="L2->L1" dataIndex="l2Tol1Times" key="l2Tol1Tx" align={"center"}
+                                        render={(text, record) => (text === null ? <Spin/> : text)}
+                                        className={"cross_son"}/>
+                            </ColumnGroup>
+                            <ColumnGroup title="官方桥跨链金额(ETH)" className={"cross"}>
+                                <Column title="L1->L2" dataIndex="l1Tol2Amount" key="l1Tol2Amount" align={"center"}
+                                        render={(text, record) => (text === null ? <Spin/> : text)}
+                                        className={"cross_son"}/>
+                                <Column title="L2->L1" dataIndex="l2Tol1Amount" key="l2Tol1Amount" align={"center"}
+                                        render={(text, record) => (text === null ? <Spin/> : text)}
+                                        className={"cross_son"}/>
+                            </ColumnGroup>
+                        </ColumnGroup>
+                        <Column
+                            className={"action"}
+                            title="操作"
+                            key="action"
+                            align={"center"}
+                            render={(text, record) => (
+                                <Space size="small">
+                                    <Button
+                                        type="primary"
+                                        danger
+                                        onClick={() => handleDelete(record.key)}
+                                    >
+                                        删除
+                                    </Button>
+                                </Space>
+                            )}
+                        />
+                    </Table>
+                </Spin>
                 <Card>
                     <div style={{width: '100%', display: 'flex', justifyContent: 'space-between'}}>
                         <Button type="primary" onClick={showModal} size={"large"} style={{width: "20%"}}>
