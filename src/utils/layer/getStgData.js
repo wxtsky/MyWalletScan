@@ -23,36 +23,41 @@ const keyMap = {
 let txMap = {}
 
 async function getStgData(address) {
-    for (let net in netMap) {
+    const txMapPromises = Object.keys(netMap).map(async (net) => {
         try {
-            const u = netMap[net]
-            const k = keyMap[net]
-            let tx = 0
-            address = address.toLowerCase()
-            const url = u + "/api?module=account&action=txlist&address=" + address + "&startblock=0&endblock=99999999&page=1&offset=10000&sort=asc&apikey=" + k
-            const res = await axios.get(url)
+            const u = netMap[net];
+            const k = keyMap[net];
+            let tx = 0;
+            address = address.toLowerCase();
+            const url = `${u}/api?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&page=1&offset=10000&sort=asc&apikey=${k}`;
+            const res = await axios.get(url);
             for (let i = 0; i < res.data.result.length; i++) {
-                const methodId = res.data.result[i].input.slice(0, 10)
+                const methodId = res.data.result[i].input.slice(0, 10);
                 if (res.data.result[i].from === address && res.data.result[i]['txreceipt_status'] === "1") {
                     if (methodId === "0x9fbf10fc" || methodId === "0x1114cd2a" || methodId === "0x76a9099a" || methodId === "0x2e15238c") {
-                        tx += 1
+                        tx += 1;
                     }
                 }
             }
-            txMap[net] = tx
+            return {net, tx};
         } catch (e) {
-            console.log(e.message)
-            txMap[net] = "error"
+            console.log(e.message);
+            return {net, tx: "error"};
         }
-    }
+    });
+
+    const txMapResults = await Promise.all(txMapPromises);
     let totalTx = 0;
-    for (let net in txMap) {
-        if (txMap[net] !== "error") {
-            totalTx += txMap[net]
+
+    txMapResults.forEach(({net, tx}) => {
+        if (tx !== "error") {
+            totalTx += tx;
         }
-    }
-    txMap["total"] = totalTx
-    return txMap
+        txMap[net] = tx;
+    });
+
+    txMap["total"] = totalTx;
+    return txMap;
 }
 
 
