@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react";
-import {Button, Input, Space, Typography, Table, Modal, Form, notification, Spin, Tag} from 'antd';
+import {Button, Input, Space, Typography, Table, Modal, Form, notification, Spin, Tag, Checkbox} from 'antd';
 import {Layout, Card} from 'antd';
 import {
     getStarkTx,
@@ -42,10 +42,10 @@ const Stark = () => {
     const handleOk = async () => {
         try {
             const values = await form.validateFields();
-            if (values.address.length === 0) {
+            if (values.address.length !== 66 && values.address.length !== 64) {
                 notification.error({
                     message: "错误",
-                    description: "请输入正确的stark地址",
+                    description: "请输入正确的stark地址(64位)",
                 }, 2);
                 return;
             }
@@ -218,10 +218,10 @@ const Stark = () => {
             const newData = [...data];
             for (let address of addresses) {
                 address = address.trim();
-                if (address.length === 0) {
+                if (values.address.length !== 66 && values.address.length !== 64) {
                     notification.error({
                         message: "错误",
-                        description: "请输入正确的地址",
+                        description: "请输入正确的stark地址(64位)",
                     });
                     continue;
                 }
