@@ -13,6 +13,7 @@ const Layer = () => {
     const [selectedKeys, setSelectedKeys] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [isBatchModalVisible, setIsBatchModalVisible] = useState(false);
+    const [tableLoading, setTableLoading] = useState(false);
     const rowSelection = {
         onChange: (selectedRowKeys, selectedRows) => {
             setSelectedKeys(selectedRowKeys);
@@ -379,81 +380,89 @@ const Layer = () => {
         ]
     ;
     useEffect(() => {
-        const addresses = JSON.parse(localStorage.getItem('l0_addresses'));
-        if (addresses) {
-            setData(addresses);
+        setTableLoading(true)
+        const storedAddresses = localStorage.getItem('l0_addresses');
+        setTimeout(() => {
+            setTableLoading(false);
+        }, 500);
+        if (storedAddresses) {
+            setData(JSON.parse(storedAddresses));
         }
-    }, [])
+    }, []);
     return (
         <div>
-            <Modal title="批量添加地址" open={isBatchModalVisible} onOk={handleBatchOk}
-                   onCancel={() => {
-                       setIsBatchModalVisible(false)
-                       batchForm.resetFields()
-                   }}
-                   okText={"添加地址"}
-                   cancelText={"取消"}
-            >
-                <Form form={batchForm} layout="vertical">
-                    <Form.Item label="地址" name="addresses" rules={[{required: true}]}>
-                        <TextArea placeholder="请输入地址，每行一个"
-                                  style={{width: "500px", height: "200px"}}
-                        />
-                    </Form.Item>
-                </Form>
-            </Modal>
-            <Modal title="添加地址" open={isModalVisible} onOk={handleOk}
-                   onCancel={() => setIsModalVisible(false)}
-                   okText={"添加地址"}
-                   cancelText={"取消"}
-            >
-                <Form form={form} layout="vertical">
-                    <Form.Item label="地址" name="address" rules={[{required: true}]}>
-                        <Input placeholder="请输入地址"/>
-                    </Form.Item>
-                    <Form.Item label="备注" name="name" rules={[{required: true}]}>
-                        <Input placeholder="请输入备注"/>
-                    </Form.Item>
-                </Form>
-            </Modal>
-            <Table
-                columns={columns}
-                dataSource={data}
-                rowSelection={{
-                    type: 'checkbox',
-                    ...rowSelection,
-                }}
-                pagination={false}
-                bordered={true}
-                size={"small"}
-            />
-            <Card>
-                <div style={{width: '100%', display: 'flex', justifyContent: 'space-between'}}>
-                    <Button type="primary" onClick={() => {
-                        setIsModalVisible(true)
-                    }} size={"large"} style={{width: "20%"}}>
-                        添加地址
-                    </Button>
-                    <Button type="primary" onClick={() => {
-                        setIsBatchModalVisible(true)
-                    }} size={"large"} style={{width: "20%"}}>
-                        批量添加地址
-                    </Button>
-                    <Button type="primary" onClick={handleRefresh} loading={isLoading} size={"large"}
-                            style={{width: "20%"}}
-                            disabled={!selectedKeys.length}>
-                        刷新选中地址
-                    </Button>
-                    <Button type="primary" danger onClick={handleDeleteSelected} size={"large"}
-                            style={{width: "20%"}}
-                            disabled={!selectedKeys.length}>
-                        删除选中地址
-                    </Button>
-                    <Button type="primary" icon={<DownloadOutlined/>} size={"large"} style={{width: "8%"}}
-                            onClick={exportToExcelFile}
+            <Content>
+                <Modal title="批量添加地址" open={isBatchModalVisible} onOk={handleBatchOk}
+                       onCancel={() => {
+                           setIsBatchModalVisible(false)
+                           batchForm.resetFields()
+                       }}
+                       okText={"添加地址"}
+                       cancelText={"取消"}
+                >
+                    <Form form={batchForm} layout="vertical">
+                        <Form.Item label="地址" name="addresses" rules={[{required: true}]}>
+                            <TextArea placeholder="请输入地址，每行一个"
+                                      style={{width: "500px", height: "200px"}}
+                            />
+                        </Form.Item>
+                    </Form>
+                </Modal>
+                <Modal title="添加地址" open={isModalVisible} onOk={handleOk}
+                       onCancel={() => setIsModalVisible(false)}
+                       okText={"添加地址"}
+                       cancelText={"取消"}
+                >
+                    <Form form={form} layout="vertical">
+                        <Form.Item label="地址" name="address" rules={[{required: true}]}>
+                            <Input placeholder="请输入地址"/>
+                        </Form.Item>
+                        <Form.Item label="备注" name="name" rules={[{required: true}]}>
+                            <Input placeholder="请输入备注"/>
+                        </Form.Item>
+                    </Form>
+                </Modal>
+                <Spin loading={tableLoading}>
+                    <Table
+                        columns={columns}
+                        dataSource={data}
+                        rowSelection={{
+                            type: 'checkbox',
+                            ...rowSelection,
+                        }}
+                        pagination={false}
+                        bordered={true}
+                        size={"small"}
                     />
-                </div>
-            </Card>
+                </Spin>
+                <Card>
+                    <div style={{width: '100%', display: 'flex', justifyContent: 'space-between'}}>
+                        <Button type="primary" onClick={() => {
+                            setIsModalVisible(true)
+                        }} size={"large"} style={{width: "20%"}}>
+                            添加地址
+                        </Button>
+                        <Button type="primary" onClick={() => {
+                            setIsBatchModalVisible(true)
+                        }} size={"large"} style={{width: "20%"}}>
+                            批量添加地址
+                        </Button>
+                        <Button type="primary" onClick={handleRefresh} loading={isLoading} size={"large"}
+                                style={{width: "20%"}}
+                                disabled={!selectedKeys.length}>
+                            刷新选中地址
+                        </Button>
+                        <Button type="primary" danger onClick={handleDeleteSelected} size={"large"}
+                                style={{width: "20%"}}
+                                disabled={!selectedKeys.length}>
+                            删除选中地址
+                        </Button>
+                        <Button type="primary" icon={<DownloadOutlined/>} size={"large"} style={{width: "8%"}}
+                                onClick={exportToExcelFile}
+                        />
+                    </div>
+                </Card>
+            </Content>
         </div>
     )
 

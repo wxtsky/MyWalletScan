@@ -64,9 +64,6 @@ function MainPage() {
                 <Footer
                     style={{
                         backgroundColor: "#f0f2f5",
-                        // borderTop: "1px solid #e8e8e8",
-                        // boxShadow: "0 -2px 8px rgba(0, 0, 0, 0.06)",
-                        // padding: "20px",
                         textAlign: "center",
                         width: "100%",
                     }}
