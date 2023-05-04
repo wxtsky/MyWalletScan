@@ -1,8 +1,9 @@
 import {useEffect, useState} from "react";
-import {Button, Card, Form, Input, Modal, notification, Space, Spin, Table, Tag} from "antd";
+import {Button, Card, Form, Input, Layout, Modal, notification, Space, Spin, Table, Tag} from "antd";
 import {exportToExcel, getStgData} from "@utils";
 import {DownloadOutlined, EditOutlined} from "@ant-design/icons";
 
+const {Content} = Layout;
 const {TextArea} = Input;
 
 const Layer = () => {
@@ -422,7 +423,7 @@ const Layer = () => {
                         </Form.Item>
                     </Form>
                 </Modal>
-                <Spin loading={tableLoading}>
+                <Spin spinning={tableLoading}>
                     <Table
                         columns={columns}
                         dataSource={data}
