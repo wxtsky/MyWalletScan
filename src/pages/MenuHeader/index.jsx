@@ -10,6 +10,10 @@ const items = [
     {
         label: 'StarkWare',
         key: 'stark',
+    },
+    {
+        label: 'LayerZero',
+        key: 'layer',
     }
 ];
 const MenuHeader = () => {
@@ -27,6 +31,8 @@ const MenuHeader = () => {
             setCurrent('zksync')
         } else if (location.pathname === '/stark') {
             setCurrent('stark')
+        } else if (location.pathname === '/layer') {
+            setCurrent('layer')
         }
     }, [location.pathname]);
     useEffect(() => {
@@ -35,6 +41,9 @@ const MenuHeader = () => {
         }
         if (current === 'stark') {
             navigate('/stark');
+        }
+        if (current === 'layer') {
+            navigate('/layer');
         }
     }, [current]);
     return <Menu onClick={onClick} selectedKeys={[current]} mode="horizontal" items={items}/>;

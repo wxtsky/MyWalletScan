@@ -2,12 +2,12 @@ import MenuHeader from "@pages/MenuHeader/index.jsx";
 import Zksync from "@pages/Zksync/index.jsx";
 import {useLocation} from "react-router-dom";
 import Stark from "@pages/Stark/index.jsx";
-import {useEffect, useState} from "react";
 import {Layout, Spin} from "antd";
 import {LoadingOutlined} from "@ant-design/icons";
 
 const {Footer} = Layout;
 import MyFooter from "@components/MyFooter/index.jsx";
+import Layer from "@pages/Layer/index.jsx";
 
 function MainPage() {
     const location = useLocation();
@@ -58,6 +58,7 @@ function MainPage() {
                         {location.pathname === "/" && <Zksync/>}
                         {location.pathname === "/zksync" && <Zksync/>}
                         {location.pathname === "/stark" && <Stark/>}
+                        {location.pathname === "/layer" && <Layer/>}
                     </div>
                 </div>
                 <Footer

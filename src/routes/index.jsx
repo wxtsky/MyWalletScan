@@ -7,6 +7,7 @@ const Zksync = React.lazy(() => import("@pages/Zksync"));
 const App = React.lazy(() => import("@/App"));
 const MainPage = React.lazy(() => import("@pages/MainPage"));
 const Stark = React.lazy(() => import("@pages/Stark"));
+const Layer = React.lazy(() => import("@pages/Layer"));
 const router = [
     {
         path: '/', element: <MainPage/>,
@@ -23,6 +24,10 @@ const router = [
                 path: '/stark',
                 element: <Stark/>,
             },
+            {
+                path: '/Layer',
+                element: <Layer/>,
+            }
         ]
     },
     {path: "*", element: <Navigate to="/"/>},
