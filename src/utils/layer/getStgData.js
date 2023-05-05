@@ -35,7 +35,7 @@ async function getStgData(address) {
                 const methodId = res.data.result[i].input.slice(0, 10);
                 if (res.data.result[i].from === address && res.data.result[i]['txreceipt_status'] === "1") {
                     const methodIds =
-                        ["0x9fbf10fc", "0x1114cd2a", "0x76a9099a", "0x2e15238c", "0xae30f6ee", "0xc45dec27", "0x2cdf0b95", "0x879762e2", "0x656f3d64", "0x51905636", "0xad660825"];
+                        ["0x9fbf10fc", "0x1114cd2a", "0x76a9099a", "0x2e15238c", "0xae30f6ee", "0xc45dec27", "0x2cdf0b95", "0x879762e2", "0x656f3d64", "0x51905636", "0xad660825", "0xfe359a0d", "0xca23bb4c"];
                     if (methodIds.includes(methodId)) {
                         tx += 1;
                     }
