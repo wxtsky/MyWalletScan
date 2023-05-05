@@ -2,7 +2,7 @@ import MenuHeader from "@pages/MenuHeader/index.jsx";
 import Zksync from "@pages/Zksync/index.jsx";
 import {useLocation} from "react-router-dom";
 import Stark from "@pages/Stark/index.jsx";
-import {Layout, Spin} from "antd";
+import {Layout, Spin, Tag} from "antd";
 import {LoadingOutlined} from "@ant-design/icons";
 
 const {Footer} = Layout;
@@ -54,6 +54,10 @@ function MainPage() {
                         marginTop: "20px",
                     }}
                 >
+                    <Tag color={"red"}
+                         style={{marginBottom: "10px"}}>
+                        所有数据都存放在本地，不会上传到服务器，请放心使用，如果你喜欢这款工具，可以为我点赞吗，谢谢！
+                    </Tag>
                     <div>
                         {location.pathname === "/" && <Zksync/>}
                         {location.pathname === "/zksync" && <Zksync/>}

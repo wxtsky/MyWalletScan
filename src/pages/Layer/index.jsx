@@ -423,6 +423,10 @@ const Layer = () => {
                         </Form.Item>
                     </Form>
                 </Modal>
+                <Tag color="blue" style={{marginBottom: "10px"}}>
+                    获取数据使用的是作者的区块链浏览器API Key，用的人多可能会有卡顿报错的情况，如果有需要请自行申请API
+                    Key，并在Github Clone并修改代码
+                </Tag>
                 <Spin spinning={tableLoading}>
                     <Table
                         columns={columns}
