@@ -14,6 +14,10 @@ const items = [
     {
         label: 'LayerZero',
         key: 'layer',
+    },
+    {
+        label: 'Mirror',
+        key: 'mirror',
     }
 ];
 const MenuHeader = () => {
@@ -45,7 +49,27 @@ const MenuHeader = () => {
         if (current === 'layer') {
             navigate('/layer');
         }
+        if (current === 'mirror') {
+            navigate('/mirror');
+        }
     }, [current]);
-    return <Menu onClick={onClick} selectedKeys={[current]} mode="horizontal" items={items}/>;
+    return (
+        <Menu
+            onClick={onClick}
+            selectedKeys={[current]}
+            mode="horizontal"
+            style={{
+                display: 'flex',
+                justifyContent: 'center'
+            }}
+        >
+            {items.map(item =>
+                <Menu.Item key={item.key}>
+                    {item.label}
+                </Menu.Item>
+            )}
+        </Menu>
+    );
+
 };
 export default MenuHeader;

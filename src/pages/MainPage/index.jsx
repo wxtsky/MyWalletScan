@@ -8,6 +8,7 @@ import {LoadingOutlined} from "@ant-design/icons";
 const {Footer} = Layout;
 import MyFooter from "@components/MyFooter/index.jsx";
 import Layer from "@pages/Layer/index.jsx";
+import Mirror from "@pages/Mirror/index.jsx";
 
 function MainPage() {
     const location = useLocation();
@@ -63,6 +64,7 @@ function MainPage() {
                         {location.pathname === "/zksync" && <Zksync/>}
                         {location.pathname === "/stark" && <Stark/>}
                         {location.pathname === "/layer" && <Layer/>}
+                        {location.pathname === "/mirror" && <Mirror/>}
                     </div>
                 </div>
                 <Footer
