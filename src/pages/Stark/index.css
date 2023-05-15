@@ -1,89 +1,19 @@
-.ant-table-thead > tr > th.name {
-    background-color: #ecd35d;
-    color: white;
+.ant-table-small .ant-table-cell,
+.ant-table-small .ant-table-thead > tr > th {
+    padding: 4px 8px;
+    font-size: 14px;
 }
 
-.ant-table-thead > tr > th.eth {
-    background-color: #4CAF50;
-    color: white;
+.ant-table-small .ant-table-row {
+    line-height: 1.2;
 }
 
-.ant-table-thead > tr > th.eth_son {
-    background-color: #74af4c;
-    color: white;
-}
-
-.ant-table-thead > tr > th.zksync1 {
-    background-color: #f0ad4e;
-    color: white;
-}
-
-.ant-table-thead > tr > th.zks1_son {
-    background-color: #f0794e;
-    color: white;
-}
-
-.ant-table-thead > tr > th.zksync2 {
+.ant-table-thead > tr > th.stark_cross_tx {
     background-color: #5bc0de;
     color: white;
 }
 
-.ant-table-thead > tr > th.zks2_son {
+.ant-table-thead > tr > th.stark_cross_amount {
     background-color: #4e9ed4;
     color: white;
-}
-
-.ant-table-thead > tr > th.cross {
-    background-color: #d9534f;
-    color: white;
-}
-
-.ant-table-thead > tr > th.cross_son {
-    background-color: #d9784f;
-    color: white;
-}
-
-.ant-table-thead > tr > th.address {
-    background-color: #fdb0ad;
-    color: white;
-}
-
-.ant-table-thead > tr > th.action {
-    background-color: #9d9d9d;
-    color: white;
-}
-
-.ant-table-thead > tr > th.create_time {
-    background-color: #f59b9b;
-    color: white;
-}
-
-.ant-table-thead > tr > th.stark_id {
-    background-color: #f37b7b;
-    color: white;
-}
-
-.ant-table-thead > tr > th.cross12 {
-    background-color: #968b8b;
-    color: white;
-}
-
-.ant-table-thead > tr > th.cross21 {
-    background-color: #968b8b;
-    color: white;
-}
-
-.ant-table-thead > tr > th.cross12a {
-    background-color: #9cbec5;
-    color: white;
-}
-
-.ant-table-thead > tr > th.cross21a {
-    background-color: #9cbec5;
-    color: white;
-}
-
-.ant-table-cell {
-    text-align: center;
-    font-size: 20px;
 }

@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react";
-import {Button, Input, Space, Typography, Table, Modal, Form, notification, Spin, Tag, Checkbox} from 'antd';
+import {Button, Input, Space, Table, Modal, Form, notification, Spin, Tag} from 'antd';
 import {Layout, Card} from 'antd';
 import {
     getStarkTx,
@@ -7,7 +7,14 @@ import {
     getStarkInfo,
     exportToExcel,
 } from "@utils"
-import {DownloadOutlined, EditOutlined} from "@ant-design/icons";
+import {
+    DeleteOutlined,
+    DownloadOutlined,
+    EditOutlined,
+    PlusOutlined,
+    SyncOutlined,
+    UploadOutlined
+} from "@ant-design/icons";
 import './index.css'
 
 const {TextArea} = Input;
@@ -113,10 +120,11 @@ const Stark = () => {
                     setData(updatedData);
                     localStorage.setItem('stark_addresses', JSON.stringify(data));
                 })
-                getStarkTx(values.address).then(({tx}) => {
+                getStarkTx(values.address).then(({tx, stark_latest_tx}) => {
                     updatedData[index] = {
                         ...updatedData[index],
                         stark_tx_amount: tx,
+                        stark_latest_tx: stark_latest_tx
                     };
                     setData(updatedData);
                     localStorage.setItem('stark_addresses', JSON.stringify(data));
@@ -150,13 +158,15 @@ const Stark = () => {
                     w_wbtc_amount: null,
                     w_wbtc_count: null,
                     stark_tx_amount: null,
+                    stark_latest_tx: null,
                     total_deposit_count: null,
                     total_widthdraw_count: null
                 };
                 const newData = [...data, newEntry];
                 setData(newData);
-                getStarkTx(values.address).then(({tx}) => {
+                getStarkTx(values.address).then(({tx, stark_latest_tx}) => {
                     newEntry.stark_tx_amount = tx;
+                    newEntry.stark_latest_tx = stark_latest_tx;
                     setData([...newData]);
                     localStorage.setItem('stark_addresses', JSON.stringify(newData));
                 })
@@ -236,10 +246,11 @@ const Stark = () => {
                 const index = newData.findIndex(item => item.address === address);
                 if (index !== -1) {
                     const updatedData = [...newData];
-                    getStarkTx(address).then(({tx}) => {
+                    getStarkTx(address).then(({tx, stark_latest_tx}) => {
                         updatedData[index] = {
                             ...updatedData[index],
                             stark_tx_amount: tx,
+                            stark_latest_tx: stark_latest_tx,
                         };
                         setData(updatedData);
                         localStorage.setItem('stark_addresses', JSON.stringify(updatedData));
@@ -322,14 +333,16 @@ const Stark = () => {
                         w_wbtc_amount: null,
                         w_wbtc_count: null,
                         stark_tx_amount: null,
+                        stark_latest_tx: null,
                         total_deposit_count: null,
                         total_widthdraw_count: null
 
                     };
                     newData.push(newEntry);
                     setData(newData);
-                    getStarkTx(address).then(({tx}) => {
+                    getStarkTx(address).then(({tx, stark_latest_tx}) => {
                         newEntry.stark_tx_amount = tx;
+                        newEntry.stark_latest_tx = stark_latest_tx;
                         setData([...newData]);
                         localStorage.setItem('stark_addresses', JSON.stringify(newData));
                     })
@@ -407,6 +420,7 @@ const Stark = () => {
                 if (index !== -1) {
                     const item = newData[index];
                     item.stark_tx_amount = null;
+                    item.stark_latest_tx = null;
                     item.stark_eth_balance = null;
                     item.stark_id = null;
                     item.create_time = null;
@@ -433,8 +447,9 @@ const Stark = () => {
                     item.total_widthdraw_count = null;
                     item.total_deposit_count = null;
                     setData([...newData]);
-                    getStarkTx(item.address).then(({tx}) => {
+                    getStarkTx(item.address).then(({tx, stark_latest_tx}) => {
                         item.stark_tx_amount = tx;
+                        item.stark_latest_tx = stark_latest_tx;
                         setData([...newData]);
                         localStorage.setItem('stark_addresses', JSON.stringify(data));
                     })
@@ -548,9 +563,6 @@ const Stark = () => {
                         bordered={true}
                         style={{marginBottom: "20px"}}
                         size={"small"}
-                        scroll={{
-                            x: 3500,
-                        }}
                     >
                         <Column
                             title="备注"
@@ -558,7 +570,6 @@ const Stark = () => {
                             key="name"
                             align={"center"}
                             className={"name"}
-                            fixed={"left"}
                             render={(text, record) => {
                                 const isEditing = record.key === editingKey; // Check if this row is being edited
                                 return isEditing ? (
@@ -590,7 +601,6 @@ const Stark = () => {
                                 render={(text, record) => (
                                     text === null ? <Spin/> : text.slice(0, 4) + "..." + text.slice(-4)
                                 )}
-                                fixed={"left"}
                         />
                         <Column title="创建时间" dataIndex="create_time" key="create_time" align={"center"}
                                 className={"create_time"}
@@ -617,21 +627,17 @@ const Stark = () => {
                                     render={(text, record) => (text === null ? <Spin/> : text)} className={"zks2_son"}/>
                             <Column title="Tx" dataIndex="stark_tx_amount" key="stark_tx_amount" align={"center"}
                                     render={(text, record) => (text === null ? <Spin/> : text)} className={"zks2_son"}/>
-                            <ColumnGroup title="官方桥Tx" className={"cross"}>
+                            <Column title="最后交易时间" dataIndex="stark_latest_tx" key="stark_latest_tx"
+                                    align={"center"}
+                                    render={(text, record) => (text === null ? <Spin/> : text)} className={"zks2_son"}/>
+                            <ColumnGroup title="官方桥Tx数量" className={"stark_cross_tx"}>
                                 <ColumnGroup title="L1->L2" className={"cross12"}>
                                     <Column title="ETH"
                                             dataIndex="d_eth_count"
                                             key="12cross_eth_tx" align={"center"}
                                             render={(text, record) => (text === null ? <Spin/> : text)}
                                             className={"cross_son"}/>
-                                    <Column title="DAI" dataIndex="d_dai_count" key="12cross_dai_tx" align={"center"}
-                                            render={(text, record) => (text === null ? <Spin/> : text)}
-                                            className={"cross_son"}/>
                                     <Column title="USDC" dataIndex="d_usdc_count" key="12cross_usdc_tx"
-                                            align={"center"}
-                                            render={(text, record) => (text === null ? <Spin/> : text)}
-                                            className={"cross_son"}/>
-                                    <Column title="WBTC" dataIndex="d_wbtc_count" key="12cross_wbtc_tx"
                                             align={"center"}
                                             render={(text, record) => (text === null ? <Spin/> : text)}
                                             className={"cross_son"}/>
@@ -648,14 +654,7 @@ const Stark = () => {
                                     <Column title="ETH" dataIndex="w_eth_count" key="21cross_eth_tx" align={"center"}
                                             render={(text, record) => (text === null ? <Spin/> : text)}
                                             className={"cross_son"}/>
-                                    <Column title="DAI" dataIndex="w_dai_count" key="21cross_dai_tx" align={"center"}
-                                            render={(text, record) => (text === null ? <Spin/> : text)}
-                                            className={"cross_son"}/>
                                     <Column title="USDC" dataIndex="w_usdc_count" key="21cross_usdc_tx"
-                                            align={"center"}
-                                            render={(text, record) => (text === null ? <Spin/> : text)}
-                                            className={"cross_son"}/>
-                                    <Column title="WBTC" dataIndex="w_wbtc_count" key="21cross_wbtc_tx"
                                             align={"center"}
                                             render={(text, record) => (text === null ? <Spin/> : text)}
                                             className={"cross_son"}/>
@@ -669,22 +668,14 @@ const Stark = () => {
                                             className={"cross_son"}/>
                                 </ColumnGroup>
                             </ColumnGroup>
-                            <ColumnGroup title="官方桥跨链额" className={"cross"}>
+                            <ColumnGroup title="官方桥跨链额" className={"stark_cross_amount"}>
                                 <ColumnGroup title="L1->L2" className={"cross12a"}>
                                     <Column title="ETH" dataIndex="d_eth_amount"
                                             key="12cross_eth_amount"
                                             align={"center"}
                                             render={(text, record) => (text === null ? <Spin/> : text)}
                                             className={"cross_son"}/>
-                                    <Column title="DAI" dataIndex="d_dai_amount" key="12cross_dai_amount"
-                                            align={"center"}
-                                            render={(text, record) => (text === null ? <Spin/> : text)}
-                                            className={"cross_son"}/>
                                     <Column title="USDC" dataIndex="d_usdc_amount" key="12cross_usdc_amount"
-                                            align={"center"}
-                                            render={(text, record) => (text === null ? <Spin/> : text)}
-                                            className={"cross_son"}/>
-                                    <Column title="WBTC" dataIndex="d_wbtc_amount" key="12cross_wbtc_amount"
                                             align={"center"}
                                             render={(text, record) => (text === null ? <Spin/> : text)}
                                             className={"cross_son"}/>
@@ -698,15 +689,7 @@ const Stark = () => {
                                             align={"center"}
                                             render={(text, record) => (text === null ? <Spin/> : text)}
                                             className={"cross_son"}/>
-                                    <Column title="DAI" dataIndex="w_dai_amount" key="21cross_dai_amount"
-                                            align={"center"}
-                                            render={(text, record) => (text === null ? <Spin/> : text)}
-                                            className={"cross_son"}/>
                                     <Column title="USDC" dataIndex="w_usdc_amount" key="21cross_usdc_amount"
-                                            align={"center"}
-                                            render={(text, record) => (text === null ? <Spin/> : text)}
-                                            className={"cross_son"}/>
-                                    <Column title="WBTC" dataIndex="w_wbtc_amount" key="21cross_wbtc_amount"
                                             align={"center"}
                                             render={(text, record) => (text === null ? <Spin/> : text)}
                                             className={"cross_son"}/>
@@ -733,7 +716,7 @@ const Stark = () => {
                                     </Button>
                                 </Space>
                             )}
-                            fixed={"right"}
+                            // fixed={"right"}
                         />
                     </Table>
                 </Spin>
@@ -741,22 +724,22 @@ const Stark = () => {
                     <div style={{width: '100%', display: 'flex', justifyContent: 'space-between'}}>
                         <Button type="primary" onClick={() => {
                             setIsModalVisible(true)
-                        }} size={"large"} style={{width: "20%"}}>
+                        }} size={"large"} style={{width: "20%"}} icon={<PlusOutlined/>}>
                             添加地址
                         </Button>
                         <Button type="primary" onClick={() => {
                             setIsBatchModalVisible(true)
-                        }} size={"large"} style={{width: "20%"}}>
+                        }} size={"large"} style={{width: "20%"}} icon={<UploadOutlined/>}>
                             批量添加地址
                         </Button>
                         <Button type="primary" onClick={handleRefresh} loading={isLoading} size={"large"}
                                 style={{width: "20%"}}
-                                disabled={!selectedKeys.length}>
+                                disabled={!selectedKeys.length} icon={<SyncOutlined/>}>
                             刷新选中地址
                         </Button>
                         <Button type="primary" danger onClick={handleDeleteSelected} size={"large"}
                                 style={{width: "20%"}}
-                                disabled={!selectedKeys.length}>
+                                disabled={!selectedKeys.length} icon={<DeleteOutlined/>}>
                             删除选中地址
                         </Button>
                         <Button type="primary" icon={<DownloadOutlined/>} size={"large"} style={{width: "8%"}}

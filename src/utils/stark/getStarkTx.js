@@ -34,6 +34,14 @@ async function getStarkTx(address) {
         const response = await axios.post(url, Json_data, {headers: headers});
         tx += response.data.data['transactions']['edges'].length;
         hasNextPage = response.data.data['transactions']['pageInfo']['hasNextPage'];
+        const timestamp = response.data.data['transactions']['edges'][0]['node']['timestamp'];
+        const latestDate = new Date(timestamp * 1000);
+        let year = latestDate.getFullYear();
+        let month = latestDate.getMonth() + 1;
+        let date = latestDate.getDate();
+        if (month < 10) month = '0' + month;
+        if (date < 10) date = '0' + date;
+        let formattedDate = `${year}/${month}/${date}`;
         if (hasNextPage === true) {
             endCursor = response.data.data['transactions']['pageInfo']['endCursor'];
             while (hasNextPage) {
@@ -44,10 +52,11 @@ async function getStarkTx(address) {
                 tx += response.data.data['transactions']['edges'].length;
             }
         }
-        return {tx: tx};
+        console.log(tx, formattedDate)
+        return {tx: tx, stark_latest_tx: formattedDate};
     } catch (error) {
         console.error(error);
-        return {tx: "Error"};
+        return {tx: "Error", stark_latest_tx: "Error"};
     }
 }
 

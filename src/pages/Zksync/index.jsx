@@ -13,7 +13,14 @@ import './index.css';
 import {Layout, Card} from 'antd';
 
 const {Content} = Layout;
-import {DownloadOutlined, EditOutlined} from "@ant-design/icons";
+import {
+    DeleteOutlined,
+    DownloadOutlined,
+    EditOutlined,
+    PlusOutlined,
+    SyncOutlined,
+    UploadOutlined
+} from "@ant-design/icons";
 
 const {TextArea} = Input;
 const {Column, ColumnGroup} = Table;
@@ -51,11 +58,12 @@ function Zksync() {
                     return item;
                 }));
                 const updatedData = [...data];
-                getZksEra(values.address).then(({balance2, tx2}) => {
+                getZksEra(values.address).then(({balance2, tx2, usdcBalance}) => {
                     updatedData[index] = {
                         ...updatedData[index],
                         zks2_balance: balance2,
                         zks2_tx_amount: tx2,
+                        zks2_usdcBalance: usdcBalance,
                     };
                     setData(updatedData);
                     localStorage.setItem('addresses', JSON.stringify(data));
@@ -116,6 +124,7 @@ function Zksync() {
                     eth_tx_amount: null,
                     zks2_balance: null,
                     zks2_tx_amount: null,
+                    zks2_usdcBalance: null,
                     zks2_last_tx: null,
                     zks1_balance: null,
                     zks1_tx_amount: null,
@@ -126,9 +135,10 @@ function Zksync() {
                 };
                 const newData = [...data, newEntry];
                 setData(newData);
-                getZksEra(values.address).then(({balance2, tx2}) => {
+                getZksEra(values.address).then(({balance2, tx2, usdcBalance}) => {
                     newEntry.zks2_balance = balance2;
                     newEntry.zks2_tx_amount = tx2;
+                    newEntry.zks2_usdcBalance = usdcBalance;
                     setData([...newData]);
                     localStorage.setItem('addresses', JSON.stringify(newData));
                 })
@@ -195,15 +205,17 @@ function Zksync() {
                     item.zks1_tx_amount = null;
                     item.zks2_balance = null;
                     item.zks2_tx_amount = null;
+                    item.zks2_usdcBalance = null;
                     item.zks2_last_tx = null;
                     item.l1Tol2Times = null;
                     item.l1Tol2Amount = null;
                     item.l2Tol1Times = null;
                     item.l2Tol1Amount = null;
                     setData([...newData]);
-                    getZksEra(item.address).then(({balance2, tx2}) => {
+                    getZksEra(item.address).then(({balance2, tx2, usdcBalance}) => {
                         item.zks2_balance = balance2;
                         item.zks2_tx_amount = tx2;
+                        item.zks2_usdcBalance = usdcBalance;
                         setData([...newData]);
                         localStorage.setItem('addresses', JSON.stringify(data));
                     });
@@ -264,11 +276,12 @@ function Zksync() {
                 const index = newData.findIndex(item => item.address === address);
                 if (index !== -1) {
                     const updatedData = [...newData];
-                    getZksEra(address).then(({balance2, tx2}) => {
+                    getZksEra(address).then(({balance2, tx2, usdcBalance}) => {
                         updatedData[index] = {
                             ...updatedData[index],
                             zks2_balance: balance2,
                             zks2_tx_amount: tx2,
+                            zks2_usdcBalance: usdcBalance,
                         };
                         setData(updatedData);
                         localStorage.setItem('addresses', JSON.stringify(updatedData));
@@ -325,6 +338,7 @@ function Zksync() {
                         eth_tx_amount: null,
                         zks2_balance: null,
                         zks2_tx_amount: null,
+                        zks2_usdcBalance: null,
                         zks1_balance: null,
                         zks1_tx_amount: null,
                         zks2_last_tx: null,
@@ -335,9 +349,10 @@ function Zksync() {
                     };
                     newData.push(newEntry);
                     setData(newData);
-                    getZksEra(address).then(({balance2, tx2}) => {
+                    getZksEra(address).then(({balance2, tx2, usdcBalance}) => {
                         newEntry.zks2_balance = balance2;
                         newEntry.zks2_tx_amount = tx2;
+                        newEntry.zks2_usdcBalance = usdcBalance;
                         setData([...newData]);
                         localStorage.setItem('addresses', JSON.stringify(newData));
                     })
@@ -473,7 +488,7 @@ function Zksync() {
                             dataIndex="name"
                             key="name"
                             align={"center"}
-                            className={"name"}
+                            className={""}
                             render={(text, record) => {
                                 const isEditing = record.key === editingKey; // Check if this row is being edited
                                 return isEditing ? (
@@ -501,46 +516,48 @@ function Zksync() {
                             }}
                         />
                         <Column title="钱包地址" dataIndex="address" key="address" align={"center"}
-                                className={"address"}/>
-                        <ColumnGroup title="ETH" className={"eth"}>
+                                className={""}/>
+                        <ColumnGroup title="ETH" className={"zks_eth"}>
                             <Column title="ETH" dataIndex="eth_balance" key="eth_balance" align={"center"}
-                                    render={(text, record) => (text === null ? <Spin/> : text)} className={"eth_son"}/>
+                                    render={(text, record) => (text === null ? <Spin/> : text)} className={""}/>
                             <Column title="Tx" dataIndex="eth_tx_amount" key="eth_tx_amount" align={"center"}
-                                    render={(text, record) => (text === null ? <Spin/> : text)} className={"eth_son"}/>
+                                    render={(text, record) => (text === null ? <Spin/> : text)} className={""}/>
                         </ColumnGroup>
-                        <ColumnGroup title="zkSyncLite" className={"zksync1"}>
+                        <ColumnGroup title="zkSyncLite" className={"zks_lite"}>
                             <Column title="ETH" dataIndex="zks1_balance" key="zks1_balance" align={"center"}
-                                    render={(text, record) => (text === null ? <Spin/> : text)} className={"zks1_son"}/>
+                                    render={(text, record) => (text === null ? <Spin/> : text)} className={""}/>
                             <Column title="Tx" dataIndex="zks1_tx_amount" key="zks1_tx_amount" align={"center"}
                                     render={
                                         (text, record) => (text === null ? <Spin/> : text)
-                                    } className={"zks1_son"}/>
+                                    } className={""}/>
                         </ColumnGroup>
-                        <ColumnGroup title="zkSyncEra" className={"zksync2"}>
+                        <ColumnGroup title="zkSyncEra" className={"zks_era"}>
                             <Column title="ETH" dataIndex="zks2_balance" key="zks2_balance" align={"center"}
-                                    render={(text, record) => (text === null ? <Spin/> : text)} className={"zks2_son"}/>
+                                    render={(text, record) => (text === null ? <Spin/> : text)} className={""}/>
+                            <Column title="USDC" dataIndex="zks2_usdcBalance" key="zks2_usdc_balance" align={"center"}
+                                    render={(text, record) => (text === null ? <Spin/> : text)} className={""}/>
                             <Column title="Tx" dataIndex="zks2_tx_amount" key="zks2_tx_amount" align={"center"}
-                                    render={(text, record) => (text === null ? <Spin/> : text)} className={"zks2_son"}/>
+                                    render={(text, record) => (text === null ? <Spin/> : text)} className={""}/>
                             <Column title="最后交易" dataIndex="zks2_last_tx" key="zks2_last_tx" align={"center"}
                                     render={(text, record) => (text === null ? <Spin/> :
                                         <a href={"https://explorer.zksync.io/address/" + record.address}
                                            target={"_blank"}>{text}</a>)}
-                                    className={"zks2_son"}/>
-                            <ColumnGroup title="官方桥跨链Tx数" className={"cross"}>
+                                    className={""}/>
+                            <ColumnGroup title="官方桥跨链Tx数" className={""}>
                                 <Column title="L1->L2" dataIndex="l1Tol2Times" key="l1Tol2Tx" align={"center"}
                                         render={(text, record) => (text === null ? <Spin/> : text)}
-                                        className={"cross_son"}/>
+                                        className={""}/>
                                 <Column title="L2->L1" dataIndex="l2Tol1Times" key="l2Tol1Tx" align={"center"}
                                         render={(text, record) => (text === null ? <Spin/> : text)}
-                                        className={"cross_son"}/>
+                                        className={""}/>
                             </ColumnGroup>
-                            <ColumnGroup title="官方桥跨链金额(ETH)" className={"cross"}>
+                            <ColumnGroup title="官方桥跨链金额(ETH)" className={""}>
                                 <Column title="L1->L2" dataIndex="l1Tol2Amount" key="l1Tol2Amount" align={"center"}
                                         render={(text, record) => (text === null ? <Spin/> : text)}
-                                        className={"cross_son"}/>
+                                        className={""}/>
                                 <Column title="L2->L1" dataIndex="l2Tol1Amount" key="l2Tol1Amount" align={"center"}
                                         render={(text, record) => (text === null ? <Spin/> : text)}
-                                        className={"cross_son"}/>
+                                        className={""}/>
                             </ColumnGroup>
                         </ColumnGroup>
                         <Column
@@ -563,26 +580,25 @@ function Zksync() {
                     </Table>
                 </Spin>
                 <Card>
-                    <div style={{width: '100%', display: 'flex', justifyContent: 'space-between'}}>
-                        <Button type="primary" onClick={showModal} size={"large"} style={{width: "20%"}}>
+                    <div style={{width: '100%', display: 'flex', justifyContent: 'space-between', gap: '10px'}}>
+                        <Button type="primary" onClick={showModal} size={"large"} style={{width: "20%"}}
+                                icon={<PlusOutlined/>}>
                             添加地址
                         </Button>
-                        <Button type="primary" onClick={showBatchModal} size={"large"} style={{width: "20%"}}>
+                        <Button type="primary" onClick={showBatchModal} size={"large"} style={{width: "20%"}}
+                                icon={<UploadOutlined/>}>
                             批量添加地址
                         </Button>
                         <Button type="primary" onClick={handleRefresh} loading={isLoading} size={"large"}
-                                style={{width: "20%"}}
-                                disabled={!selectedKeys.length}>
+                                style={{width: "20%"}} disabled={!selectedKeys.length} icon={<SyncOutlined/>}>
                             刷新选中地址
                         </Button>
                         <Button type="primary" danger onClick={handleDeleteSelected} size={"large"}
-                                style={{width: "20%"}}
-                                disabled={!selectedKeys.length}>
+                                style={{width: "20%"}} disabled={!selectedKeys.length} icon={<DeleteOutlined/>}>
                             删除选中地址
                         </Button>
                         <Button type="primary" icon={<DownloadOutlined/>} size={"large"} style={{width: "8%"}}
-                                onClick={exportToExcelFile}
-                        />
+                                onClick={exportToExcelFile}/>
                     </div>
                 </Card>
             </Content>
