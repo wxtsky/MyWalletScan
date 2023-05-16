@@ -12,6 +12,7 @@
     "@ant-design/icons": "^5.0.1",
     "antd": "^5.4.6",
     "axios": "^1.4.0",
+    "copy-to-clipboard": "^3.3.3",
     "ethers": "^6.3.0",
     "file-saver": "^2.0.5",
     "react": "^18.2.0",

@@ -9,6 +9,7 @@ const MainPage = React.lazy(() => import("@pages/MainPage"));
 const Stark = React.lazy(() => import("@pages/Stark"));
 const Layer = React.lazy(() => import("@pages/Layer"));
 const Mirror = React.lazy(() => import("@pages/Mirror"));
+const Coffee = React.lazy(() => import("@pages/Coffee"));
 const router = [
     {
         path: '/', element: <MainPage/>,
@@ -32,6 +33,10 @@ const router = [
             {
                 path: '/mirror',
                 element: <Mirror/>,
+            },
+            {
+                path: '/coffee',
+                element: <Coffee/>,
             }
         ]
     },
