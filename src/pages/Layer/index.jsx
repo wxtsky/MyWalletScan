@@ -195,29 +195,28 @@ const Layer = () => {
                 if (address.length !== 42) {
                     notification.error({
                         message: "错误",
-                        description: "请输入正确的EVM地址",
+                        description: "请输入正确的地址",
                     });
                     continue;
                 }
                 const index = newData.findIndex(item => item.address === address);
                 if (index !== -1) {
                     const updatedData = [...newData];
-                    getLayerData(address, apiKey).then(({arb, avax, bsc, eth, ftm, matic, metis, op, total}) => {
-                        updatedData[index] = {
-                            ...updatedData[index],
-                            arb: arb,
-                            avax: avax,
-                            bsc: bsc,
-                            eth: eth,
-                            ftm: ftm,
-                            matic: matic,
-                            metis: metis,
-                            op: op,
-                            total: total,
-                        }
-                        setData(updatedData);
-                        localStorage.setItem('l0_addresses', JSON.stringify(updatedData));
-                    })
+                    const {arb, avax, bsc, eth, ftm, matic, metis, op, total} = await getLayerData(address, apiKey);
+                    updatedData[index] = {
+                        ...updatedData[index],
+                        arb: arb,
+                        avax: avax,
+                        bsc: bsc,
+                        eth: eth,
+                        ftm: ftm,
+                        matic: matic,
+                        metis: metis,
+                        op: op,
+                        total: total,
+                    }
+                    setData(updatedData);
+                    localStorage.setItem('l0_addresses', JSON.stringify(updatedData));
                 } else {
                     const newEntry = {
                         key: newData.length.toString(),
@@ -234,19 +233,18 @@ const Layer = () => {
                     };
                     newData.push(newEntry);
                     setData(newData);
-                    getLayerData(address, apiKey).then(({arb, avax, bsc, eth, ftm, matic, metis, op, total}) => {
-                        newEntry.arb = arb;
-                        newEntry.avax = avax;
-                        newEntry.bsc = bsc;
-                        newEntry.eth = eth;
-                        newEntry.ftm = ftm;
-                        newEntry.matic = matic;
-                        newEntry.metis = metis;
-                        newEntry.op = op;
-                        newEntry.total = total;
-                        setData([...newData]);
-                        localStorage.setItem('l0_addresses', JSON.stringify(newData));
-                    })
+                    const {arb, avax, bsc, eth, ftm, matic, metis, op, total} = await getLayerData(address, apiKey);
+                    newEntry.arb = arb;
+                    newEntry.avax = avax;
+                    newEntry.bsc = bsc;
+                    newEntry.eth = eth;
+                    newEntry.ftm = ftm;
+                    newEntry.matic = matic;
+                    newEntry.metis = metis;
+                    newEntry.op = op;
+                    newEntry.total = total;
+                    setData([...newData]);
+                    localStorage.setItem('l0_addresses', JSON.stringify(newData));
                 }
             }
             setIsBatchModalVisible(false);
