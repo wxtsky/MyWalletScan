@@ -34,7 +34,7 @@ async function getLayerData(address, apiKeyData) {
         try {
             const u = netMap[net];
             let k;
-            if (apiKeyData[net] !== undefined && apiKeyData[net] !== null && apiKeyData[net] !== "") {
+            if (apiKeyData && net in apiKeyData && apiKeyData[net]) {
                 k = apiKeyData[net];
             } else {
                 const keys = keyMap[net];
