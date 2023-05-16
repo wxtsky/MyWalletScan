@@ -47,7 +47,6 @@ function Zksync() {
             setIsModalVisible(false);
             const index = data.findIndex(item => item.address === values.address);
             if (index !== -1) {
-                // 添加备注
                 setData(data.map((item, i) => {
                     if (i === index) {
                         return {
@@ -104,9 +103,20 @@ function Zksync() {
                     setData(updatedData);
                     localStorage.setItem('addresses', JSON.stringify(data));
                 })
-                getZkSyncBridge(values.address).then(({l1Tol2Times, l1Tol2Amount, l2Tol1Times, l2Tol1Amount}) => {
+                getZkSyncBridge(values.address).then(({
+                                                          dayActivity,
+                                                          weekActivity,
+                                                          monthActivity,
+                                                          l1Tol2Times,
+                                                          l1Tol2Amount,
+                                                          l2Tol1Times,
+                                                          l2Tol1Amount
+                                                      }) => {
                     updatedData[index] = {
                         ...updatedData[index],
+                        dayActivity,
+                        weekActivity,
+                        monthActivity,
                         l1Tol2Times,
                         l1Tol2Amount,
                         l2Tol1Times,
@@ -128,6 +138,9 @@ function Zksync() {
                     zks2_last_tx: null,
                     zks1_balance: null,
                     zks1_tx_amount: null,
+                    dayActivity: null,
+                    weekActivity: null,
+                    monthActivity: null,
                     l1Tol2Times: null,
                     l1Tol2Amount: null,
                     l2Tol1Times: null,
@@ -166,7 +179,18 @@ function Zksync() {
                     setData([...newData]);
                     localStorage.setItem('addresses', JSON.stringify(newData));
                 })
-                getZkSyncBridge(values.address).then(({l1Tol2Times, l1Tol2Amount, l2Tol1Times, l2Tol1Amount}) => {
+                getZkSyncBridge(values.address).then(({
+                                                          dayActivity,
+                                                          weekActivity,
+                                                          monthActivity,
+                                                          l1Tol2Times,
+                                                          l1Tol2Amount,
+                                                          l2Tol1Times,
+                                                          l2Tol1Amount
+                                                      }) => {
+                    newEntry.dayActivity = dayActivity;
+                    newEntry.weekActivity = weekActivity;
+                    newEntry.monthActivity = monthActivity;
                     newEntry.l1Tol2Times = l1Tol2Times;
                     newEntry.l1Tol2Amount = l1Tol2Amount;
                     newEntry.l2Tol1Times = l2Tol1Times;
@@ -207,6 +231,9 @@ function Zksync() {
                     item.zks2_tx_amount = null;
                     item.zks2_usdcBalance = null;
                     item.zks2_last_tx = null;
+                    item.dayActivity = null;
+                    item.weekActivity = null;
+                    item.monthActivity = null;
                     item.l1Tol2Times = null;
                     item.l1Tol2Amount = null;
                     item.l2Tol1Times = null;
@@ -240,7 +267,19 @@ function Zksync() {
                         setData([...newData]);
                         localStorage.setItem('addresses', JSON.stringify(data));
                     });
-                    getZkSyncBridge(item.address).then(({l1Tol2Times, l1Tol2Amount, l2Tol1Times, l2Tol1Amount}) => {
+                    getZkSyncBridge(item.address).then(({
+                                                            dayActivity,
+                                                            weekActivity,
+                                                            monthActivity,
+                                                            l1Tol2Times,
+                                                            l1Tol2Amount,
+                                                            l2Tol1Times,
+                                                            l2Tol1Amount
+                                                        }) => {
+
+                        item.dayActivity = dayActivity;
+                        item.weekActivity = weekActivity;
+                        item.monthActivity = monthActivity;
                         item.l1Tol2Times = l1Tol2Times;
                         item.l1Tol2Amount = l1Tol2Amount;
                         item.l2Tol1Times = l2Tol1Times;
@@ -319,9 +358,20 @@ function Zksync() {
                         setData(updatedData);
                         localStorage.setItem('addresses', JSON.stringify(updatedData));
                     })
-                    getZkSyncBridge(address).then(({l1Tol2Times, l1Tol2Amount, l2Tol1Times, l2Tol1Amount}) => {
+                    getZkSyncBridge(address).then(({
+                                                       dayActivity,
+                                                       weekActivity,
+                                                       monthActivity,
+                                                       l1Tol2Times,
+                                                       l1Tol2Amount,
+                                                       l2Tol1Times,
+                                                       l2Tol1Amount
+                                                   }) => {
                         updatedData[index] = {
                             ...updatedData[index],
+                            dayActivity,
+                            weekActivity,
+                            monthActivity,
                             l1Tol2Times,
                             l1Tol2Amount,
                             l2Tol1Times,
@@ -342,6 +392,9 @@ function Zksync() {
                         zks1_balance: null,
                         zks1_tx_amount: null,
                         zks2_last_tx: null,
+                        dayActivity: null,
+                        weekActivity: null,
+                        monthActivity: null,
                         l1Tol2Times: null,
                         l1Tol2Amount: null,
                         l2Tol1Times: null,
@@ -380,7 +433,18 @@ function Zksync() {
                         setData([...newData]);
                         localStorage.setItem('addresses', JSON.stringify(newData));
                     })
-                    getZkSyncBridge(address).then(({l1Tol2Times, l1Tol2Amount, l2Tol1Times, l2Tol1Amount}) => {
+                    getZkSyncBridge(address).then(({
+                                                       dayActivity,
+                                                       weekActivity,
+                                                       monthActivity,
+                                                       l1Tol2Times,
+                                                       l1Tol2Amount,
+                                                       l2Tol1Times,
+                                                       l2Tol1Amount
+                                                   }) => {
+                        newEntry.dayActivity = dayActivity;
+                        newEntry.weekActivity = weekActivity;
+                        newEntry.monthActivity = monthActivity;
                         newEntry.l1Tol2Times = l1Tol2Times;
                         newEntry.l1Tol2Amount = l1Tol2Amount;
                         newEntry.l2Tol1Times = l2Tol1Times;
@@ -521,49 +585,49 @@ function Zksync() {
                                 );
                             }}
                         />
-                        <Column title="钱包地址" dataIndex="address" key="address" align={"center"}
-                                className={""}/>
+                        <Column title="钱包地址" dataIndex="address" key="address" align={"center"}/>
                         <ColumnGroup title="ETH" className={"zks_eth"}>
                             <Column title="ETH" dataIndex="eth_balance" key="eth_balance" align={"center"}
-                                    render={(text, record) => (text === null ? <Spin/> : text)} className={""}/>
+                                    render={(text, record) => (text === null ? <Spin/> : text)}/>
                             <Column title="Tx" dataIndex="eth_tx_amount" key="eth_tx_amount" align={"center"}
-                                    render={(text, record) => (text === null ? <Spin/> : text)} className={""}/>
+                                    render={(text, record) => (text === null ? <Spin/> : text)}/>
                         </ColumnGroup>
                         <ColumnGroup title="zkSyncLite" className={"zks_lite"}>
                             <Column title="ETH" dataIndex="zks1_balance" key="zks1_balance" align={"center"}
-                                    render={(text, record) => (text === null ? <Spin/> : text)} className={""}/>
+                                    render={(text, record) => (text === null ? <Spin/> : text)}/>
                             <Column title="Tx" dataIndex="zks1_tx_amount" key="zks1_tx_amount" align={"center"}
-                                    render={
-                                        (text, record) => (text === null ? <Spin/> : text)
-                                    } className={""}/>
+                                    render={(text, record) => (text === null ? <Spin/> : text)}/>
                         </ColumnGroup>
                         <ColumnGroup title="zkSyncEra" className={"zks_era"}>
                             <Column title="ETH" dataIndex="zks2_balance" key="zks2_balance" align={"center"}
-                                    render={(text, record) => (text === null ? <Spin/> : text)} className={""}/>
+                                    render={(text, record) => (text === null ? <Spin/> : text)}/>
                             <Column title="USDC" dataIndex="zks2_usdcBalance" key="zks2_usdc_balance" align={"center"}
-                                    render={(text, record) => (text === null ? <Spin/> : text)} className={""}/>
+                                    render={(text, record) => (text === null ? <Spin/> : text)}/>
                             <Column title="Tx" dataIndex="zks2_tx_amount" key="zks2_tx_amount" align={"center"}
-                                    render={(text, record) => (text === null ? <Spin/> : text)} className={""}/>
+                                    render={(text, record) => (text === null ? <Spin/> : text)}/>
                             <Column title="最后交易" dataIndex="zks2_last_tx" key="zks2_last_tx" align={"center"}
                                     render={(text, record) => (text === null ? <Spin/> :
                                         <a href={"https://explorer.zksync.io/address/" + record.address}
-                                           target={"_blank"}>{text}</a>)}
-                                    className={""}/>
+                                           target={"_blank"}>{text}</a>)}/>
                             <ColumnGroup title="官方桥跨链Tx数" className={""}>
                                 <Column title="L1->L2" dataIndex="l1Tol2Times" key="l1Tol2Tx" align={"center"}
-                                        render={(text, record) => (text === null ? <Spin/> : text)}
-                                        className={""}/>
+                                        render={(text, record) => (text === null ? <Spin/> : text)}/>
                                 <Column title="L2->L1" dataIndex="l2Tol1Times" key="l2Tol1Tx" align={"center"}
-                                        render={(text, record) => (text === null ? <Spin/> : text)}
-                                        className={""}/>
+                                        render={(text, record) => (text === null ? <Spin/> : text)}/>
                             </ColumnGroup>
                             <ColumnGroup title="官方桥跨链金额(ETH)" className={""}>
                                 <Column title="L1->L2" dataIndex="l1Tol2Amount" key="l1Tol2Amount" align={"center"}
-                                        render={(text, record) => (text === null ? <Spin/> : text)}
-                                        className={""}/>
+                                        render={(text, record) => (text === null ? <Spin/> : text)}/>
                                 <Column title="L2->L1" dataIndex="l2Tol1Amount" key="l2Tol1Amount" align={"center"}
-                                        render={(text, record) => (text === null ? <Spin/> : text)}
-                                        className={""}/>
+                                        render={(text, record) => (text === null ? <Spin/> : text)}/>
+                            </ColumnGroup>
+                            <ColumnGroup title="活跃统计" className={""}>
+                                <Column title="日" dataIndex="dayActivity" key="dayActive" align={"center"}
+                                        render={(text, record) => (text === null ? <Spin/> : text)}/>
+                                <Column title="周" dataIndex="weekActivity" key="weekAvtive" align={"center"}
+                                        render={(text, record) => (text === null ? <Spin/> : text)}/>
+                                <Column title="月" dataIndex="monthActivity" key="monthActive" align={"center"}
+                                        render={(text, record) => (text === null ? <Spin/> : text)}/>
                             </ColumnGroup>
                         </ColumnGroup>
                         <Column

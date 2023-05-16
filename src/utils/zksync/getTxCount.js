@@ -13,7 +13,6 @@ async function getTxCount(address, network) {
         let rpcLink = RPC_MAP[network];
         if (!rpcLink) {
             return "Error: Invalid Network Name";
-            Q
         }
         const response = await axios.post(rpcLink, {
             jsonrpc: "2.0",

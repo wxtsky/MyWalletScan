@@ -1,14 +1,40 @@
 import axios from "axios";
 import {ethers} from "ethers";
 
+function getDayNumber(d) {
+    return `${d.getUTCFullYear()}-${d.getUTCMonth() + 1}-${d.getUTCDate()}`;
+}
+
+function getWeekNumber(d) {
+    d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+    d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+    let yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+    let weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+    return d.getUTCFullYear() + "W" + weekNo;
+}
+
+function getMonthNumber(d) {
+    return d.getUTCFullYear() + "-" + (d.getUTCMonth() + 1);
+}
+
 async function processTransactions(
     list,
+    dayActivity,
+    weekActivity,
+    monthActivity,
     l1Tol2Times,
     l1Tol2Amount,
     l2Tol1Times,
     l2Tol1Amount
 ) {
+    const days = new Set();
+    const weeks = new Set();
+    const months = new Set();
     for (let i = 0; i < list.length; i++) {
+        const receivedAt = new Date(list[i]['receivedAt']);
+        days.add(getDayNumber(receivedAt));
+        weeks.add(getWeekNumber(receivedAt));
+        months.add(getMonthNumber(receivedAt));
         if (list[i].isL1Originated === true) {
             l1Tol2Times++;
             const value = ethers.formatEther(list[i].data.value, "ether");
@@ -22,11 +48,17 @@ async function processTransactions(
             l2Tol1Amount += parseFloat(value);
         }
     }
-    return [l1Tol2Times, l1Tol2Amount, l2Tol1Times, l2Tol1Amount];
+    dayActivity += days.size;
+    weekActivity += weeks.size;
+    monthActivity += months.size;
+    return [dayActivity, weekActivity, monthActivity, l1Tol2Times, l1Tol2Amount, l2Tol1Times, l2Tol1Amount];
 }
 
 async function getZkSyncBridge(address) {
     try {
+        let dayActivity = 0;
+        let weekActivity = 0;
+        let monthActivity = 0;
         let l1Tol2Times = 0;
         let l1Tol2Amount = 0;
         let l2Tol1Times = 0;
@@ -37,9 +69,14 @@ async function getZkSyncBridge(address) {
         const initUrl = "https://zksync2-mainnet-explorer.zksync.io/transactions?limit=100&direction=older&accountAddress=" + address;
         const initResponse = await axios.get(initUrl)
         const initDataLength = initResponse.data.total;
-        [l1Tol2Times, l1Tol2Amount, l2Tol1Times, l2Tol1Amount] =
+        [dayActivity,
+         weekActivity,
+         monthActivity, l1Tol2Times, l1Tol2Amount, l2Tol1Times, l2Tol1Amount] =
             await processTransactions(
                 initResponse.data.list,
+                dayActivity,
+                weekActivity,
+                monthActivity,
                 l1Tol2Times,
                 l1Tol2Amount,
                 l2Tol1Times,
@@ -55,17 +92,18 @@ async function getZkSyncBridge(address) {
                 }
                 const response = await axios.get(url);
                 const ListLength = response.data.list.length;
-                [l1Tol2Times, l1Tol2Amount, l2Tol1Times, l2Tol1Amount] =
+                [dayActivity, weekActivity, monthActivity, l1Tol2Times, l1Tol2Amount, l2Tol1Times, l2Tol1Amount] =
                     await processTransactions(
                         response.data.list,
+                        dayActivity,
+                        weekActivity,
+                        monthActivity,
                         l1Tol2Times,
                         l1Tol2Amount,
                         l2Tol1Times,
                         l2Tol1Amount
                     );
                 if (ListLength === 100) {
-                    // fromBlockNumber = response.data.list[0].blockNumber;
-                    // fromTxIndex = response.data.list[0].indexInBlock;
                     offset += ListLength;
                 } else {
                     break;
@@ -73,6 +111,9 @@ async function getZkSyncBridge(address) {
             }
         }
         return {
+            dayActivity,
+            weekActivity,
+            monthActivity,
             l1Tol2Times,
             l1Tol2Amount: l1Tol2Amount.toFixed(3),
             l2Tol1Times,
@@ -80,7 +121,10 @@ async function getZkSyncBridge(address) {
         }
     } catch (e) {
         console.log(e);
-        return {l1Tol2Times: "Error", l1Tol2Amount: "Error", l2Tol1Times: "Error", l2Tol1Amount: "Error"}
+        return {
+            dayActivity: "Error", weekActivity: "Error", monthActivity: "Error",
+            l1Tol2Times: "Error", l1Tol2Amount: "Error", l2Tol1Times: "Error", l2Tol1Amount: "Error"
+        }
     }
 }
 
