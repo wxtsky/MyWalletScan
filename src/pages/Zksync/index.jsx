@@ -484,6 +484,12 @@ function Zksync() {
                         size={"small"}
                     >
                         <Column
+                            title="#"
+                            key="index"
+                            align={"center"}
+                            render={(text, record, index) => index + 1}
+                        />
+                        <Column
                             title="备注"
                             dataIndex="name"
                             key="name"

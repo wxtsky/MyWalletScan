@@ -259,16 +259,22 @@ const Layer = () => {
     }
     const [editingKey, setEditingKey] = useState(null);
     const columns = [
-            {
-                title: '备注',
-                dataIndex: 'name',
-                key: 'name',
-                align: 'center',
-                render: (text, record) => {
-                    const isEditing = record.key === editingKey;
-                    return isEditing ? (
-                        <Input
-                            placeholder="请输入备注"
+        {
+            title: '#',
+            key: 'index',
+            render: (text, record, index) => index + 1,
+            align: 'center',
+        },
+        {
+            title: '备注',
+            dataIndex: 'name',
+            key: 'name',
+            align: 'center',
+            render: (text, record) => {
+                const isEditing = record.key === editingKey;
+                return isEditing ? (
+                    <Input
+                        placeholder="请输入备注"
                             defaultValue={text}
                             onPressEnter={(e) => {
                                 record.name = e.target.value;
