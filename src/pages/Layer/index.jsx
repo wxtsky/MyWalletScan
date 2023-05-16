@@ -149,19 +149,28 @@ const Layer = () => {
                     item.avax = null;
                     item.total = null;
                     setData([...newData]);
-                    getLayerData(item.address, apiKey).then(({arb, avax, bsc, eth, ftm, matic, metis, op, total}) => {
-                        item.arb = arb;
-                        item.avax = avax;
-                        item.bsc = bsc;
-                        item.eth = eth;
-                        item.ftm = ftm;
-                        item.matic = matic;
-                        item.metis = metis;
-                        item.op = op;
-                        item.total = total;
-                        setData([...newData]);
-                        localStorage.setItem('l0_addresses', JSON.stringify(data));
-                    })
+                    const {
+                        arb,
+                        avax,
+                        bsc,
+                        eth,
+                        ftm,
+                        matic,
+                        metis,
+                        op,
+                        total
+                    } = await getLayerData(item.address, apiKey);
+                    item.arb = arb;
+                    item.avax = avax;
+                    item.bsc = bsc;
+                    item.eth = eth;
+                    item.ftm = ftm;
+                    item.matic = matic;
+                    item.metis = metis;
+                    item.op = op;
+                    item.total = total;
+                    setData([...newData]);
+                    localStorage.setItem('l0_addresses', JSON.stringify(data));
                 }
             }
         } catch (error) {

@@ -11,14 +11,20 @@ const netMap = {
     "eth": "https://api.etherscan.io"
 }
 const keyMap = {
-    "bsc": "IHA6XUNGC9A8CS1EVB4ZKMMNCEVWQYWGNF",
-    "ftm": "7NS7WM87WNYTDWXFRUP1QFVEGEMEWWTT1R",
-    "metis": null,
-    "avax": "XZVMR1A53KHXIEZV2X5QYZ2GSYFDDHUGVS",
-    "matic": "5N7B38PZTENUK44XDF3WUPFFN68ICZ87Y3",
-    "arb": "FTAT7G2F45P8VNVQG66SGF7T4TS6R2QFGY",
-    "op": "C8JSVBMBI2NBBYWUJ99ZR2QCQ8GB33NFGB",
-    "eth": "FPFT5EGK6F4JS97IA4E8SI24UN559W53VI"
+    "bsc": ["IHA6XUNGC9A8CS1EVB4ZKMMNCEVWQYWGNF", "35GX1RBQBNKDSS2QFF8YZ9IJ4MUPD8FBV4",
+            "KD21NU93H2696XZGUE6IIZX291V2291WBZ"],
+    "ftm": ["7NS7WM87WNYTDWXFRUP1QFVEGEMEWWTT1R", "JUEKUR5XBG5Z4WQUV71IZHJCPGVWADGHY3",
+            "YCTIQFTS8AXJQVE84CYY2FSGU9JYHWTEMN"],
+    "metis": [null],
+    "avax": ["XZVMR1A53KHXIEZV2X5QYZ2GSYFDDHUGVS", "PX4ZC7BFCMF51E7DC7JKDWERHYCW8JNPM7",
+             "B4XCRBZYZX26NGZG1XJB7UIDGDWF8TYSHT"],
+    "matic": ["5N7B38PZTENUK44XDF3WUPFFN68ICZ87Y3", "SIKU51V7YGAYUZF8HJ7R5FE6WHBP4Z6VEI",
+              "SMIPK99XJR9IXRSSCDHWJB8CT4YKTKJC4E"],
+    "arb": ["FTAT7G2F45P8VNVQG66SGF7T4TS6R2QFGY", "MXKDX8ZX8H5P34WFXFZF1YEPA6X6DDIV5R",
+            "WBCVFF7GVC4XJZFMS3EZJVVPMAH14IT7SU"],
+    "op": ["C8JSVBMBI2NBBYWUJ99ZR2QCQ8GB33NFGB"],
+    "eth": ["FPFT5EGK6F4JS97IA4E8SI24UN559W53VI", "XHSCQN5JZHT4WY1JCATJTN4IDGX2PU6WHH",
+            "ADX2IDIUKD57WAM1GN6YA9E9Y9R3W5CXMC"]
 }
 let txMap = {}
 
@@ -28,10 +34,13 @@ async function getLayerData(address, apiKeyData) {
         try {
             const u = netMap[net];
             let k;
-            if (apiKeyData[net] !== undefined) {
+            if (apiKeyData[net] !== undefined && apiKeyData[net] !== null && apiKeyData[net] !== "") {
                 k = apiKeyData[net];
+            } else {
+                const keys = keyMap[net];
+                const index = Math.floor(Math.random() * keys.length);
+                k = keys[index];
             }
-            // const k = keyMap[net];
             let tx = 0;
             address = address.toLowerCase();
             let url;
