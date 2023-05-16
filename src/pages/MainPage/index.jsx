@@ -9,6 +9,7 @@ import MyFooter from "@components/MyFooter/index.jsx";
 import Layer from "@pages/Layer/index.jsx";
 import Mirror from "@pages/Mirror/index.jsx";
 import Coffee from "@pages/Coffee/index.jsx";
+import Deposit from "@pages/Deposit/index.jsx";
 
 function MainPage() {
     const location = useLocation()
@@ -53,6 +54,7 @@ function MainPage() {
                         {location.pathname === "/layer" && <Layer/>}
                         {location.pathname === "/mirror" && <Mirror/>}
                         {location.pathname === "/coffee" && <Coffee/>}
+                        {location.pathname === "/deposit" && <Deposit/>}
                     </div>
                 </div>
                 <Footer

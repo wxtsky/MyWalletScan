@@ -20,6 +20,10 @@ const items = [
         key: 'mirror',
     },
     {
+        label: 'Deposit',
+        key: 'deposit',
+    },
+    {
         label: 'Coffee',
         key: 'coffee',
     }
@@ -34,17 +38,7 @@ const MenuHeader = () => {
     const location = useLocation();
     useEffect(() => {
         if (location.pathname === '/') {
-            setCurrent('zksync')
-        } else if (location.pathname === '/zksync') {
-            setCurrent('zksync')
-        } else if (location.pathname === '/stark') {
-            setCurrent('stark')
-        } else if (location.pathname === '/layer') {
-            setCurrent('layer')
-        } else if (location.pathname === '/mirror') {
-            setCurrent('mirror')
-        } else if (location.pathname === '/coffee') {
-            setCurrent('coffee')
+            setCurrent('zksync');
         }
     }, [location.pathname]);
     useEffect(() => {
@@ -62,6 +56,9 @@ const MenuHeader = () => {
         }
         if (current === 'coffee') {
             navigate('/coffee');
+        }
+        if (current === 'deposit') {
+            navigate('/deposit');
         }
     }, [current]);
     return (
