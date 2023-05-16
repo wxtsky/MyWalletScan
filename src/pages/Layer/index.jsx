@@ -1,7 +1,14 @@
 import {useEffect, useState} from "react";
 import {Button, Card, Form, Input, Layout, Modal, notification, Space, Spin, Table, Tag} from "antd";
-import {exportToExcel, getStgData} from "@utils";
-import {DownloadOutlined, EditOutlined} from "@ant-design/icons";
+import {exportToExcel, getLayerData} from "@utils";
+import {
+    DeleteOutlined,
+    DownloadOutlined,
+    EditOutlined,
+    PlusOutlined, SlidersOutlined,
+    SyncOutlined,
+    UploadOutlined
+} from "@ant-design/icons";
 
 const {Content} = Layout;
 const {TextArea} = Input;
@@ -11,10 +18,13 @@ const Layer = () => {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [form] = Form.useForm();
     const [batchForm] = Form.useForm();
+    const [changeApiForm] = Form.useForm();
     const [selectedKeys, setSelectedKeys] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [isBatchModalVisible, setIsBatchModalVisible] = useState(false);
+    const [isChangeApiModalVisible, setIsChangeApiModalVisible] = useState(false);
     const [tableLoading, setTableLoading] = useState(false);
+    const [apiKey, setApiKey] = useState(localStorage.getItem('l0_api_key'));
     const rowSelection = {
         onChange: (selectedRowKeys, selectedRows) => {
             setSelectedKeys(selectedRowKeys);
@@ -58,7 +68,7 @@ const Layer = () => {
                     return item;
                 }));
                 const updatedData = [...data];
-                getStgData(values.address).then(({arb, avax, bsc, eth, ftm, matic, metis, op, total}) => {
+                getLayerData(values.address, apiKey).then(({arb, avax, bsc, eth, ftm, matic, metis, op, total}) => {
                     updatedData[index] = {
                         ...updatedData[index],
                         arb: arb,
@@ -91,7 +101,7 @@ const Layer = () => {
                 };
                 const newData = [...data, newEntry];
                 setData(newData);
-                getStgData(values.address).then(({arb, avax, bsc, eth, ftm, matic, metis, op, total}) => {
+                getLayerData(values.address, apiKey).then(({arb, avax, bsc, eth, ftm, matic, metis, op, total}) => {
                     newEntry.arb = arb;
                     newEntry.avax = avax;
                     newEntry.bsc = bsc;
@@ -139,7 +149,7 @@ const Layer = () => {
                     item.avax = null;
                     item.total = null;
                     setData([...newData]);
-                    getStgData(item.address).then(({arb, avax, bsc, eth, ftm, matic, metis, op, total}) => {
+                    getLayerData(item.address, apiKey).then(({arb, avax, bsc, eth, ftm, matic, metis, op, total}) => {
                         item.arb = arb;
                         item.avax = avax;
                         item.bsc = bsc;
@@ -183,7 +193,7 @@ const Layer = () => {
                 const index = newData.findIndex(item => item.address === address);
                 if (index !== -1) {
                     const updatedData = [...newData];
-                    getStgData(address).then(({arb, avax, bsc, eth, ftm, matic, metis, op, total}) => {
+                    getLayerData(address, apiKey).then(({arb, avax, bsc, eth, ftm, matic, metis, op, total}) => {
                         updatedData[index] = {
                             ...updatedData[index],
                             arb: arb,
@@ -215,7 +225,7 @@ const Layer = () => {
                     };
                     newData.push(newEntry);
                     setData(newData);
-                    getStgData(address).then(({arb, avax, bsc, eth, ftm, matic, metis, op, total}) => {
+                    getLayerData(address, apiKey).then(({arb, avax, bsc, eth, ftm, matic, metis, op, total}) => {
                         newEntry.arb = arb;
                         newEntry.avax = avax;
                         newEntry.bsc = bsc;
@@ -390,6 +400,18 @@ const Layer = () => {
             setData(JSON.parse(storedAddresses));
         }
     }, []);
+    const handleChangeApiOk = () => {
+        localStorage.setItem('l0_api_key', JSON.stringify(changeApiForm.getFieldsValue()));
+        setIsChangeApiModalVisible(false);
+        setApiKey(JSON.parse(localStorage.getItem('l0_api_key')));
+    }
+    useEffect(() => {
+        const storedApiKey = localStorage.getItem('l0_api_key');
+        if (storedApiKey) {
+            setApiKey(JSON.parse(storedApiKey));
+            changeApiForm.setFieldsValue(JSON.parse(storedApiKey));
+        }
+    }, []);
     return (
         <div>
             <Content>
@@ -423,9 +445,61 @@ const Layer = () => {
                         </Form.Item>
                     </Form>
                 </Modal>
+                <Modal
+                    title={
+                        <>
+                            <div>更换API Key</div>
+                            <div style={{fontSize: '12px', color: '#888'}}>
+                                <Space>
+                                    <Button type="link"
+                                            onClick={() => window.open('https://etherscan.io/myapikey', '_blank')}>Eth</Button>
+                                    <Button type="link"
+                                            onClick={() => window.open('https://polygonscan.com/myapikey', '_blank')}>Matic</Button>
+                                    <Button type="link"
+                                            onClick={() => window.open('https://bscscan.com/myapikey', '_blank')}>Bsc</Button>
+                                    <Button type="link"
+                                            onClick={() => window.open('https://arbiscan.io/myapikey', '_blank')}>Arb</Button>
+                                    <Button type="link"
+                                            onClick={() => window.open('https://optimistic.etherscan.io/myapikey', '_blank')}>Op</Button>
+                                    <Button type="link"
+                                            onClick={() => window.open('https://snowtrace.io/myapikey', '_blank')}>Avax</Button>
+                                    <Button type="link"
+                                            onClick={() => window.open('https://ftmscan.com/myapikey', '_blank')}>Ftm</Button>
+                                </Space>
+                            </div>
+                        </>
+                    }
+                    open={isChangeApiModalVisible} onOk={handleChangeApiOk}
+                    onCancel={() => setIsChangeApiModalVisible(false)}
+                    okText={"确定"}
+                    cancelText={"取消"}
+                >
+                    <Form form={changeApiForm} layout="horizontal">
+                        <Form.Item label="Eth" name="eth">
+                            <Input placeholder="请输入Etherscan API Key"/>
+                        </Form.Item>
+                        <Form.Item label="Polygon" name="matic">
+                            <Input placeholder="请输入Polygonscan API Key"/>
+                        </Form.Item>
+                        <Form.Item label="Bsc" name="bsc">
+                            <Input placeholder="请输入Bscscan API Key"/>
+                        </Form.Item>
+                        <Form.Item label="Arb" name="arb">
+                            <Input placeholder="请输入Arbitrumscan API Key"/>
+                        </Form.Item>
+                        <Form.Item label="Op" name="op">
+                            <Input placeholder="请输入Optimismscan API Key"/>
+                        </Form.Item>
+                        <Form.Item label="Avax" name="avax">
+                            <Input placeholder="请输入Avalanche API Key"/>
+                        </Form.Item>
+                        <Form.Item label="Ftm" name="ftm">
+                            <Input placeholder="请输入Fantomscan API Key"/>
+                        </Form.Item>
+                    </Form>
+                </Modal>
                 <Tag color="blue" style={{marginBottom: "10px"}}>
-                    获取数据使用的是作者的区块链浏览器API Key，用的人多可能会有卡顿报错的情况，如果有需要请自行申请API
-                    Key，并在Github Clone并修改代码
+                    获取数据使用的是作者的区块链浏览器API Key，用的人多可能会有卡顿报错的情况，如果有需要请自行更换API Key
                 </Tag>
                 <Spin spinning={tableLoading}>
                     <Table
@@ -444,23 +518,31 @@ const Layer = () => {
                     <div style={{width: '100%', display: 'flex', justifyContent: 'space-between'}}>
                         <Button type="primary" onClick={() => {
                             setIsModalVisible(true)
-                        }} size={"large"} style={{width: "20%"}}>
+                        }} size={"large"} style={{width: "15%"}} icon={<PlusOutlined/>}>
                             添加地址
                         </Button>
                         <Button type="primary" onClick={() => {
                             setIsBatchModalVisible(true)
-                        }} size={"large"} style={{width: "20%"}}>
+                        }} size={"large"} style={{width: "15%"}} icon={<UploadOutlined/>}>
                             批量添加地址
                         </Button>
                         <Button type="primary" onClick={handleRefresh} loading={isLoading} size={"large"}
-                                style={{width: "20%"}}
-                                disabled={!selectedKeys.length}>
+                                style={{width: "15%"}}
+                                disabled={!selectedKeys.length} icon={<SyncOutlined/>}>
                             刷新选中地址
                         </Button>
                         <Button type="primary" danger onClick={handleDeleteSelected} size={"large"}
-                                style={{width: "20%"}}
-                                disabled={!selectedKeys.length}>
+                                style={{width: "15%"}}
+                                disabled={!selectedKeys.length} icon={<DeleteOutlined/>}>
                             删除选中地址
+                        </Button>
+                        <Button type="primary" onClick={
+                            () => {
+                                setIsChangeApiModalVisible(true)
+                            }
+                        } size={"large"}
+                                style={{width: "15%"}} icon={<SlidersOutlined/>}>
+                            更换API KEY
                         </Button>
                         <Button type="primary" icon={<DownloadOutlined/>} size={"large"} style={{width: "8%"}}
                                 onClick={exportToExcelFile}

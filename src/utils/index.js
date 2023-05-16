@@ -8,7 +8,7 @@ import exportToExcel from "./save_excel/save_excel.js";
 import getStarkTx from "@utils/stark/getStarkTx.js";
 import getStarkBridge from "@utils/stark/getStarkBridge.js";
 import getStarkInfo from "@utils/stark/getStarkInfo.js";
-import getStgData from "@utils/layer/getStgData.js";
+import getLayerData from "@utils/layer/getLayerData.js";
 
 export {
     getEthBalance,
@@ -21,5 +21,5 @@ export {
     getStarkTx,
     getStarkBridge,
     getStarkInfo,
-    getStgData
+    getLayerData
 };

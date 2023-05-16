@@ -22,14 +22,24 @@ const keyMap = {
 }
 let txMap = {}
 
-async function getStgData(address) {
+async function getLayerData(address, apiKeyData) {
+    console.log(apiKeyData)
     const txMapPromises = Object.keys(netMap).map(async (net) => {
         try {
             const u = netMap[net];
-            const k = keyMap[net];
+            let k;
+            if (apiKeyData[net] !== undefined) {
+                k = apiKeyData[net];
+            }
+            // const k = keyMap[net];
             let tx = 0;
             address = address.toLowerCase();
-            const url = `${u}/api?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&page=1&offset=10000&sort=asc&apikey=${k}`;
+            let url;
+            if (k === null) {
+                url = `${u}/api?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&page=1&offset=10000&sort=asc`;
+            } else {
+                url = `${u}/api?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&page=1&offset=10000&sort=asc&apikey=${k}`;
+            }
             const res = await axios.get(url);
             for (let i = 0; i < res.data.result.length; i++) {
                 const methodId = res.data.result[i].input.slice(0, 10);
@@ -64,5 +74,4 @@ async function getStgData(address) {
     return txMap;
 }
 
-//0xFc09d64601df2656e681F21e28C544347b2Fa5ef
-export default getStgData
+export default getLayerData
