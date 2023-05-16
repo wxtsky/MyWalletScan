@@ -20,7 +20,7 @@ const items = [
         key: 'mirror',
     },
     {
-        label: '请作者喝咖啡',
+        label: 'Coffee',
         key: 'coffee',
     }
 ];
