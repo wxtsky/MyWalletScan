@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import {Table, Button, Input, Modal, Form, Popconfirm, Space, Spin, Checkbox, Tag} from 'antd';
 import './index.css'
+import {CheckOutlined, CloseOutlined, DeleteOutlined, EditOutlined, PlusOutlined} from "@ant-design/icons";
 
 const Deposit = () => {
     const [data, setData] = useState([]);
@@ -137,15 +138,23 @@ const Deposit = () => {
                 const editable = isEditing(record);
                 return editable ? (
                     <Space>
-                        <Button type={"primary"} onClick={() => save(record)}>保存</Button>
-
-                        <Button onClick={cancel}>取消</Button>
+                        <Button
+                            type={"primary"}
+                            onClick={() => save(record)}
+                            icon={<CheckOutlined/>}
+                        />
+                        <Button onClick={cancel} icon={<CloseOutlined/>}/>
                     </Space>
                 ) : (
                     <Space>
-                        <Button type={"primary"} disabled={editingKey !== ''} onClick={() => edit(record)}>编辑</Button>
+                        <Button
+                            type={"primary"}
+                            disabled={editingKey !== ''}
+                            onClick={() => edit(record)}
+                            icon={<EditOutlined/>}
+                        />
                         <Popconfirm title={`确定删除吗?`} onConfirm={() => deleteRecord(record)}>
-                            <Button danger disabled={editingKey !== ''}>删除</Button>
+                            <Button icon={<DeleteOutlined/>}/>
                         </Popconfirm>
                     </Space>
                 );
@@ -156,7 +165,8 @@ const Deposit = () => {
     return (
         <>
             <Space style={{marginBottom: 10}}>
-                <Button type="primary" onClick={() => setIsModalVisible(true)}>添加</Button>
+                <Button type="primary" onClick={() => setIsModalVisible(true)}
+                        icon={<PlusOutlined/>} shape="round"/>
                 <Checkbox onChange={onPaginationChange} checked={isPaginated}>是否分页</Checkbox>
                 <Tag color="magenta">当前共有{data.length}条记录</Tag>
                 <Tag color="magenta">方便管理个人地址和交易所充值地址，做到一一对应，防止女巫</Tag>

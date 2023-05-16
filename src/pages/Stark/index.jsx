@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react";
-import {Button, Input, Space, Table, Modal, Form, notification, Spin, Tag} from 'antd';
+import {Button, Input, Space, Table, Modal, Form, notification, Spin, Tag, Popconfirm} from 'antd';
 import {Layout, Card} from 'antd';
 import {
     getStarkTx,
@@ -713,13 +713,9 @@ const Stark = () => {
                             align={"center"}
                             render={(text, record) => (
                                 <Space size="small">
-                                    <Button
-                                        type="primary"
-                                        danger
-                                        onClick={() => handleDelete(record.key)}
-                                    >
-                                        删除
-                                    </Button>
+                                    <Popconfirm title={"确认删除？"} onConfirm={() => handleDelete(record.key)}>
+                                        <Button icon={<DeleteOutlined/>}/>
+                                    </Popconfirm>
                                 </Space>
                             )}
                             // fixed={"right"}

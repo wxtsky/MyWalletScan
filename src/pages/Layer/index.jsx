@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react";
-import {Button, Card, Form, Input, Layout, Modal, notification, Space, Spin, Table, Tag} from "antd";
+import {Button, Card, Form, Input, Layout, Modal, notification, Popconfirm, Space, Spin, Table, Tag} from "antd";
 import {exportToExcel, getLayerData} from "@utils";
 import {
     DeleteOutlined,
@@ -275,16 +275,16 @@ const Layer = () => {
                 return isEditing ? (
                     <Input
                         placeholder="请输入备注"
-                            defaultValue={text}
-                            onPressEnter={(e) => {
-                                record.name = e.target.value;
-                                setData([...data]);
-                                localStorage.setItem('l0_addresses', JSON.stringify(data));
-                                setEditingKey(null);
-                            }}
-                        />
-                    ) : (
-                        <>
+                        defaultValue={text}
+                        onPressEnter={(e) => {
+                            record.name = e.target.value;
+                            setData([...data]);
+                            localStorage.setItem('l0_addresses', JSON.stringify(data));
+                            setEditingKey(null);
+                        }}
+                    />
+                ) : (
+                    <>
                             <Tag color="blue">{text}</Tag>
                             <Button
                                 shape="circle"
@@ -389,13 +389,9 @@ const Layer = () => {
                 render: (text, record) => {
                     return (
                         <Space size="small">
-                            <Button
-                                type="primary"
-                                danger
-                                onClick={() => handleDelete(record.key)}
-                            >
-                                删除
-                            </Button>
+                            <Popconfirm title={"确定删除吗？"} onConfirm={() => handleDelete(record.key)}>
+                                <Button icon={<DeleteOutlined/>}/>
+                            </Popconfirm>
                         </Space>
                     )
                 },
