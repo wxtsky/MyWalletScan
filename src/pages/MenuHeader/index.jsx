@@ -8,7 +8,7 @@ const items = [
         key: 'zksync',
     },
     {
-        label: 'StarkWare',
+        label: 'Stark',
         key: 'stark',
     },
     {

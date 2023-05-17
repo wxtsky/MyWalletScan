@@ -56,7 +56,7 @@ async function getLayerData(address, apiKeyData) {
                     const methodIds =
                         ["0x9fbf10fc", "0x1114cd2a", "0xc858f5f9", "0x76a9099a", "0x2e15238c", "0xae30f6ee",
                          "0xc45dec27", "0x2cdf0b95", "0x879762e2", "0x656f3d64", "0x51905636", "0xad660825",
-                         "0xfe359a0d", "0xca23bb4c"];
+                         "0xfe359a0d", "0xca23bb4c", "0x00000005"];
                     if (methodIds.includes(methodId)) {
                         tx += 1;
                     }
