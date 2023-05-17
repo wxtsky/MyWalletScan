@@ -402,6 +402,7 @@ const Stark = () => {
             });
         } finally {
             batchForm.resetFields();
+            setSelectedKeys([]);
         }
     }
     const handleRefresh = async () => {
@@ -508,6 +509,7 @@ const Stark = () => {
             }, 2);
         } finally {
             setIsLoading(false);
+            setSelectedKeys([]);
         }
     };
     const handleDeleteSelected = () => {
@@ -718,7 +720,6 @@ const Stark = () => {
                                     </Popconfirm>
                                 </Space>
                             )}
-                            // fixed={"right"}
                         />
                     </Table>
                 </Spin>
@@ -739,7 +740,7 @@ const Stark = () => {
                                 disabled={!selectedKeys.length} icon={<SyncOutlined/>}>
                             刷新选中地址
                         </Button>
-                        <Button type="primary" danger onClick={handleDeleteSelected} size={"large"}
+                        <Button type="primary" danger size={"large"} onConfirm={handleDeleteSelected}
                                 style={{width: "20%"}}
                                 disabled={!selectedKeys.length} icon={<DeleteOutlined/>}>
                             删除选中地址

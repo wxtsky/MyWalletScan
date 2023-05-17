@@ -180,6 +180,7 @@ const Layer = () => {
             }, 2);
         } finally {
             setIsLoading(false);
+            setSelectedKeys([]);
         }
     };
     const handleBatchOk = async () => {
@@ -255,6 +256,7 @@ const Layer = () => {
             });
         } finally {
             batchForm.resetFields();
+            setSelectedKeys([]);
         }
     }
     const [editingKey, setEditingKey] = useState(null);
@@ -285,16 +287,16 @@ const Layer = () => {
                     />
                 ) : (
                     <>
-                            <Tag color="blue">{text}</Tag>
-                            <Button
-                                shape="circle"
-                                icon={<EditOutlined/>}
-                                size={"small"}
-                                onClick={() => setEditingKey(record.key)}
-                            />
-                        </>
-                    );
-                }
+                        <Tag color="blue">{text}</Tag>
+                        <Button
+                            shape="circle"
+                            icon={<EditOutlined/>}
+                            size={"small"}
+                            onClick={() => setEditingKey(record.key)}
+                        />
+                    </>
+                );
+            }
             },
             {
                 title: '地址',
@@ -540,7 +542,7 @@ const Layer = () => {
                                 disabled={!selectedKeys.length} icon={<SyncOutlined/>}>
                             刷新选中地址
                         </Button>
-                        <Button type="primary" danger onClick={handleDeleteSelected} size={"large"}
+                        <Button type="primary" danger size={"large"} onConfirm={handleDeleteSelected}
                                 style={{width: "15%"}}
                                 disabled={!selectedKeys.length} icon={<DeleteOutlined/>}>
                             删除选中地址

@@ -26,6 +26,7 @@ const {TextArea} = Input;
 const {Column, ColumnGroup} = Table;
 
 function Zksync() {
+
     const [data, setData] = useState([]);
     const [isBatchModalVisible, setIsBatchModalVisible] = useState(false);
     const [batchForm] = Form.useForm();
@@ -296,6 +297,7 @@ function Zksync() {
             }, 2);
         } finally {
             setIsLoading(false);
+            setSelectedKeys([]);
         }
     };
     const handleBatchOk = async () => {
@@ -462,6 +464,7 @@ function Zksync() {
             });
         } finally {
             batchForm.resetFields();
+            setSelectedKeys([]);
         }
     };
     const showModal = () => {
@@ -517,7 +520,7 @@ function Zksync() {
                 >
                     <Form form={batchForm} layout="vertical">
                         <Form.Item label="地址" name="addresses" rules={[{required: true}]}>
-                            <TextArea placeholder="请输入地址，每行一个"/>
+                            <TextArea placeholder="请输入地址，每行一个" style={{width: "500px", height: "200px"}}/>
                         </Form.Item>
                     </Form>
                 </Modal>
@@ -601,7 +604,7 @@ function Zksync() {
                         <ColumnGroup title="zkSyncEra" className={"zks_era"}>
                             <Column title="ETH" dataIndex="zks2_balance" key="zks2_balance" align={"center"}
                                     render={(text, record) => (text === null ? <Spin/> : text)}/>
-                            <Column title="USDC" dataIndex="zks2_usdcBalance" key="zks2_usdc_balance" align={"center"}
+                            <Column title="USDC" dataIndex="zks2_usdcBalance" key="zks2_usdcBalance" align={"center"}
                                     render={(text, record) => (text === null ? <Spin/> : text)}/>
                             <Column title="Tx" dataIndex="zks2_tx_amount" key="zks2_tx_amount" align={"center"}
                                     render={(text, record) => (text === null ? <Spin/> : text)}/>
@@ -610,9 +613,9 @@ function Zksync() {
                                         <a href={"https://explorer.zksync.io/address/" + record.address}
                                            target={"_blank"}>{text}</a>)}/>
                             <ColumnGroup title="官方桥跨链Tx数" className={""}>
-                                <Column title="L1->L2" dataIndex="l1Tol2Times" key="l1Tol2Tx" align={"center"}
+                                <Column title="L1->L2" dataIndex="l1Tol2Times" key="l1Tol2Times" align={"center"}
                                         render={(text, record) => (text === null ? <Spin/> : text)}/>
-                                <Column title="L2->L1" dataIndex="l2Tol1Times" key="l2Tol1Tx" align={"center"}
+                                <Column title="L2->L1" dataIndex="l2Tol1Times" key="l2Tol1Times" align={"center"}
                                         render={(text, record) => (text === null ? <Spin/> : text)}/>
                             </ColumnGroup>
                             <ColumnGroup title="官方桥跨链金额(ETH)" className={""}>
@@ -622,11 +625,11 @@ function Zksync() {
                                         render={(text, record) => (text === null ? <Spin/> : text)}/>
                             </ColumnGroup>
                             <ColumnGroup title="活跃统计" className={""}>
-                                <Column title="日" dataIndex="dayActivity" key="dayActive" align={"center"}
+                                <Column title="日" dataIndex="dayActivity" key="dayActivity" align={"center"}
                                         render={(text, record) => (text === null ? <Spin/> : text)}/>
-                                <Column title="周" dataIndex="weekActivity" key="weekAvtive" align={"center"}
+                                <Column title="周" dataIndex="weekActivity" key="weekActivity" align={"center"}
                                         render={(text, record) => (text === null ? <Spin/> : text)}/>
-                                <Column title="月" dataIndex="monthActivity" key="monthActive" align={"center"}
+                                <Column title="月" dataIndex="monthActivity" key="monthActivity" align={"center"}
                                         render={(text, record) => (text === null ? <Spin/> : text)}/>
                             </ColumnGroup>
                         </ColumnGroup>
@@ -659,7 +662,7 @@ function Zksync() {
                                 style={{width: "20%"}} disabled={!selectedKeys.length} icon={<SyncOutlined/>}>
                             刷新选中地址
                         </Button>
-                        <Button type="primary" danger onClick={handleDeleteSelected} size={"large"}
+                        <Button type="primary" danger size={"large"} onConfirm={handleDeleteSelected}
                                 style={{width: "20%"}} disabled={!selectedKeys.length} icon={<DeleteOutlined/>}>
                             删除选中地址
                         </Button>

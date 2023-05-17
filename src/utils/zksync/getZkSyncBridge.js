@@ -14,6 +14,7 @@ function getWeekNumber(d) {
 }
 
 function getMonthNumber(d) {
+    console.log(d.getUTCFullYear() + "-" + (d.getUTCMonth() + 1))
     return d.getUTCFullYear() + "-" + (d.getUTCMonth() + 1);
 }
 
@@ -32,9 +33,11 @@ async function processTransactions(
     const months = new Set();
     for (let i = 0; i < list.length; i++) {
         const receivedAt = new Date(list[i]['receivedAt']);
+        console.log(receivedAt)
         days.add(getDayNumber(receivedAt));
         weeks.add(getWeekNumber(receivedAt));
         months.add(getMonthNumber(receivedAt));
+        console.log(months.size)
         if (list[i].isL1Originated === true) {
             l1Tol2Times++;
             const value = ethers.formatEther(list[i].data.value, "ether");
