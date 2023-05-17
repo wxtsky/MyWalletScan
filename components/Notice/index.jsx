@@ -41,10 +41,13 @@ const Notice = () => {
                 <p style={{color: '#666', marginBottom: '10px'}}>迁移注意事项</p>
                 <ul>
                     <li style={{color: '#666', marginBottom: '10px'}}>1.
-                        迁移到新网站以后，原网站将逐渐关闭（一周左右），您可以将数据迁移到新的网站。
+                        迁移到新网站以后，原网站（http://150.158.27.95）将逐渐关闭（一周左右），您可以将数据迁移到新的网站。
                     </li>
                     <li style={{color: '#666', marginBottom: '10px'}}>2.
                         新的网站域名将永远不会改变，您以后可以放心使用。纯前端页面，不会收集任何信息。
+                    </li>
+                    <li style={{color: '#666', marginBottom: '10px'}}>2.
+                        如果您正在使用旧网站，可以将数据手动迁移到新网站，如果您使用的是新网站，可以忽略这条信息。
                     </li>
                 </ul>
                 <p>新的网站链接：<a href={"https://bitboxtools.github.io"}>https://bitboxtools.github.io</a></p>
