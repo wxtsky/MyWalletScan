@@ -297,16 +297,16 @@ const Layer = () => {
                     </>
                 );
             }
-            },
-            {
-                title: '地址',
-                dataIndex: 'address',
-                key: 'address',
-                align: 'center',
-            },
-            {
-                title: 'ETH',
-                dataIndex: 'eth',
+        },
+        {
+            title: '地址',
+            dataIndex: 'address',
+            key: 'address',
+            align: 'center',
+        },
+        {
+            title: 'ETH',
+            dataIndex: 'eth',
                 key: 'eth',
                 render: (text, record) => {
                     return (text === null ? <Spin/> : text)

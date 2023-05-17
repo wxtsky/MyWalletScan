@@ -521,6 +521,254 @@ const Stark = () => {
         exportToExcel(data, 'starkInfo');
     }
     const [editingKey, setEditingKey] = useState(null);
+    const columns = [
+        {
+            title: "#",
+            key: "index",
+            align: "center",
+            render: (text, record, index) => index + 1,
+        },
+        {
+            title: "备注",
+            dataIndex: "name",
+            key: "name",
+            align: "center",
+            className: "name",
+            render: (text, record) => {
+                const isEditing = record.key === editingKey;
+                return isEditing ? (
+                    <Input
+                        placeholder="请输入备注"
+                        defaultValue={text}
+                        onPressEnter={(e) => {
+                            record.name = e.target.value;
+                            setData([...data]);
+                            localStorage.setItem('stark_addresses', JSON.stringify(data));
+                            setEditingKey(null);
+                        }}
+                    />
+                ) : (
+                    <>
+                        <Tag color="blue">{text}</Tag>
+                        <Button
+                            shape="circle"
+                            icon={<EditOutlined/>}
+                            size={"small"}
+                            onClick={() => setEditingKey(record.key)}
+                        />
+                    </>
+                );
+            },
+        },
+        {
+            title: "钱包地址",
+            dataIndex: "address",
+            key: "address",
+            align: "center",
+            className: "address",
+            render: (text, record) =>
+                text === null ? <Spin/> : text.slice(0, 4) + "..." + text.slice(-4),
+        },
+        {
+            title: "创建时间",
+            dataIndex: "create_time",
+            key: "create_time",
+            align: "center",
+            className: "create_time",
+            render: (text, record) => {
+                if (text === null) {
+                    return <Spin/>;
+                } else {
+                    let date = new Date(text * 1000);
+                    let year = date.getFullYear();
+                    let month = (date.getMonth() + 1).toString().padStart(2, '0');
+                    let day = date.getDate().toString().padStart(2, '0');
+                    return `${year}/${month}/${day}`;
+                }
+            },
+        },
+        {
+            title: "StarkId",
+            dataIndex: "stark_id",
+            key: "stark_id",
+            align: "center",
+            render: (text, record) => text === null ? <Spin/> : text,
+        },
+        {
+            title: "StarkWare",
+            className: "zksync2",
+            children: [
+                {
+                    title: "ETH",
+                    dataIndex: "stark_eth_balance",
+                    key: "stark_eth_balance",
+                    align: "center",
+                    render: (text, record) => text === null ? <Spin/> : text,
+                },
+                {
+                    title: "Tx",
+                    dataIndex: "stark_tx_amount",
+                    key: "stark_tx_amount",
+                    align: "center",
+                    render: (text, record) => text === null ? <Spin/> : text,
+                },
+                {
+                    title: "最后交易时间",
+                    dataIndex: "stark_latest_tx",
+                    key: "stark_latest_tx",
+                    align: "center",
+                    render: (text, record) => text === null ? <Spin/> : text,
+                },
+                {
+                    title: "官方桥Tx数量",
+                    className: "stark_cross_tx",
+                    children: [
+                        {
+                            title: "L1->L2",
+                            children: [
+                                {
+                                    title: "ETH",
+                                    dataIndex: "d_eth_count",
+                                    key: "12cross_eth_tx",
+                                    align: "center",
+                                    render: (text, record) => text === null ? <Spin/> : text,
+                                },
+                                {
+                                    title: "USDT",
+                                    dataIndex: "d_usdt_count",
+                                    key: "12cross_usdt_tx",
+                                    align: "center",
+                                    render: (text, record) => text === null ? <Spin/> : text,
+                                },
+                                {
+                                    title: "USDC",
+                                    dataIndex: "d_usdc_count",
+                                    key: "12cross_usdc_tx",
+                                    align: "center",
+                                    render: (text, record) => text === null ? <Spin/> : text,
+                                },
+                                {
+                                    title: "总计",
+                                    dataIndex: "total_deposit_count",
+                                    key: "12cross_total_tx",
+                                    align: "center",
+                                    render: (text, record) => text === null ? <Spin/> : text
+                                }
+                            ]
+                        },
+                        {
+                            title: "L2->L1",
+                            className: "cross21",
+                            children: [
+                                {
+                                    title: "ETH",
+                                    dataIndex: "w_eth_count",
+                                    key: "21cross_eth_tx",
+                                    align: "center",
+                                    render: (text, record) => text === null ? <Spin/> : text,
+                                },
+                                {
+                                    title: "USDT",
+                                    dataIndex: "w_usdt_count",
+                                    key: "21cross_usdt_tx",
+                                    align: "center",
+                                    render: (text, record) => text === null ? <Spin/> : text,
+                                },
+                                {
+                                    title: "USDC",
+                                    dataIndex: "w_usdc_count",
+                                    key: "21cross_usdc_tx",
+                                    align: "center",
+                                    render: (text, record) => text === null ? <Spin/> : text,
+                                },
+                                {
+                                    title: "总计",
+                                    dataIndex: "total_widthdraw_count",
+                                    key: "21cross_total_tx",
+                                    align: "center",
+                                    render: (text, record) => text === null ? <Spin/> : text
+                                }
+                            ]
+                        },
+                    ]
+                },
+                {
+                    title: "官方桥跨链额",
+                    className: "stark_cross_amount",
+                    children: [
+                        {
+                            title: "L1->L2",
+                            children: [
+                                {
+                                    title: "ETH",
+                                    dataIndex: "d_eth_amount",
+                                    key: "12cross_eth_amount",
+                                    align: "center",
+                                    render: (text, record) => text === null ? <Spin/> : text,
+                                },
+                                {
+                                    title: "USDT",
+                                    dataIndex: "d_usdt_amount",
+                                    key: "12cross_usdt_amount",
+                                    align: "center",
+                                    render: (text, record) => text === null ? <Spin/> : text,
+                                },
+                                {
+                                    title: "USDC",
+                                    dataIndex: "d_usdc_amount",
+                                    key: "12cross_usdc_amount",
+                                    align: "center",
+                                    render: (text, record) => text === null ? <Spin/> : text,
+                                },
+                            ]
+                        },
+                        {
+                            title: "L2->L1",
+                            className: "cross21",
+                            children: [
+                                {
+                                    title: "ETH",
+                                    dataIndex: "w_eth_amount",
+                                    key: "21cross_eth_amount",
+                                    align: "center",
+                                    render: (text, record) => text === null ? <Spin/> : text,
+                                },
+                                {
+                                    title: "USDT",
+                                    dataIndex: "w_usdt_amount",
+                                    key: "21cross_usdt_amount",
+                                    align: "center",
+                                    render: (text, record) => text === null ? <Spin/> : text,
+                                },
+                                {
+                                    title: "USDC",
+                                    dataIndex: "w_usdc_amount",
+                                    key: "21cross_usdc_amount",
+                                    align: "center",
+                                    render: (text, record) => text === null ? <Spin/> : text,
+                                }
+                            ]
+                        }
+
+                    ]
+
+                },
+                {
+                    title: "操作",
+                    key: "action",
+                    align: "center",
+                    render: (text, record) => (
+                        <Space size="small">
+                            <Popconfirm title={"确认删除？"} onConfirm={() => handleDelete(record.key)}>
+                                <Button icon={<DeleteOutlined/>}/>
+                            </Popconfirm>
+                        </Space>
+                    )
+
+                }
+            ]
+        },
+    ];
     return (
         <div>
             <Content>
@@ -565,163 +813,8 @@ const Stark = () => {
                         bordered={true}
                         style={{marginBottom: "20px"}}
                         size={"small"}
-                    >
-                        <Column
-                            title="#"
-                            key="index"
-                            align={"center"}
-                            render={(text, record, index) => index + 1}
-                        />
-                        <Column
-                            title="备注"
-                            dataIndex="name"
-                            key="name"
-                            align={"center"}
-                            className={"name"}
-                            render={(text, record) => {
-                                const isEditing = record.key === editingKey; // Check if this row is being edited
-                                return isEditing ? (
-                                    <Input
-                                        placeholder="请输入备注"
-                                        defaultValue={text}
-                                        onPressEnter={(e) => {
-                                            record.name = e.target.value;
-                                            setData([...data]);
-                                            localStorage.setItem('stark_addresses', JSON.stringify(data));
-                                            setEditingKey(null); // Stop editing when Enter is pressed
-                                        }}
-                                    />
-                                ) : (
-                                    <>
-                                        <Tag color="blue">{text}</Tag>
-                                        <Button
-                                            shape="circle"
-                                            icon={<EditOutlined/>}
-                                            size={"small"}
-                                            onClick={() => setEditingKey(record.key)} // Start editing when the button is clicked
-                                        />
-                                    </>
-                                );
-                            }}
-                        />
-                        <Column title="钱包地址" dataIndex="address" key="address" align={"center"}
-                                className={"address"}
-                                render={(text, record) => (
-                                    text === null ? <Spin/> : text.slice(0, 4) + "..." + text.slice(-4)
-                                )}
-                        />
-                        <Column title="创建时间" dataIndex="create_time" key="create_time" align={"center"}
-                                className={"create_time"}
-                                render={(text, record) => {
-                                    if (text === null) {
-                                        return <Spin/>;
-                                    } else {
-                                        let date = new Date(text * 1000);
-                                        let year = date.getFullYear();
-                                        let month = (date.getMonth() + 1).toString().padStart(2, '0'); // month is 0-based
-                                        let day = date.getDate().toString().padStart(2, '0');
-                                        return `${year}/${month}/${day}`;
-                                    }
-                                }}
-
-                        />
-
-                        <Column title="StarkId" dataIndex="stark_id" key="stark_id" align={"center"}
-                                className={"stark_id"}
-                                render={(text, record) => (text === null ? <Spin/> : text)}
-                        />
-                        <ColumnGroup title="StarkWare" className={"zksync2"}>
-                            <Column title="ETH" dataIndex="stark_eth_balance" key="stark_eth_balance" align={"center"}
-                                    render={(text, record) => (text === null ? <Spin/> : text)} className={"zks2_son"}/>
-                            <Column title="Tx" dataIndex="stark_tx_amount" key="stark_tx_amount" align={"center"}
-                                    render={(text, record) => (text === null ? <Spin/> : text)} className={"zks2_son"}/>
-                            <Column title="最后交易时间" dataIndex="stark_latest_tx" key="stark_latest_tx"
-                                    align={"center"}
-                                    render={(text, record) => (text === null ? <Spin/> : text)} className={"zks2_son"}/>
-                            <ColumnGroup title="官方桥Tx数量" className={"stark_cross_tx"}>
-                                <ColumnGroup title="L1->L2" className={"cross12"}>
-                                    <Column title="ETH"
-                                            dataIndex="d_eth_count"
-                                            key="12cross_eth_tx" align={"center"}
-                                            render={(text, record) => (text === null ? <Spin/> : text)}
-                                            className={"cross_son"}/>
-                                    <Column title="USDC" dataIndex="d_usdc_count" key="12cross_usdc_tx"
-                                            align={"center"}
-                                            render={(text, record) => (text === null ? <Spin/> : text)}
-                                            className={"cross_son"}/>
-                                    <Column title="USDT" dataIndex="d_usdt_count" key="12cross_usdt_tx"
-                                            align={"center"}
-                                            render={(text, record) => (text === null ? <Spin/> : text)}
-                                            className={"cross_son"}/>
-                                    <Column title="总共" dataIndex="total_deposit_count" key="12cross_total_tx"
-                                            align={"center"}
-                                            render={(text, record) => (text === null ? <Spin/> : text)}
-                                            className={"cross_son"}/>
-                                </ColumnGroup>
-                                <ColumnGroup title="L2->L1" className={"cross21"}>
-                                    <Column title="ETH" dataIndex="w_eth_count" key="21cross_eth_tx" align={"center"}
-                                            render={(text, record) => (text === null ? <Spin/> : text)}
-                                            className={"cross_son"}/>
-                                    <Column title="USDC" dataIndex="w_usdc_count" key="21cross_usdc_tx"
-                                            align={"center"}
-                                            render={(text, record) => (text === null ? <Spin/> : text)}
-                                            className={"cross_son"}/>
-                                    <Column title="USDT" dataIndex="w_usdt_count" key="21cross_usdt_tx"
-                                            align={"center"}
-                                            render={(text, record) => (text === null ? <Spin/> : text)}
-                                            className={"cross_son"}/>
-                                    <Column title="总共" dataIndex="total_widthdraw_count" key="21cross_total_tx"
-                                            align={"center"}
-                                            render={(text, record) => (text === null ? <Spin/> : text)}
-                                            className={"cross_son"}/>
-                                </ColumnGroup>
-                            </ColumnGroup>
-                            <ColumnGroup title="官方桥跨链额" className={"stark_cross_amount"}>
-                                <ColumnGroup title="L1->L2" className={"cross12a"}>
-                                    <Column title="ETH" dataIndex="d_eth_amount"
-                                            key="12cross_eth_amount"
-                                            align={"center"}
-                                            render={(text, record) => (text === null ? <Spin/> : text)}
-                                            className={"cross_son"}/>
-                                    <Column title="USDC" dataIndex="d_usdc_amount" key="12cross_usdc_amount"
-                                            align={"center"}
-                                            render={(text, record) => (text === null ? <Spin/> : text)}
-                                            className={"cross_son"}/>
-                                    <Column title="USDT" dataIndex="d_usdt_amount" key="12cross_usdt_amount"
-                                            align={"center"}
-                                            render={(text, record) => (text === null ? <Spin/> : text)}
-                                            className={"cross_son"}/>
-                                </ColumnGroup>
-                                <ColumnGroup title="L2->L1" className={"cross21a"}>
-                                    <Column title="ETH" dataIndex="w_eth_amount" key="21cross_eth_amount"
-                                            align={"center"}
-                                            render={(text, record) => (text === null ? <Spin/> : text)}
-                                            className={"cross_son"}/>
-                                    <Column title="USDC" dataIndex="w_usdc_amount" key="21cross_usdc_amount"
-                                            align={"center"}
-                                            render={(text, record) => (text === null ? <Spin/> : text)}
-                                            className={"cross_son"}/>
-                                    <Column title="USDT" dataIndex="w_usdt_amount" key="21cross_usdt_amount"
-                                            align={"center"}
-                                            render={(text, record) => (text === null ? <Spin/> : text)}
-                                            className={"cross_son"}/>
-                                </ColumnGroup>
-                            </ColumnGroup>
-                        </ColumnGroup>
-                        <Column
-                            className={"action"}
-                            title="操作"
-                            key="action"
-                            align={"center"}
-                            render={(text, record) => (
-                                <Space size="small">
-                                    <Popconfirm title={"确认删除？"} onConfirm={() => handleDelete(record.key)}>
-                                        <Button icon={<DeleteOutlined/>}/>
-                                    </Popconfirm>
-                                </Space>
-                            )}
-                        />
-                    </Table>
+                        columns={columns}
+                    />
                 </Spin>
                 <Card>
                     <div style={{width: '100%', display: 'flex', justifyContent: 'space-between'}}>
