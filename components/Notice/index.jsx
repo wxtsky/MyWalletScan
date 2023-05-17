@@ -9,7 +9,7 @@ const Notice = () => {
     return (
         <div>
             <Modal
-                title="注意事项"
+                title="注意事项(2023-05-17)"
                 open={modalIsOpen}
                 onOk={() => setModalIsOpen(false)}
                 onCancel={() => setModalIsOpen(false)}
@@ -46,7 +46,7 @@ const Notice = () => {
                     <li style={{color: '#666', marginBottom: '10px'}}>2.
                         新的网站域名将永远不会改变，您以后可以放心使用。纯前端页面，不会收集任何信息。
                     </li>
-                    <li style={{color: '#666', marginBottom: '10px'}}>2.
+                    <li style={{color: '#666', marginBottom: '10px'}}>3.
                         如果您正在使用旧网站，可以将数据手动迁移到新网站，如果您使用的是新网站，可以忽略这条信息。
                     </li>
                 </ul>

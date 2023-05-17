@@ -19,20 +19,17 @@ function getMonthNumber(d) {
 }
 
 async function processTransactions(
+    days,
+    weeks,
+    months,
     list,
-    dayActivity,
-    weekActivity,
-    monthActivity,
     l1Tol2Times,
     l1Tol2Amount,
     l2Tol1Times,
     l2Tol1Amount
 ) {
-    const days = new Set();
-    const weeks = new Set();
-    const months = new Set();
     for (let i = 0; i < list.length; i++) {
-        const receivedAt = new Date(list[i]['receivedAt']);
+        const receivedAt = new Date(Date.parse(list[i]['receivedAt']));
         console.log(receivedAt)
         days.add(getDayNumber(receivedAt));
         weeks.add(getWeekNumber(receivedAt));
@@ -51,14 +48,15 @@ async function processTransactions(
             l2Tol1Amount += parseFloat(value);
         }
     }
-    dayActivity += days.size;
-    weekActivity += weeks.size;
-    monthActivity += months.size;
-    return [dayActivity, weekActivity, monthActivity, l1Tol2Times, l1Tol2Amount, l2Tol1Times, l2Tol1Amount];
+    return [days, weeks, months, l1Tol2Times, l1Tol2Amount, l2Tol1Times,
+            l2Tol1Amount];
 }
 
 async function getZkSyncBridge(address) {
     try {
+        let days = new Set();
+        let weeks = new Set();
+        let months = new Set();
         let dayActivity = 0;
         let weekActivity = 0;
         let monthActivity = 0;
@@ -72,14 +70,12 @@ async function getZkSyncBridge(address) {
         const initUrl = "https://zksync2-mainnet-explorer.zksync.io/transactions?limit=100&direction=older&accountAddress=" + address;
         const initResponse = await axios.get(initUrl)
         const initDataLength = initResponse.data.total;
-        [dayActivity,
-         weekActivity,
-         monthActivity, l1Tol2Times, l1Tol2Amount, l2Tol1Times, l2Tol1Amount] =
+        [days, weeks, months, l1Tol2Times, l1Tol2Amount, l2Tol1Times, l2Tol1Amount] =
             await processTransactions(
+                days,
+                weeks,
+                months,
                 initResponse.data.list,
-                dayActivity,
-                weekActivity,
-                monthActivity,
                 l1Tol2Times,
                 l1Tol2Amount,
                 l2Tol1Times,
@@ -95,12 +91,13 @@ async function getZkSyncBridge(address) {
                 }
                 const response = await axios.get(url);
                 const ListLength = response.data.list.length;
-                [dayActivity, weekActivity, monthActivity, l1Tol2Times, l1Tol2Amount, l2Tol1Times, l2Tol1Amount] =
+                [
+                    days, weeks, months, l1Tol2Times, l1Tol2Amount, l2Tol1Times, l2Tol1Amount] =
                     await processTransactions(
+                        days,
+                        weeks,
+                        months,
                         response.data.list,
-                        dayActivity,
-                        weekActivity,
-                        monthActivity,
                         l1Tol2Times,
                         l1Tol2Amount,
                         l2Tol1Times,
@@ -113,6 +110,9 @@ async function getZkSyncBridge(address) {
                 }
             }
         }
+        dayActivity = days.size;
+        weekActivity = weeks.size;
+        monthActivity = months.size;
         return {
             dayActivity,
             weekActivity,
