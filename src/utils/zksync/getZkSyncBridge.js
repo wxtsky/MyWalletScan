@@ -19,6 +19,9 @@ function getMonthNumber(d) {
 }
 
 async function processTransactions(
+    address,
+    totalFee,
+    contract,
     days,
     weeks,
     months,
@@ -29,12 +32,16 @@ async function processTransactions(
     l2Tol1Amount
 ) {
     for (let i = 0; i < list.length; i++) {
-        const receivedAt = new Date(Date.parse(list[i]['receivedAt']));
-        console.log(receivedAt)
-        days.add(getDayNumber(receivedAt));
-        weeks.add(getWeekNumber(receivedAt));
-        months.add(getMonthNumber(receivedAt));
-        console.log(months.size)
+        if (list[i]['balanceChanges'][0]['from'].toLowerCase() === address.toLowerCase()) {
+            const receivedAt = new Date(Date.parse(list[i]['receivedAt']));
+            const contractAddress = list[i].data.contractAddress;
+            const fee = (parseInt(list[i].fee, 16) / 10 ** 18).toFixed(5)
+            totalFee += parseFloat(fee);
+            contract.add(contractAddress)
+            days.add(getDayNumber(receivedAt));
+            weeks.add(getWeekNumber(receivedAt));
+            months.add(getMonthNumber(receivedAt));
+        }
         if (list[i].isL1Originated === true) {
             l1Tol2Times++;
             const value = ethers.formatEther(list[i].data.value, "ether");
@@ -48,18 +55,21 @@ async function processTransactions(
             l2Tol1Amount += parseFloat(value);
         }
     }
-    return [days, weeks, months, l1Tol2Times, l1Tol2Amount, l2Tol1Times,
+    return [totalFee, contract, days, weeks, months, l1Tol2Times, l1Tol2Amount, l2Tol1Times,
             l2Tol1Amount];
 }
 
 async function getZkSyncBridge(address) {
     try {
+        let contract = new Set();
         let days = new Set();
         let weeks = new Set();
         let months = new Set();
-        let dayActivity = 0;
-        let weekActivity = 0;
-        let monthActivity = 0;
+        let dayActivity;
+        let weekActivity;
+        let monthActivity;
+        let contractActivity;
+        let totalFee = 0;
         let l1Tol2Times = 0;
         let l1Tol2Amount = 0;
         let l2Tol1Times = 0;
@@ -70,8 +80,11 @@ async function getZkSyncBridge(address) {
         const initUrl = "https://zksync2-mainnet-explorer.zksync.io/transactions?limit=100&direction=older&accountAddress=" + address;
         const initResponse = await axios.get(initUrl)
         const initDataLength = initResponse.data.total;
-        [days, weeks, months, l1Tol2Times, l1Tol2Amount, l2Tol1Times, l2Tol1Amount] =
+        [totalFee, contract, days, weeks, months, l1Tol2Times, l1Tol2Amount, l2Tol1Times, l2Tol1Amount] =
             await processTransactions(
+                address,
+                totalFee,
+                contract,
                 days,
                 weeks,
                 months,
@@ -92,8 +105,11 @@ async function getZkSyncBridge(address) {
                 const response = await axios.get(url);
                 const ListLength = response.data.list.length;
                 [
-                    days, weeks, months, l1Tol2Times, l1Tol2Amount, l2Tol1Times, l2Tol1Amount] =
+                    totalFee, contract, days, weeks, months, l1Tol2Times, l1Tol2Amount, l2Tol1Times, l2Tol1Amount] =
                     await processTransactions(
+                        address,
+                        totalFee,
+                        contract,
                         days,
                         weeks,
                         months,
@@ -113,7 +129,10 @@ async function getZkSyncBridge(address) {
         dayActivity = days.size;
         weekActivity = weeks.size;
         monthActivity = months.size;
+        contractActivity = contract.size;
         return {
+            totalFee: totalFee.toFixed(4),
+            contractActivity,
             dayActivity,
             weekActivity,
             monthActivity,
@@ -125,6 +144,8 @@ async function getZkSyncBridge(address) {
     } catch (e) {
         console.log(e);
         return {
+            totalFee: "Error",
+            contractActivity: "Error",
             dayActivity: "Error", weekActivity: "Error", monthActivity: "Error",
             l1Tol2Times: "Error", l1Tol2Amount: "Error", l2Tol1Times: "Error", l2Tol1Amount: "Error"
         }

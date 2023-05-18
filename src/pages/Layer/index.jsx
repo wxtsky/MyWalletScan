@@ -25,15 +25,17 @@ const Layer = () => {
     const [isChangeApiModalVisible, setIsChangeApiModalVisible] = useState(false);
     const [tableLoading, setTableLoading] = useState(false);
     const [apiKey, setApiKey] = useState(localStorage.getItem('l0_api_key'));
-    const rowSelection = {
-        onChange: (selectedRowKeys, selectedRows) => {
-            setSelectedKeys(selectedRowKeys);
-        },
-    };
     const exportToExcelFile = () => {
         exportToExcel(data, 'LayerZeroInfo');
     }
     const handleDeleteSelected = () => {
+        if (!selectedKeys.length) {
+            notification.error({
+                message: "错误",
+                description: "请先选择要删除的地址",
+            }, 2);
+            return;
+        }
         setData(data.filter(item => !selectedKeys.includes(item.key)));
         localStorage.setItem('l0_addresses', JSON.stringify(data.filter(item => !selectedKeys.includes(item.key))));
         setSelectedKeys([]);
@@ -307,16 +309,16 @@ const Layer = () => {
         {
             title: 'ETH',
             dataIndex: 'eth',
-                key: 'eth',
-                render: (text, record) => {
-                    return (text === null ? <Spin/> : text)
-                },
-                align: 'center',
+            key: 'eth',
+            render: (text, record) => {
+                return (text === null ? <Spin/> : text)
             },
-            {
-                title: 'MATIC',
-                dataIndex: 'matic',
-                key: 'matic',
+            align: 'center',
+        },
+        {
+            title: 'MATIC',
+            dataIndex: 'matic',
+            key: 'matic',
                 render: (text, record) => {
                     return (text === null ? <Spin/> : text)
                 },
@@ -423,6 +425,12 @@ const Layer = () => {
             changeApiForm.setFieldsValue(JSON.parse(storedApiKey));
         }
     }, []);
+    const rowSelection = {
+        selectedRowKeys: selectedKeys,
+        onChange: (selectedRowKeys) => {
+            setSelectedKeys(selectedRowKeys);
+        },
+    };
     return (
         <div>
             <Content>
@@ -516,10 +524,7 @@ const Layer = () => {
                     <Table
                         columns={columns}
                         dataSource={data}
-                        rowSelection={{
-                            type: 'checkbox',
-                            ...rowSelection,
-                        }}
+                        rowSelection={rowSelection}
                         pagination={false}
                         bordered={true}
                         size={"small"}
@@ -539,14 +544,17 @@ const Layer = () => {
                         </Button>
                         <Button type="primary" onClick={handleRefresh} loading={isLoading} size={"large"}
                                 style={{width: "15%"}}
-                                disabled={!selectedKeys.length} icon={<SyncOutlined/>}>
+                                icon={<SyncOutlined/>}>
                             刷新选中地址
                         </Button>
-                        <Button type="primary" danger size={"large"} onConfirm={handleDeleteSelected}
-                                style={{width: "15%"}}
-                                disabled={!selectedKeys.length} icon={<DeleteOutlined/>}>
-                            删除选中地址
-                        </Button>
+                        <Popconfirm title={"确认删除" + selectedKeys.length + "个地址？"}
+                                    onConfirm={handleDeleteSelected}>
+                            <Button type="primary" danger size={"large"}
+                                    style={{width: "15%"}}
+                                    icon={<DeleteOutlined/>}>
+                                删除选中地址
+                            </Button>
+                        </Popconfirm>
                         <Button type="primary" onClick={
                             () => {
                                 setIsChangeApiModalVisible(true)

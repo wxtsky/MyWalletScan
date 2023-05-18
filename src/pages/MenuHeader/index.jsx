@@ -1,6 +1,7 @@
 import {Menu} from 'antd';
 import {useEffect, useState} from 'react';
 import {useLocation, useNavigate} from "react-router-dom";
+import {GithubOutlined, TwitterOutlined} from "@ant-design/icons";
 
 const items = [
     {
@@ -26,41 +27,38 @@ const items = [
     {
         label: 'Coffee',
         key: 'coffee',
+    },
+    {
+        label: <a href="https://github.com/wxtsky/MyWalletScan" target="_blank"
+                  rel="noopener noreferrer"><GithubOutlined/></a>,
+        key: 'github',
+    },
+    {
+        label: <a href="https://twitter.com/jingluo0" target="_blank" rel="noopener noreferrer"><TwitterOutlined/></a>,
+        key: 'twitter',
     }
 ];
 const MenuHeader = () => {
     const navigate = useNavigate();
-    const [current, setCurrent] = useState();
+    const location = useLocation();
+    const [current, setCurrent] = useState(location.pathname.replace('/', '') || 'zksync');
     const onClick = (e) => {
-        console.log('click ', e);
         setCurrent(e.key);
     };
-    const location = useLocation();
     useEffect(() => {
-        if (location.pathname === '/') {
-            setCurrent('zksync');
+        if (location.pathname.replace('/', '') === 'twitter' || location.pathname.replace('/', '') === 'github') {
+            return;
         }
+        setCurrent(location.pathname.replace('/', '') || 'zksync');
     }, [location.pathname]);
+
     useEffect(() => {
-        if (current === 'zksync') {
-            navigate('/zksync');
+        if (current === 'twitter' || current === 'github') {
+            return;
         }
-        if (current === 'stark') {
-            navigate('/stark');
-        }
-        if (current === 'layer') {
-            navigate('/layer');
-        }
-        if (current === 'mirror') {
-            navigate('/mirror');
-        }
-        if (current === 'coffee') {
-            navigate('/coffee');
-        }
-        if (current === 'deposit') {
-            navigate('/deposit');
-        }
+        navigate(`/${current}`);
     }, [current]);
+
     return (
         <Menu
             onClick={onClick}

@@ -3,9 +3,6 @@ import Zksync from "@pages/Zksync/index.jsx";
 import {useLocation} from "react-router-dom";
 import Stark from "@pages/Stark/index.jsx";
 import {Layout} from "antd";
-
-const {Footer} = Layout;
-import MyFooter from "@components/MyFooter/index.jsx";
 import Layer from "@pages/Layer/index.jsx";
 import Mirror from "@pages/Mirror/index.jsx";
 import Coffee from "@pages/Coffee/index.jsx";
@@ -59,15 +56,6 @@ function MainPage() {
                         {location.pathname === "/deposit" && <Deposit/>}
                     </div>
                 </div>
-                <Footer
-                    style={{
-                        backgroundColor: "#f0f2f5",
-                        textAlign: "center",
-                        width: "100%",
-                    }}
-                >
-                    <MyFooter/>
-                </Footer>
             </Layout>
         </div>
     );

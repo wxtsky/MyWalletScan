@@ -23,7 +23,6 @@ import {
 } from "@ant-design/icons";
 
 const {TextArea} = Input;
-const {Column, ColumnGroup} = Table;
 
 function Zksync() {
     const [data, setData] = useState([]);
@@ -104,6 +103,8 @@ function Zksync() {
                     localStorage.setItem('addresses', JSON.stringify(data));
                 })
                 getZkSyncBridge(values.address).then(({
+                                                          totalFee,
+                                                          contractActivity,
                                                           dayActivity,
                                                           weekActivity,
                                                           monthActivity,
@@ -114,6 +115,8 @@ function Zksync() {
                                                       }) => {
                     updatedData[index] = {
                         ...updatedData[index],
+                        totalFee,
+                        contractActivity,
                         dayActivity,
                         weekActivity,
                         monthActivity,
@@ -145,6 +148,8 @@ function Zksync() {
                     l1Tol2Amount: null,
                     l2Tol1Times: null,
                     l2Tol1Amount: null,
+                    contractActivity: null,
+                    totalFee: null,
                 };
                 const newData = [...data, newEntry];
                 setData(newData);
@@ -180,6 +185,8 @@ function Zksync() {
                     localStorage.setItem('addresses', JSON.stringify(newData));
                 })
                 getZkSyncBridge(values.address).then(({
+                                                          totalFee,
+                                                          contractActivity,
                                                           dayActivity,
                                                           weekActivity,
                                                           monthActivity,
@@ -188,6 +195,8 @@ function Zksync() {
                                                           l2Tol1Times,
                                                           l2Tol1Amount
                                                       }) => {
+                    newEntry.totalFee = totalFee;
+                    newEntry.contractActivity = contractActivity;
                     newEntry.dayActivity = dayActivity;
                     newEntry.weekActivity = weekActivity;
                     newEntry.monthActivity = monthActivity;
@@ -218,7 +227,22 @@ function Zksync() {
         }
         setIsLoading(true);
         try {
+            const limit = 10;
+            let activePromises = 0;
+            let promisesQueue = [];
             const newData = [...data];
+            const processQueue = () => {
+                if (promisesQueue.length === 0) return;
+                if (activePromises >= limit) return;
+
+                const promise = promisesQueue.shift();
+                activePromises += 1;
+
+                promise().finally(() => {
+                    activePromises -= 1;
+                    processQueue();
+                });
+            };
             for (let key of selectedKeys) {
                 const index = newData.findIndex(item => item.key === key);
                 if (index !== -1) {
@@ -238,45 +262,50 @@ function Zksync() {
                     item.l1Tol2Amount = null;
                     item.l2Tol1Times = null;
                     item.l2Tol1Amount = null;
+                    item.contractActivity = null;
+                    item.totalFee = null;
                     setData([...newData]);
-                    getZksEra(item.address).then(({balance2, tx2, usdcBalance}) => {
+                    promisesQueue.push(() => getZksEra(item.address).then(({balance2, tx2, usdcBalance}) => {
                         item.zks2_balance = balance2;
                         item.zks2_tx_amount = tx2;
                         item.zks2_usdcBalance = usdcBalance;
                         setData([...newData]);
                         localStorage.setItem('addresses', JSON.stringify(data));
-                    });
-                    getZkSyncLastTX(item.address).then(({zkSyncLastTx}) => {
+                    }))
+                    promisesQueue.push(() => getZkSyncLastTX(item.address).then(({zkSyncLastTx}) => {
                         item.zks2_last_tx = zkSyncLastTx;
                         setData([...newData]);
                         localStorage.setItem('addresses', JSON.stringify(data));
-                    })
-                    getZksLite(item.address).then(({balance1, tx1}) => {
+                    }))
+                    promisesQueue.push(() => getZksLite(item.address).then(({balance1, tx1}) => {
                         item.zks1_balance = balance1;
                         item.zks1_tx_amount = tx1;
                         setData([...newData]);
                         localStorage.setItem('addresses', JSON.stringify(data));
-                    });
-                    getEthBalance(item.address, "ethereum").then((eth_balance) => {
+                    }))
+                    promisesQueue.push(() => getEthBalance(item.address, "ethereum").then((eth_balance) => {
                         item.eth_balance = eth_balance;
                         setData([...newData]);
                         localStorage.setItem('addresses', JSON.stringify(data));
-                    });
-                    getTxCount(item.address, "ethereum").then((eth_tx_amount) => {
+                    }))
+                    promisesQueue.push(() => getTxCount(item.address, "ethereum").then((eth_tx_amount) => {
                         item.eth_tx_amount = eth_tx_amount;
                         setData([...newData]);
                         localStorage.setItem('addresses', JSON.stringify(data));
-                    });
-                    getZkSyncBridge(item.address).then(({
-                                                            dayActivity,
-                                                            weekActivity,
-                                                            monthActivity,
-                                                            l1Tol2Times,
-                                                            l1Tol2Amount,
-                                                            l2Tol1Times,
-                                                            l2Tol1Amount
-                                                        }) => {
-
+                    }))
+                    promisesQueue.push(() => getZkSyncBridge(item.address).then(({
+                                                                                     totalFee,
+                                                                                     contractActivity,
+                                                                                     dayActivity,
+                                                                                     weekActivity,
+                                                                                     monthActivity,
+                                                                                     l1Tol2Times,
+                                                                                     l1Tol2Amount,
+                                                                                     l2Tol1Times,
+                                                                                     l2Tol1Amount
+                                                                                 }) => {
+                        item.totalFee = totalFee;
+                        item.contractActivity = contractActivity;
                         item.dayActivity = dayActivity;
                         item.weekActivity = weekActivity;
                         item.monthActivity = monthActivity;
@@ -286,8 +315,12 @@ function Zksync() {
                         item.l2Tol1Amount = l2Tol1Amount;
                         setData([...newData]);
                         localStorage.setItem('addresses', JSON.stringify(data));
-                    })
+                    }))
+                    processQueue();
                 }
+            }
+            while (activePromises > 0 || promisesQueue.length > 0) {
+                await new Promise(resolve => setTimeout(resolve, 100));
             }
         } catch (error) {
             notification.error({
@@ -360,6 +393,8 @@ function Zksync() {
                         localStorage.setItem('addresses', JSON.stringify(updatedData));
                     })
                     getZkSyncBridge(address).then(({
+                                                       totalFee,
+                                                       contractActivity,
                                                        dayActivity,
                                                        weekActivity,
                                                        monthActivity,
@@ -370,6 +405,8 @@ function Zksync() {
                                                    }) => {
                         updatedData[index] = {
                             ...updatedData[index],
+                            totalFee,
+                            contractActivity,
                             dayActivity,
                             weekActivity,
                             monthActivity,
@@ -400,6 +437,8 @@ function Zksync() {
                         l1Tol2Amount: null,
                         l2Tol1Times: null,
                         l2Tol1Amount: null,
+                        contractActivity: null,
+                        totalFee: null,
                     };
                     newData.push(newEntry);
                     setData(newData);
@@ -435,6 +474,8 @@ function Zksync() {
                         localStorage.setItem('addresses', JSON.stringify(newData));
                     })
                     getZkSyncBridge(address).then(({
+                                                       totalFee,
+                                                       contractActivity,
                                                        dayActivity,
                                                        weekActivity,
                                                        monthActivity,
@@ -443,6 +484,8 @@ function Zksync() {
                                                        l2Tol1Times,
                                                        l2Tol1Amount
                                                    }) => {
+                        newEntry.totalFee = totalFee;
+                        newEntry.contractActivity = contractActivity;
                         newEntry.dayActivity = dayActivity;
                         newEntry.weekActivity = weekActivity;
                         newEntry.monthActivity = monthActivity;
@@ -493,12 +536,20 @@ function Zksync() {
         localStorage.setItem('addresses', JSON.stringify(data.filter(item => item.key !== key)));
     }
     const handleDeleteSelected = () => {
+        if (!selectedKeys.length) {
+            notification.error({
+                message: "错误",
+                description: "请先选择要删除的地址",
+            }, 2);
+            return;
+        }
         setData(data.filter(item => !selectedKeys.includes(item.key)));
         localStorage.setItem('addresses', JSON.stringify(data.filter(item => !selectedKeys.includes(item.key))));
         setSelectedKeys([]);
     }
     const rowSelection = {
-        onChange: (selectedRowKeys, selectedRows) => {
+        selectedRowKeys: selectedKeys,
+        onChange: (selectedRowKeys) => {
             setSelectedKeys(selectedRowKeys);
         },
     };
@@ -692,6 +743,20 @@ function Zksync() {
                             align: "center",
                             render: (text, record) => (text === null ? <Spin/> : text),
                         },
+                        {
+                            title: "不同合约",
+                            dataIndex: "contractActivity",
+                            key: "contractActivity",
+                            align: "center",
+                            render: (text, record) => (text === null ? <Spin/> : text),
+                        },
+                        {
+                            title: "Fee",
+                            dataIndex: "totalFee",
+                            key: "totalFee",
+                            align: "center",
+                            render: (text, record) => (text === null ? <Spin/> : text),
+                        }
                     ],
                 },
             ],
@@ -741,10 +806,7 @@ function Zksync() {
                 </Modal>
                 <Spin spinning={tableLoading}>
                     <Table
-                        rowSelection={{
-                            type: 'checkbox',
-                            ...rowSelection,
-                        }}
+                        rowSelection={rowSelection}
                         dataSource={data}
                         pagination={false}
                         bordered={true}
@@ -764,13 +826,16 @@ function Zksync() {
                             批量添加地址
                         </Button>
                         <Button type="primary" onClick={handleRefresh} loading={isLoading} size={"large"}
-                                style={{width: "20%"}} disabled={!selectedKeys.length} icon={<SyncOutlined/>}>
+                                style={{width: "20%"}} icon={<SyncOutlined/>}>
                             刷新选中地址
                         </Button>
-                        <Button type="primary" danger size={"large"} onConfirm={handleDeleteSelected}
-                                style={{width: "20%"}} disabled={!selectedKeys.length} icon={<DeleteOutlined/>}>
-                            删除选中地址
-                        </Button>
+                        <Popconfirm title={"确认删除" + selectedKeys.length + "个地址？"}
+                                    onConfirm={handleDeleteSelected}>
+                            <Button type="primary" danger size={"large"}
+                                    style={{width: "20%"}} icon={<DeleteOutlined/>}>
+                                删除选中地址
+                            </Button>
+                        </Popconfirm>
                         <Button type="primary" icon={<DownloadOutlined/>} size={"large"} style={{width: "8%"}}
                                 onClick={exportToExcelFile}/>
                     </div>

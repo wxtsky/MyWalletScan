@@ -20,9 +20,6 @@ import './index.css'
 const {TextArea} = Input;
 
 const {Content} = Layout;
-
-
-const {Column, ColumnGroup} = Table;
 const Stark = () => {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [isBatchModalVisible, setIsBatchModalVisible] = useState(false);
@@ -32,11 +29,6 @@ const Stark = () => {
     const [selectedKeys, setSelectedKeys] = useState([]);
     const [tableLoading, setTableLoading] = useState(false);
     const [form] = Form.useForm();
-    const rowSelection = {
-        onChange: (selectedRowKeys, selectedRows) => {
-            setSelectedKeys(selectedRowKeys);
-        },
-    };
     useEffect(() => {
         setTableLoading(true)
         const storedAddresses = localStorage.getItem('stark_addresses');
@@ -415,6 +407,7 @@ const Stark = () => {
         }
         setIsLoading(true);
         try {
+            let promises = [];
             const newData = [...data];
             for (let key of selectedKeys) {
                 const index = newData.findIndex(item => item.key === key);
@@ -448,33 +441,33 @@ const Stark = () => {
                     item.total_widthdraw_count = null;
                     item.total_deposit_count = null;
                     setData([...newData]);
-                    getStarkTx(item.address).then(({tx, stark_latest_tx}) => {
+                    promises.push(getStarkTx(item.address).then(({tx, stark_latest_tx}) => {
                         item.stark_tx_amount = tx;
                         item.stark_latest_tx = stark_latest_tx;
                         setData([...newData]);
                         localStorage.setItem('stark_addresses', JSON.stringify(data));
-                    })
-                    getStarkInfo(item.address).then(({eth_balance, stark_id, deployed_at_timestamp}) => {
+                    }))
+                    promises.push(getStarkInfo(item.address).then(({eth_balance, stark_id, deployed_at_timestamp}) => {
                         item.stark_eth_balance = eth_balance;
                         item.stark_id = stark_id;
                         item.create_time = deployed_at_timestamp;
                         setData([...newData]);
                         localStorage.setItem('stark_addresses', JSON.stringify(data));
-                    })
-                    getStarkBridge(item.address).then(({
-                                                           d_eth_amount, d_eth_count,
-                                                           d_usdc_amount, d_usdc_count,
-                                                           d_usdt_amount, d_usdt_count,
-                                                           d_dai_amount, d_dai_count,
-                                                           d_wbtc_amount,
-                                                           d_wbtc_count,
-                                                           w_eth_amount, w_eth_count,
-                                                           w_usdc_amount, w_usdc_count,
-                                                           w_usdt_amount, w_usdt_count,
-                                                           w_dai_amount, w_dai_count,
-                                                           w_wbtc_amount, w_wbtc_count,
-                                                           total_widthdraw_count, total_deposit_count
-                                                       }) => {
+                    }))
+                    promises.push(getStarkBridge(item.address).then(({
+                                                                         d_eth_amount, d_eth_count,
+                                                                         d_usdc_amount, d_usdc_count,
+                                                                         d_usdt_amount, d_usdt_count,
+                                                                         d_dai_amount, d_dai_count,
+                                                                         d_wbtc_amount,
+                                                                         d_wbtc_count,
+                                                                         w_eth_amount, w_eth_count,
+                                                                         w_usdc_amount, w_usdc_count,
+                                                                         w_usdt_amount, w_usdt_count,
+                                                                         w_dai_amount, w_dai_count,
+                                                                         w_wbtc_amount, w_wbtc_count,
+                                                                         total_widthdraw_count, total_deposit_count
+                                                                     }) => {
                         item.d_eth_amount = d_eth_amount;
                         item.d_eth_count = d_eth_count;
                         item.d_usdc_amount = d_usdc_amount;
@@ -499,9 +492,10 @@ const Stark = () => {
                         item.total_deposit_count = total_deposit_count;
                         setData([...newData]);
                         localStorage.setItem('stark_addresses', JSON.stringify(data));
-                    })
+                    }))
                 }
             }
+            await Promise.all(promises);
         } catch (error) {
             notification.error({
                 message: "错误",
@@ -513,6 +507,13 @@ const Stark = () => {
         }
     };
     const handleDeleteSelected = () => {
+        if (!selectedKeys.length) {
+            notification.error({
+                message: "错误",
+                description: "请先选择要删除的地址",
+            }, 2);
+            return;
+        }
         setData(data.filter(item => !selectedKeys.includes(item.key)));
         localStorage.setItem('stark_addresses', JSON.stringify(data.filter(item => !selectedKeys.includes(item.key))));
         setSelectedKeys([]);
@@ -769,6 +770,12 @@ const Stark = () => {
             ]
         },
     ];
+    const rowSelection = {
+        selectedRowKeys: selectedKeys,
+        onChange: (selectedRowKeys) => {
+            setSelectedKeys(selectedRowKeys);
+        },
+    };
     return (
         <div>
             <Content>
@@ -804,10 +811,7 @@ const Stark = () => {
                 </Modal>
                 <Spin spinning={tableLoading}>
                     <Table
-                        rowSelection={{
-                            type: 'checkbox',
-                            ...rowSelection,
-                        }}
+                        rowSelection={rowSelection}
                         dataSource={data}
                         pagination={false}
                         bordered={true}
@@ -830,14 +834,17 @@ const Stark = () => {
                         </Button>
                         <Button type="primary" onClick={handleRefresh} loading={isLoading} size={"large"}
                                 style={{width: "20%"}}
-                                disabled={!selectedKeys.length} icon={<SyncOutlined/>}>
+                                icon={<SyncOutlined/>}>
                             刷新选中地址
                         </Button>
-                        <Button type="primary" danger size={"large"} onConfirm={handleDeleteSelected}
-                                style={{width: "20%"}}
-                                disabled={!selectedKeys.length} icon={<DeleteOutlined/>}>
-                            删除选中地址
-                        </Button>
+                        <Popconfirm title={"确认删除" + selectedKeys.length + "个地址？"}
+                                    onConfirm={handleDeleteSelected}>
+                            <Button type="primary" danger size={"large"}
+                                    style={{width: "20%"}}
+                                    icon={<DeleteOutlined/>}>
+                                删除选中地址
+                            </Button>
+                        </Popconfirm>
                         <Button type="primary" icon={<DownloadOutlined/>} size={"large"} style={{width: "8%"}}
                                 onClick={exportToExcelFile}
                         />
