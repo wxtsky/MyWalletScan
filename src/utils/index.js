@@ -9,7 +9,7 @@ import getStarkTx from "@utils/stark/getStarkTx.js";
 import getStarkBridge from "@utils/stark/getStarkBridge.js";
 import getStarkInfo from "@utils/stark/getStarkInfo.js";
 import getLayerData from "@utils/layer/getLayerData.js";
-
+import getEthPrice from "@utils/ether/getEthPrice.js";
 export {
     getEthBalance,
     getTxCount,
@@ -21,5 +21,6 @@ export {
     getStarkTx,
     getStarkBridge,
     getStarkInfo,
-    getLayerData
+    getLayerData,
+    getEthPrice
 };

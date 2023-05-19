@@ -319,16 +319,16 @@ const Layer = () => {
             title: 'MATIC',
             dataIndex: 'matic',
             key: 'matic',
-                render: (text, record) => {
-                    return (text === null ? <Spin/> : text)
-                },
-                align: 'center',
+            render: (text, record) => {
+                return (text === null ? <Spin/> : text)
             },
-            {
-                title: 'BSC',
-                dataIndex: 'bsc',
-                key: 'bsc',
-                render: (text, record) => {
+            align: 'center',
+        },
+        {
+            title: 'BSC',
+            dataIndex: 'bsc',
+            key: 'bsc',
+            render: (text, record) => {
                     return (text === null ? <Spin/> : text)
                 },
                 align: 'center',

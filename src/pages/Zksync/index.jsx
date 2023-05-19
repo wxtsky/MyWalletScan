@@ -1,4 +1,4 @@
-import {Button, Input, Space, Table, Modal, Form, notification, Spin, Tag, Popconfirm} from 'antd';
+import {Button, Input, Space, Table, Modal, Form, notification, Spin, Tag, Popconfirm, Statistic} from 'antd';
 import {
     getEthBalance,
     getTxCount,
@@ -563,6 +563,7 @@ function Zksync() {
             key: "index",
             align: "center",
             render: (text, record, index) => index + 1,
+            // width: 34.5,
         },
         {
             title: "备注",
@@ -594,12 +595,14 @@ function Zksync() {
                     </>
                 );
             },
+            // width: 67
         },
         {
             title: "钱包地址",
             dataIndex: "address",
             key: "address",
             align: "center",
+            // width: 375,
         },
         {
             title: "ETH",
@@ -612,6 +615,7 @@ function Zksync() {
                     key: "eth_balance",
                     align: "center",
                     render: (text, record) => (text === null ? <Spin/> : text),
+                    // width: 55
                 },
                 {
                     title: "Tx",
@@ -619,6 +623,7 @@ function Zksync() {
                     key: "eth_tx_amount",
                     align: "center",
                     render: (text, record) => (text === null ? <Spin/> : text),
+                    // width: 34.5
                 },
             ],
         },
@@ -633,6 +638,7 @@ function Zksync() {
                     key: "zks1_balance",
                     align: "center",
                     render: (text, record) => (text === null ? <Spin/> : text),
+                    // width: 55
                 },
                 {
                     title: "Tx",
@@ -640,6 +646,7 @@ function Zksync() {
                     key: "zks1_tx_amount",
                     align: "center",
                     render: (text, record) => (text === null ? <Spin/> : text),
+                    // width: 34.5
                 },
             ],
         },
@@ -654,6 +661,7 @@ function Zksync() {
                     key: "zks2_balance",
                     align: "center",
                     render: (text, record) => (text === null ? <Spin/> : text),
+                    // width: 55
                 },
                 {
                     title: "USDC",
@@ -661,6 +669,7 @@ function Zksync() {
                     key: "zks2_usdcBalance",
                     align: "center",
                     render: (text, record) => (text === null ? <Spin/> : text),
+                    // width: 71.5
                 },
                 {
                     title: "Tx",
@@ -668,6 +677,7 @@ function Zksync() {
                     key: "zks2_tx_amount",
                     align: "center",
                     render: (text, record) => (text === null ? <Spin/> : text),
+                    // width: 34.2
                 },
                 {
                     title: "最后交易",
@@ -677,6 +687,7 @@ function Zksync() {
                     render: (text, record) => (text === null ? <Spin/> :
                         <a href={"https://explorer.zksync.io/address/" + record.address}
                            target={"_blank"}>{text}</a>),
+                    // width: 75.5
                 },
                 {
                     title: "官方桥跨链Tx数",
@@ -688,6 +699,7 @@ function Zksync() {
                             key: "l1Tol2Times",
                             align: "center",
                             render: (text, record) => (text === null ? <Spin/> : text),
+                            // width: 61.2
                         },
                         {
                             title: "L2->L1",
@@ -695,6 +707,7 @@ function Zksync() {
                             key: "l2Tol1Times",
                             align: "center",
                             render: (text, record) => (text === null ? <Spin/> : text),
+                            // width: 61.2
                         },
                     ],
                 },
@@ -708,6 +721,7 @@ function Zksync() {
                             key: "l1Tol2Amount",
                             align: "center",
                             render: (text, record) => (text === null ? <Spin/> : text),
+                            // width: 77.5
                         },
                         {
                             title: "L2->L1",
@@ -715,6 +729,7 @@ function Zksync() {
                             key: "l2Tol1Amount",
                             align: "center",
                             render: (text, record) => (text === null ? <Spin/> : text),
+                            // width: 77.5
                         },
                     ],
                 },
@@ -728,6 +743,7 @@ function Zksync() {
                             key: "dayActivity",
                             align: "center",
                             render: (text, record) => (text === null ? <Spin/> : text),
+                            // width: 34
                         },
                         {
                             title: "周",
@@ -735,6 +751,7 @@ function Zksync() {
                             key: "weekActivity",
                             align: "center",
                             render: (text, record) => (text === null ? <Spin/> : text),
+                            // width: 34
                         },
                         {
                             title: "月",
@@ -742,6 +759,7 @@ function Zksync() {
                             key: "monthActivity",
                             align: "center",
                             render: (text, record) => (text === null ? <Spin/> : text),
+                            // width: 34
                         },
                         {
                             title: "不同合约",
@@ -749,13 +767,15 @@ function Zksync() {
                             key: "contractActivity",
                             align: "center",
                             render: (text, record) => (text === null ? <Spin/> : text),
+                            // width: 73.5
                         },
                         {
-                            title: "Fee",
+                            title: "FeeΞ",
                             dataIndex: "totalFee",
                             key: "totalFee",
                             align: "center",
                             render: (text, record) => (text === null ? <Spin/> : text),
+                            // width: 61.5
                         }
                     ],
                 },

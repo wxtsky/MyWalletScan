@@ -21,7 +21,7 @@ async function getEthBalance(walletAddress, network) {
             id: 1
         });
         let balance = response.data.result;
-        return (parseInt(balance, 16) / 10 ** 18).toFixed(3);
+        return (parseInt(balance, 16) / 10 ** 18).toFixed(4);
     } catch (error) {
         console.error(error);
         return "Error";

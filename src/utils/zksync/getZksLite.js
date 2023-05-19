@@ -14,7 +14,7 @@ async function getZksLite(address) {
         });
         let balance1
         if ("ETH" in response.data.result.committed.balances) {
-            balance1 = (response.data.result.committed.balances.ETH / 10 ** 18).toFixed(3)
+            balance1 = (response.data.result.committed.balances.ETH / 10 ** 18).toFixed(4)
         } else {
             balance1 = 0;
         }

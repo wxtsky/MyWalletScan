@@ -2,43 +2,77 @@ import {Menu} from 'antd';
 import {useEffect, useState} from 'react';
 import {useLocation, useNavigate} from "react-router-dom";
 import {GithubOutlined, TwitterOutlined} from "@ant-design/icons";
+import './index.css'
+import {getEthPrice} from "@utils";
 
-const items = [
-    {
-        label: 'zkSync',
-        key: 'zksync',
-    },
-    {
-        label: 'Stark',
-        key: 'stark',
-    },
-    {
-        label: 'LayerZero',
-        key: 'layer',
-    },
-    {
-        label: 'Mirror',
-        key: 'mirror',
-    },
-    {
-        label: 'Deposit',
-        key: 'deposit',
-    },
-    {
-        label: 'Coffee',
-        key: 'coffee',
-    },
-    {
-        label: <a href="https://github.com/wxtsky/MyWalletScan" target="_blank"
-                  rel="noopener noreferrer"><GithubOutlined/></a>,
-        key: 'github',
-    },
-    {
-        label: <a href="https://twitter.com/jingluo0" target="_blank" rel="noopener noreferrer"><TwitterOutlined/></a>,
-        key: 'twitter',
+const EthPrice = () => {
+    const [ethPrice, setEthPrice] = useState(null);
+    useEffect(() => {
+        const fetchPrice = async () => {
+            const price = await getEthPrice();
+            setEthPrice(price);
+        };
+        fetchPrice();
+        const interval = setInterval(fetchPrice, 10000);
+        return () => clearInterval(interval);
+    }, []);
+    if (ethPrice === null) {
+        return <div>Loading ETH Price...</div>;
     }
-];
+    return <div>ETH Price: ${ethPrice}</div>
+}
 const MenuHeader = () => {
+    const [ethPrice, setEthPrice] = useState("/");
+    const items = [
+        {
+            label: 'zkSync',
+            key: 'zksync',
+        },
+        {
+            label: 'Stark',
+            key: 'stark',
+        },
+        {
+            label: 'LayerZero',
+            key: 'layer',
+        },
+        {
+            label: 'Mirror',
+            key: 'mirror',
+        },
+        {
+            label: 'Deposit',
+            key: 'deposit',
+        },
+        {
+            label: 'Coffee',
+            key: 'coffee',
+        },
+        {
+            label: <a href="https://github.com/wxtsky/MyWalletScan" target="_blank"
+                      rel="noopener noreferrer"><GithubOutlined/></a>,
+            key: 'github',
+        },
+        {
+            label: <a href="https://twitter.com/jingluo0" target="_blank"
+                      rel="noopener noreferrer"><TwitterOutlined/></a>,
+            key: 'twitter',
+        },
+        {
+            label: <EthPrice/>,
+            key: 'ethPrice',
+        }
+    ];
+    useEffect(() => {
+        const timer = setInterval(() => {
+            getEthPrice().then(res => {
+                setEthPrice(res);
+            })
+        }, 10000);
+        return () => {
+            clearInterval(timer);
+        }
+    }, []);
     const navigate = useNavigate();
     const location = useLocation();
     const [current, setCurrent] = useState(location.pathname.replace('/', '') || 'zksync');
@@ -68,6 +102,7 @@ const MenuHeader = () => {
                 display: 'flex',
                 justifyContent: 'center'
             }}
+            className="custom-menu"
         >
             {items.map(item =>
                 <Menu.Item key={item.key}>

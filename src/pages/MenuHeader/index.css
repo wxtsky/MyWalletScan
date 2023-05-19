@@ -1,0 +1,32 @@
+
+.custom-menu {
+    background-color: #f8f8f8;
+}
+
+.custom-menu .ant-menu-item {
+    color: #333333;
+}
+
+.custom-menu .ant-menu-item-selected,
+.custom-menu .ant-menu-item:hover,
+.custom-menu .ant-menu-item-active,
+.custom-menu .ant-menu-item-active:hover {
+    color: #1890ff;
+    background-color: #e6f7ff;
+}
+
+
+.custom-menu .ant-menu-item::after,
+.custom-menu .ant-menu-item-active::after,
+.custom-menu .ant-menu-item-selected::after,
+.custom-menu .ant-menu-item-active:hover::after {
+    border-bottom: none !important;
+}
+
+
+.custom-menu .ant-menu-item > a::after,
+.custom-menu .ant-menu-item-active > a::after,
+.custom-menu .ant-menu-item-selected > a::after,
+.custom-menu .ant-menu-item-active:hover > a::after {
+    border-bottom: none !important;
+}

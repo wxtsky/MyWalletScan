@@ -27,3 +27,7 @@
 .ant-table-small .ant-table-row {
     line-height: 1.2;
 }
+
+.ant-table {
+    font-weight: 600;
+}
