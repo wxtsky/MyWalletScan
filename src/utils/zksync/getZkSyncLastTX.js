@@ -1,7 +1,8 @@
 import axios from "axios";
+import { ZksEraApi } from "@/constants/apiKey";
 
 async function getZkSyncLastTX(address) {
-    const url = "https://zksync2-mainnet-explorer.zksync.io/transactions?limit=5&direction=older&accountAddress=" + address;
+    const url = `${ZksEraApi}/transactions?limit=5&direction=older&accountAddress=` + address;
     try {
         const response = await axios.get(url);
         if (response.data.total === 0) {

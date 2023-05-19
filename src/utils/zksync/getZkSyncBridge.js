@@ -1,5 +1,7 @@
 import axios from "axios";
 import {ethers} from "ethers";
+import { ZksEraApi } from "../../constants/apiKey";
+
 
 function getDayNumber(d) {
     return `${d.getUTCFullYear()}-${d.getUTCMonth() + 1}-${d.getUTCDate()}`;
@@ -67,7 +69,7 @@ async function getZkSyncBridge(address) {
         let offset = 0;
         let fromBlockNumber = null;
         let fromTxIndex = null;
-        const initUrl = "https://zksync2-mainnet-explorer.zksync.io/transactions?limit=100&direction=older&accountAddress=" + address;
+        const initUrl = `${ZksEraApi}/transactions?limit=100&direction=older&accountAddress=` + address;
         const initResponse = await axios.get(initUrl)
         const initDataLength = initResponse.data.total;
         [days, weeks, months, l1Tol2Times, l1Tol2Amount, l2Tol1Times, l2Tol1Amount] =
@@ -85,7 +87,7 @@ async function getZkSyncBridge(address) {
             fromBlockNumber = initResponse.data.list[0].blockNumber;
             fromTxIndex = initResponse.data.list[0].indexInBlock;
             while (true) {
-                let url = `https://zksync2-mainnet-explorer.zksync.io/transactions?limit=100&direction=older&accountAddress=${address}`;
+                let url = `${ZksEraApi}/transactions?limit=100&direction=older&accountAddress=${address}`;
                 if (fromBlockNumber !== undefined && fromTxIndex !== undefined && offset !== 0) {
                     url += `&fromBlockNumber=${fromBlockNumber}&fromTxIndex=${fromTxIndex}&offset=${offset}`;
                 }
