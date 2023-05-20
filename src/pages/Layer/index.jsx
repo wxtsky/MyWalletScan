@@ -329,16 +329,16 @@ const Layer = () => {
             dataIndex: 'bsc',
             key: 'bsc',
             render: (text, record) => {
-                    return (text === null ? <Spin/> : text)
-                },
-                align: 'center',
+                return (text === null ? <Spin/> : text)
             },
-            {
-                title: 'ARB',
-                dataIndex: 'arb',
-                key: 'arb',
-                render: (text, record) => {
-                    return (text === null ? <Spin/> : text)
+            align: 'center',
+        },
+        {
+            title: 'ARB',
+            dataIndex: 'arb',
+            key: 'arb',
+            render: (text, record) => {
+                return (text === null ? <Spin/> : text)
                 },
                 align: 'center',
             },
@@ -459,7 +459,7 @@ const Layer = () => {
                         <Form.Item label="地址" name="address" rules={[{required: true}]}>
                             <Input placeholder="请输入地址"/>
                         </Form.Item>
-                        <Form.Item label="备注" name="name" rules={[{required: true}]}>
+                        <Form.Item label="备注" name="name">
                             <Input placeholder="请输入备注"/>
                         </Form.Item>
                     </Form>
