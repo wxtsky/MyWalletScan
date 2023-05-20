@@ -833,33 +833,82 @@ function Zksync() {
                         style={{marginBottom: "20px"}}
                         size={"small"}
                         columns={columns}
+                        summary={pageData => {
+                            let ethBalance = 0;
+                            let zks1Balance = 0;
+                            let zks2Balance = 0;
+                            let zks2UsdcBalance = 0;
+                            let totalFees = 0;
+                            pageData.forEach(({
+                                                  eth_balance,
+                                                  zks1_balance,
+                                                  zks2_balance,
+                                                  zks2_usdcBalance,
+                                                  totalFee
+                                              }) => {
+                                ethBalance += Number(eth_balance);
+                                zks1Balance += Number(zks1_balance);
+                                zks2Balance += Number(zks2_balance);
+                                zks2UsdcBalance += Number(zks2_usdcBalance);
+                                totalFees += Number(totalFee);
+                            })
+
+                            const emptyCells = Array(10).fill().map((_, index) => <Table.Summary.Cell
+                                index={index + 6}/>);
+
+                            return (
+                                <>
+                                    <Table.Summary.Row>
+                                        <Table.Summary.Cell index={0} colSpan={4}>总计</Table.Summary.Cell>
+                                        <Table.Summary.Cell index={4}>{ethBalance.toFixed(4)}</Table.Summary.Cell>
+                                        <Table.Summary.Cell index={5}/>
+                                        <Table.Summary.Cell index={6}>{zks1Balance.toFixed(4)}</Table.Summary.Cell>
+                                        <Table.Summary.Cell index={7}/>
+                                        <Table.Summary.Cell index={8}>{zks2Balance.toFixed(4)}</Table.Summary.Cell>
+                                        <Table.Summary.Cell index={9}>{zks2UsdcBalance.toFixed(4)}</Table.Summary.Cell>
+                                        {emptyCells}
+                                        <Table.Summary.Cell index={20}>{totalFees.toFixed(4)}</Table.Summary.Cell>
+                                    </Table.Summary.Row>
+                                </>
+                            )
+                        }}
+                        footer={() => (
+                            <Card>
+                                <div style={{
+                                    width: '100%',
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    gap: '10px'
+                                }}>
+                                    <Button type="primary" onClick={showModal} size={"large"} style={{width: "20%"}}
+                                            icon={<PlusOutlined/>}>
+                                        添加地址
+                                    </Button>
+                                    <Button type="primary" onClick={showBatchModal} size={"large"}
+                                            style={{width: "20%"}}
+                                            icon={<UploadOutlined/>}>
+                                        批量添加地址
+                                    </Button>
+                                    <Button type="primary" onClick={handleRefresh} loading={isLoading} size={"large"}
+                                            style={{width: "20%"}} icon={<SyncOutlined/>}>
+                                        刷新选中地址
+                                    </Button>
+                                    <Popconfirm title={"确认删除" + selectedKeys.length + "个地址？"}
+                                                onConfirm={handleDeleteSelected}>
+                                        <Button type="primary" danger size={"large"}
+                                                style={{width: "20%"}} icon={<DeleteOutlined/>}>
+                                            删除选中地址
+                                        </Button>
+                                    </Popconfirm>
+                                    <Button type="primary" icon={<DownloadOutlined/>} size={"large"}
+                                            style={{width: "8%"}}
+                                            onClick={exportToExcelFile}/>
+                                </div>
+                            </Card>
+                        )
+                        }
                     />
                 </Spin>
-                <Card>
-                    <div style={{width: '100%', display: 'flex', justifyContent: 'space-between', gap: '10px'}}>
-                        <Button type="primary" onClick={showModal} size={"large"} style={{width: "20%"}}
-                                icon={<PlusOutlined/>}>
-                            添加地址
-                        </Button>
-                        <Button type="primary" onClick={showBatchModal} size={"large"} style={{width: "20%"}}
-                                icon={<UploadOutlined/>}>
-                            批量添加地址
-                        </Button>
-                        <Button type="primary" onClick={handleRefresh} loading={isLoading} size={"large"}
-                                style={{width: "20%"}} icon={<SyncOutlined/>}>
-                            刷新选中地址
-                        </Button>
-                        <Popconfirm title={"确认删除" + selectedKeys.length + "个地址？"}
-                                    onConfirm={handleDeleteSelected}>
-                            <Button type="primary" danger size={"large"}
-                                    style={{width: "20%"}} icon={<DeleteOutlined/>}>
-                                删除选中地址
-                            </Button>
-                        </Popconfirm>
-                        <Button type="primary" icon={<DownloadOutlined/>} size={"large"} style={{width: "8%"}}
-                                onClick={exportToExcelFile}/>
-                    </div>
-                </Card>
             </Content>
         </div>
     );
