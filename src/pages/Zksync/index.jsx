@@ -906,7 +906,8 @@ function Zksync() {
                        width={700}
                 >
                     <Form form={walletForm} layout="vertical">
-                        <Card title="设置您的钱包预期标准" bordered={true} style={{width: '100%'}}>
+                        <Card title="设置您的钱包预期标准，如果钱包达到您设置的标准，钱包前面会有绿点" bordered={true}
+                              style={{width: '100%'}}>
                             <Row gutter={[16, 16]}>
                                 <Col span={12}>
                                     <FormItem name="ETHTx" addonBefore="ETH Tx数量 ≥ "
