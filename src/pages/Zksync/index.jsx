@@ -621,7 +621,7 @@ function Zksync() {
             key: "index",
             align: "center",
             render: (text, record, index) => index + 1,
-            // width: 34.5,
+            width: 34.5,
         },
         {
             title: "备注",
@@ -653,7 +653,7 @@ function Zksync() {
                     </>
                 );
             },
-            // width: 67
+            width: 70
         },
         {
             title: "钱包地址",
@@ -676,7 +676,7 @@ function Zksync() {
                     key: "eth_balance",
                     align: "center",
                     render: (text, record) => (text === null ? <Spin/> : text),
-                    // width: 55
+                    width: 60
                 },
                 {
                     title: "Tx",
@@ -684,7 +684,7 @@ function Zksync() {
                     key: "eth_tx_amount",
                     align: "center",
                     render: (text, record) => (text === null ? <Spin/> : text),
-                    // width: 34.5
+                    width: 34.5
                 },
             ],
         },
@@ -699,7 +699,7 @@ function Zksync() {
                     key: "zks1_balance",
                     align: "center",
                     render: (text, record) => (text === null ? <Spin/> : text),
-                    // width: 55
+                    width: 60
                 },
                 {
                     title: "Tx",
@@ -707,7 +707,7 @@ function Zksync() {
                     key: "zks1_tx_amount",
                     align: "center",
                     render: (text, record) => (text === null ? <Spin/> : text),
-                    // width: 34.5
+                    width: 34.5
                 },
             ],
         },
@@ -722,7 +722,7 @@ function Zksync() {
                     key: "zks2_balance",
                     align: "center",
                     render: (text, record) => (text === null ? <Spin/> : text),
-                    // width: 55
+                    width: 60
                 },
                 {
                     title: "USDC",
@@ -730,7 +730,7 @@ function Zksync() {
                     key: "zks2_usdcBalance",
                     align: "center",
                     render: (text, record) => (text === null ? <Spin/> : text),
-                    // width: 71.5
+                    width: 63
                 },
                 {
                     title: "Tx",
@@ -738,7 +738,7 @@ function Zksync() {
                     key: "zks2_tx_amount",
                     align: "center",
                     render: (text, record) => (text === null ? <Spin/> : text),
-                    // width: 34.2
+                    width: 34.2
                 },
                 {
                     title: "最后交易",
@@ -748,7 +748,7 @@ function Zksync() {
                     render: (text, record) => (text === null ? <Spin/> :
                         <a href={"https://explorer.zksync.io/address/" + record.address}
                            target={"_blank"}>{text}</a>),
-                    // width: 75.5
+                    width: 77
                 },
                 {
                     title: "官方桥跨链Tx数",
@@ -760,7 +760,7 @@ function Zksync() {
                             key: "l1Tol2Times",
                             align: "center",
                             render: (text, record) => (text === null ? <Spin/> : text),
-                            // width: 61.2
+                            width: 60
                         },
                         {
                             title: "L2->L1",
@@ -768,7 +768,7 @@ function Zksync() {
                             key: "l2Tol1Times",
                             align: "center",
                             render: (text, record) => (text === null ? <Spin/> : text),
-                            // width: 61.2
+                            width: 60
                         },
                     ],
                 },
@@ -782,7 +782,7 @@ function Zksync() {
                             key: "l1Tol2Amount",
                             align: "center",
                             render: (text, record) => (text === null ? <Spin/> : text),
-                            // width: 77.5
+                            width: 75
                         },
                         {
                             title: "L2->L1",
@@ -790,7 +790,7 @@ function Zksync() {
                             key: "l2Tol1Amount",
                             align: "center",
                             render: (text, record) => (text === null ? <Spin/> : text),
-                            // width: 77.5
+                            width: 75
                         },
                     ],
                 },
@@ -804,7 +804,7 @@ function Zksync() {
                             key: "dayActivity",
                             align: "center",
                             render: (text, record) => (text === null ? <Spin/> : text),
-                            // width: 34
+                            width: 34
                         },
                         {
                             title: "周",
@@ -812,7 +812,7 @@ function Zksync() {
                             key: "weekActivity",
                             align: "center",
                             render: (text, record) => (text === null ? <Spin/> : text),
-                            // width: 34
+                            width: 34
                         },
                         {
                             title: "月",
@@ -820,7 +820,7 @@ function Zksync() {
                             key: "monthActivity",
                             align: "center",
                             render: (text, record) => (text === null ? <Spin/> : text),
-                            // width: 34
+                            width: 34
                         },
                         {
                             title: "不同合约",
@@ -828,7 +828,7 @@ function Zksync() {
                             key: "contractActivity",
                             align: "center",
                             render: (text, record) => (text === null ? <Spin/> : text),
-                            // width: 73.5
+                            width: 73.5
                         },
                         {
                             title: "FeeΞ",
@@ -836,7 +836,7 @@ function Zksync() {
                             key: "totalFee",
                             align: "center",
                             render: (text, record) => (text === null ? <Spin/> : text),
-                            // width: 61.5
+                            width: 61.5
                         }
                     ],
                 },
@@ -901,6 +901,7 @@ function Zksync() {
                        okButtonProps={{loading: isLoading}}
                        okText={"添加地址"}
                        cancelText={"取消"}
+                       style={{zIndex: 3}}
                 >
                     <Form form={batchForm} layout="vertical">
                         <Form.Item label="地址" name="addresses" rules={[{required: true}]}>
@@ -912,6 +913,7 @@ function Zksync() {
                        okButtonProps={{loading: isLoading}}
                        okText={"添加地址"}
                        cancelText={"取消"}
+                       style={{zIndex: 3}}
                 >
                     <Form form={form} layout="vertical">
                         <Form.Item label="地址" name="address" rules={[{required: true}]}>
@@ -931,9 +933,12 @@ function Zksync() {
                        okText={"保存"}
                        cancelText={"取消"}
                        width={700}
+                       style={{zIndex: 3}}
+
                 >
                     <Form form={walletForm} layout="vertical">
-                        <Card title="设置您的钱包预期标准，如果钱包达到您设置的标准，钱包前面会有绿点" bordered={true}
+                        <Card title="设置您的钱包预期标准，如果钱包达到您设置的标准，钱包前面会有绿色提示点"
+                              bordered={true}
                               style={{width: '100%'}}>
                             <Row gutter={[16, 16]}>
                                 <Col span={12}>
@@ -964,9 +969,10 @@ function Zksync() {
                         dataSource={data}
                         pagination={false}
                         bordered={true}
-                        style={{marginBottom: "20px"}}
+                        style={{marginBottom: "20px", zIndex: 2}}
                         size={"small"}
                         columns={columns}
+                        sticky
                         summary={pageData => {
                             let ethBalance = 0;
                             let zks1Balance = 0;
@@ -994,14 +1000,14 @@ function Zksync() {
                                 <>
                                     <Table.Summary.Row>
                                         <Table.Summary.Cell index={0} colSpan={4}>总计</Table.Summary.Cell>
-                                        <Table.Summary.Cell index={4}>{ethBalance.toFixed(4)}</Table.Summary.Cell>
+                                        <Table.Summary.Cell index={4}>{ethBalance.toFixed(3)}</Table.Summary.Cell>
                                         <Table.Summary.Cell index={5}/>
-                                        <Table.Summary.Cell index={6}>{zks1Balance.toFixed(4)}</Table.Summary.Cell>
+                                        <Table.Summary.Cell index={6}>{zks1Balance.toFixed(3)}</Table.Summary.Cell>
                                         <Table.Summary.Cell index={7}/>
-                                        <Table.Summary.Cell index={8}>{zks2Balance.toFixed(4)}</Table.Summary.Cell>
-                                        <Table.Summary.Cell index={9}>{zks2UsdcBalance.toFixed(4)}</Table.Summary.Cell>
+                                        <Table.Summary.Cell index={8}>{zks2Balance.toFixed(3)}</Table.Summary.Cell>
+                                        <Table.Summary.Cell index={9}>{zks2UsdcBalance.toFixed(2)}</Table.Summary.Cell>
                                         {emptyCells}
-                                        <Table.Summary.Cell index={20}>{totalFees.toFixed(4)}</Table.Summary.Cell>
+                                        <Table.Summary.Cell index={20}>{totalFees.toFixed(3)}</Table.Summary.Cell>
                                     </Table.Summary.Row>
                                 </>
                             )

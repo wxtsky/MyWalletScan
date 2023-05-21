@@ -2,7 +2,7 @@ import MenuHeader from "@pages/MenuHeader/index.jsx";
 import Zksync from "@pages/Zksync/index.jsx";
 import {useLocation} from "react-router-dom";
 import Stark from "@pages/Stark/index.jsx";
-import {Layout} from "antd";
+import {Layout, FloatButton} from "antd";
 import Layer from "@pages/Layer/index.jsx";
 import Mirror from "@pages/Mirror/index.jsx";
 import Coffee from "@pages/Coffee/index.jsx";
@@ -25,7 +25,7 @@ function MainPage() {
                         position: "fixed",
                         top: 0,
                         width: "100%",
-                        zIndex: 1000,
+                        zIndex: 1,
                     }}
                 >
                     <MenuHeader
@@ -38,15 +38,16 @@ function MainPage() {
                 </div>
                 <div
                     style={{
-                        paddingTop: "25px",
+                        // paddingTop: "5px",
                         minHeight: "95vh",
                         backgroundColor: "#fff",
                         boxShadow: "0 2px 8px rgba(0, 0, 0, 0.06)",
                         borderRadius: "4px",
-                        marginTop: "20px",
+                        marginTop: "45px",
                     }}
                 >
                     <div>
+                        <FloatButton.BackTop type={"primary"} style={{right: 100, bottom: 150}}/>
                         {location.pathname === "/" && <Zksync/>}
                         {location.pathname === "/zksync" && <Zksync/>}
                         {location.pathname === "/stark" && <Stark/>}

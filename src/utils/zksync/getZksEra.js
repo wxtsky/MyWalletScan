@@ -13,7 +13,7 @@ async function getZksEra(address) {
         }
         if ("0x3355df6d4c9c3035724fd0e3914de96a5a83aaf4" in response.data.info.balances) {
             usdcBalance = (parseInt(response.data.info.balances["0x3355df6d4c9c3035724fd0e3914de96a5a83aaf4"]
-                .balance, 16) / 10 ** 6).toFixed(4)
+                .balance, 16) / 10 ** 6).toFixed(2)
         } else {
             usdcBalance = 0;
         }
