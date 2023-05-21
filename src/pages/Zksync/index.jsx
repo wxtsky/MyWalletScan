@@ -33,12 +33,11 @@ import {
     SyncOutlined,
     UploadOutlined
 } from "@ant-design/icons";
-import usezkSyncStore from "@store";
 
 const {TextArea} = Input;
 
 function Zksync() {
-    const {zkSyncConfigStore, setZkSyncConfigStore} = usezkSyncStore();
+    const [zkSyncConfigStore, setZkSyncConfigStore] = useState({});
     const [data, setData] = useState([]);
     const [isBatchModalVisible, setIsBatchModalVisible] = useState(false);
     const [isWalletModalVisible, setIsWalletModalVisible] = useState(false);
@@ -56,8 +55,22 @@ function Zksync() {
             setZkSyncConfigStore(config);
             walletForm.setFieldsValue(config);
         } else {
-            localStorage.setItem('zksync_config', {});
-            setZkSyncConfigStore({})
+            setZkSyncConfigStore(
+                {
+                    "ETHTx": null,
+                    "zkSyncLiteMinTx": null,
+                    "zkSyncEraMinTx": null,
+                    "dayMin": null,
+                    "weekMin": null,
+                    "monthMin": null,
+                    "L1ToL2Tx": null,
+                    "L2ToL1Tx": null,
+                    "L1ToL2ETH": null,
+                    "L2ToL1ETH": null,
+                    "gasFee": null,
+                    "contractMin": null
+                }
+            )
         }
     }, []);
     const handleOk = async () => {
@@ -648,12 +661,7 @@ function Zksync() {
             key: "address",
             align: "center",
             render: (text, record) => {
-                const isRowSatisfy = isRowSatisfyCondition(record);
-                if (isRowSatisfy) {
-                    return <Badge status="success" text={text}/>
-                } else {
-                    return text;
-                }
+                return isRowSatisfyCondition(record) ? <Badge status="success" text={text}/> : text || <Spin/>;
             },
             width: 375
         },
@@ -852,6 +860,7 @@ function Zksync() {
         localStorage.setItem('zksync_config', JSON.stringify(values));
         setZkSyncConfigStore(values);
         setIsWalletModalVisible(false);
+        console.log(zkSyncConfigStore)
     };
     const FormItem = ({name, addonBefore, addonAfter}) => (
         <Form.Item name={name}>
@@ -876,11 +885,11 @@ function Zksync() {
             "gasFee": "totalFee"
         };
         return Object.keys(conditionKeyMapping).every((conditionKey) => {
-            if (!(conditionKey in zkSyncConfigStore) || zkSyncConfigStore[conditionKey] === null) {
+            if (!(conditionKey in zkSyncConfigStore) || zkSyncConfigStore[conditionKey] === null || zkSyncConfigStore[conditionKey] === undefined) {
                 return true;
             }
             const recordKey = conditionKeyMapping[conditionKey];
-            return Number(record[recordKey]) > zkSyncConfigStore[conditionKey];
+            return Number(record[recordKey]) >= Number(zkSyncConfigStore[conditionKey])
         });
     };
 
