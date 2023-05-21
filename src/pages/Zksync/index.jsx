@@ -684,7 +684,7 @@ function Zksync() {
                     key: "eth_tx_amount",
                     align: "center",
                     render: (text, record) => (text === null ? <Spin/> : text),
-                    width: 34.5
+                    width: 40
                 },
             ],
         },
