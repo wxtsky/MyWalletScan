@@ -25,7 +25,7 @@ function MainPage() {
                         position: "fixed",
                         top: 0,
                         width: "100%",
-                        zIndex: 1,
+                        // zIndex: 1,
                     }}
                 >
                     <MenuHeader
@@ -39,7 +39,7 @@ function MainPage() {
                 <div
                     style={{
                         // paddingTop: "5px",
-                        minHeight: "95vh",
+                        minHeight: "85vh",
                         backgroundColor: "#fff",
                         boxShadow: "0 2px 8px rgba(0, 0, 0, 0.06)",
                         borderRadius: "4px",
@@ -47,7 +47,6 @@ function MainPage() {
                     }}
                 >
                     <div>
-                        <FloatButton.BackTop type={"primary"} style={{right: 100, bottom: 150}}/>
                         {location.pathname === "/" && <Zksync/>}
                         {location.pathname === "/zksync" && <Zksync/>}
                         {location.pathname === "/stark" && <Stark/>}
