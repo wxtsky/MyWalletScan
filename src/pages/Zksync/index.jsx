@@ -361,9 +361,27 @@ function Zksync() {
     };
     const handleBatchOk = async () => {
         try {
+            setIsBatchModalVisible(false);
             const values = await batchForm.validateFields();
             const addresses = values.addresses.split("\n");
             const newData = [...data];
+            const limit = 10;
+            let activePromises = 0;
+            let promisesQueue = [];
+
+            const processQueue = () => {
+                if (promisesQueue.length === 0) return;
+                if (activePromises >= limit) return;
+
+                const promise = promisesQueue.shift();
+                activePromises += 1;
+
+                promise().finally(() => {
+                    activePromises -= 1;
+                    processQueue();
+                });
+            };
+
             for (let address of addresses) {
                 address = address.trim();
                 if (address.length !== 42) {
@@ -375,76 +393,67 @@ function Zksync() {
                 }
                 const index = newData.findIndex(item => item.address === address);
                 if (index !== -1) {
-                    const updatedData = [...newData];
-                    getZksEra(address).then(({balance2, tx2, usdcBalance}) => {
-                        updatedData[index] = {
-                            ...updatedData[index],
-                            zks2_balance: balance2,
-                            zks2_tx_amount: tx2,
-                            zks2_usdcBalance: usdcBalance,
-                        };
-                        setData(updatedData);
-                        localStorage.setItem('addresses', JSON.stringify(updatedData));
-                    })
-                    getZkSyncLastTX(address).then(({zkSyncLastTx}) => {
-                        updatedData[index] = {
-                            ...updatedData[index],
-                            zks2_last_tx: zkSyncLastTx,
-                        };
-                        setData(updatedData);
-                        localStorage.setItem('addresses', JSON.stringify(updatedData));
-                    })
-                    getZksLite(address).then(({balance1, tx1}) => {
-                        updatedData[index] = {
-                            ...updatedData[index],
-                            zks1_balance: balance1,
-                            zks1_tx_amount: tx1,
-                        };
-                        setData(updatedData);
-                        localStorage.setItem('addresses', JSON.stringify(updatedData));
-                    })
-                    getEthBalance(address, "ethereum").then((eth_balance) => {
-                        updatedData[index] = {
-                            ...updatedData[index],
-                            eth_balance,
-                        };
-                        setData(updatedData);
-                        localStorage.setItem('addresses', JSON.stringify(updatedData));
-                    })
-                    getTxCount(address, "ethereum").then((eth_tx_amount) => {
-                        updatedData[index] = {
-                            ...updatedData[index],
-                            eth_tx_amount,
-                        };
-                        setData(updatedData);
-                        localStorage.setItem('addresses', JSON.stringify(updatedData));
-                    })
-                    getZkSyncBridge(address).then(({
-                                                       totalFee,
-                                                       contractActivity,
-                                                       dayActivity,
-                                                       weekActivity,
-                                                       monthActivity,
-                                                       l1Tol2Times,
-                                                       l1Tol2Amount,
-                                                       l2Tol1Times,
-                                                       l2Tol1Amount
-                                                   }) => {
-                        updatedData[index] = {
-                            ...updatedData[index],
-                            totalFee,
-                            contractActivity,
-                            dayActivity,
-                            weekActivity,
-                            monthActivity,
-                            l1Tol2Times,
-                            l1Tol2Amount,
-                            l2Tol1Times,
-                            l2Tol1Amount,
-                        };
-                        setData(updatedData);
-                        localStorage.setItem('addresses', JSON.stringify(updatedData));
-                    })
+                    const item = newData[index];
+
+                    promisesQueue.push(() => getZksEra(address).then(({balance2, tx2, usdcBalance}) => {
+                        item.zks2_balance = balance2;
+                        item.zks2_tx_amount = tx2;
+                        item.zks2_usdcBalance = usdcBalance;
+                        setData([...newData]);
+                        localStorage.setItem('addresses', JSON.stringify(newData));
+                    }));
+
+                    promisesQueue.push(() => getZkSyncLastTX(address).then(({zkSyncLastTx}) => {
+                        item.zks2_last_tx = zkSyncLastTx;
+                        setData([...newData]);
+                        localStorage.setItem('addresses', JSON.stringify(newData));
+                    }));
+
+                    promisesQueue.push(() => getZksLite(address).then(({balance1, tx1}) => {
+                        item.zks1_balance = balance1;
+                        item.zks1_tx_amount = tx1;
+                        setData([...newData]);
+                        localStorage.setItem('addresses', JSON.stringify(newData));
+                    }));
+
+                    promisesQueue.push(() => getEthBalance(address, "ethereum").then((eth_balance) => {
+                        item.eth_balance = eth_balance;
+                        setData([...newData]);
+                        localStorage.setItem('addresses', JSON.stringify(newData));
+                    }));
+
+                    promisesQueue.push(() => getTxCount(address, "ethereum").then((eth_tx_amount) => {
+                        item.eth_tx_amount = eth_tx_amount;
+                        setData([...newData]);
+                        localStorage.setItem('addresses', JSON.stringify(newData));
+                    }));
+
+                    promisesQueue.push(() => getZkSyncBridge(address).then(({
+                                                                                totalFee,
+                                                                                contractActivity,
+                                                                                dayActivity,
+                                                                                weekActivity,
+                                                                                monthActivity,
+                                                                                l1Tol2Times,
+                                                                                l1Tol2Amount,
+                                                                                l2Tol1Times,
+                                                                                l2Tol1Amount
+                                                                            }) => {
+                        item.totalFee = totalFee;
+                        item.contractActivity = contractActivity;
+                        item.dayActivity = dayActivity;
+                        item.weekActivity = weekActivity;
+                        item.monthActivity = monthActivity;
+                        item.l1Tol2Times = l1Tol2Times;
+                        item.l1Tol2Amount = l1Tol2Amount;
+                        item.l2Tol1Times = l2Tol1Times;
+                        item.l2Tol1Amount = l2Tol1Amount;
+                        setData([...newData]);
+                        localStorage.setItem('addresses', JSON.stringify(newData));
+                    }));
+
+                    processQueue();
+
                 } else {
                     const newEntry = {
                         key: newData.length.toString(),
@@ -469,48 +478,51 @@ function Zksync() {
                     };
                     newData.push(newEntry);
                     setData(newData);
-                    getZksEra(address).then(({balance2, tx2, usdcBalance}) => {
+
+                    promisesQueue.push(() => getZksEra(address).then(({balance2, tx2, usdcBalance}) => {
                         newEntry.zks2_balance = balance2;
                         newEntry.zks2_tx_amount = tx2;
                         newEntry.zks2_usdcBalance = usdcBalance;
                         setData([...newData]);
                         localStorage.setItem('addresses', JSON.stringify(newData));
-                    })
-                    getZkSyncLastTX(address).then(({zkSyncLastTx}) => {
+                    }));
+
+                    promisesQueue.push(() => getZkSyncLastTX(address).then(({zkSyncLastTx}) => {
                         newEntry.zks2_last_tx = zkSyncLastTx;
                         setData([...newData]);
                         localStorage.setItem('addresses', JSON.stringify(newData));
+                    }));
 
-                    })
-                    getZksLite(address).then(({balance1, tx1}) => {
+                    promisesQueue.push(() => getZksLite(address).then(({balance1, tx1}) => {
                         newEntry.zks1_balance = balance1;
                         newEntry.zks1_tx_amount = tx1;
                         setData([...newData]);
                         localStorage.setItem('addresses', JSON.stringify(newData));
+                    }));
 
-                    })
-                    getEthBalance(address, "ethereum").then((eth_balance) => {
+                    promisesQueue.push(() => getEthBalance(address, "ethereum").then((eth_balance) => {
                         newEntry.eth_balance = eth_balance;
                         setData([...newData]);
                         localStorage.setItem('addresses', JSON.stringify(newData));
+                    }));
 
-                    })
-                    getTxCount(address, "ethereum").then((eth_tx_amount) => {
+                    promisesQueue.push(() => getTxCount(address, "ethereum").then((eth_tx_amount) => {
                         newEntry.eth_tx_amount = eth_tx_amount;
                         setData([...newData]);
                         localStorage.setItem('addresses', JSON.stringify(newData));
-                    })
-                    getZkSyncBridge(address).then(({
-                                                       totalFee,
-                                                       contractActivity,
-                                                       dayActivity,
-                                                       weekActivity,
-                                                       monthActivity,
-                                                       l1Tol2Times,
-                                                       l1Tol2Amount,
-                                                       l2Tol1Times,
-                                                       l2Tol1Amount
-                                                   }) => {
+                    }));
+
+                    promisesQueue.push(() => getZkSyncBridge(address).then(({
+                                                                                totalFee,
+                                                                                contractActivity,
+                                                                                dayActivity,
+                                                                                weekActivity,
+                                                                                monthActivity,
+                                                                                l1Tol2Times,
+                                                                                l1Tol2Amount,
+                                                                                l2Tol1Times,
+                                                                                l2Tol1Amount
+                                                                            }) => {
                         newEntry.totalFee = totalFee;
                         newEntry.contractActivity = contractActivity;
                         newEntry.dayActivity = dayActivity;
@@ -522,10 +534,15 @@ function Zksync() {
                         newEntry.l2Tol1Amount = l2Tol1Amount;
                         setData([...newData]);
                         localStorage.setItem('addresses', JSON.stringify(newData));
-                    })
+                    }));
+
+                    processQueue();
                 }
             }
-            setIsBatchModalVisible(false);
+
+            while (activePromises > 0 || promisesQueue.length > 0) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
         } catch (error) {
             notification.error({
                 message: "错误",
@@ -536,6 +553,7 @@ function Zksync() {
             setSelectedKeys([]);
         }
     };
+
     const showModal = () => {
         setIsModalVisible(true);
     };
