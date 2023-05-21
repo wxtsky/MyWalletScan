@@ -15,10 +15,10 @@ const router = [
     {
         path: '/', element: <MainPage/>,
         children: [
-            {
-                path: '/',
-                element: < App/>,
-            },
+            // {
+            //     path: '/',
+            //     element: < App/>,
+            // },
             {
                 path: '/zksync',
                 element: <Zksync/>,

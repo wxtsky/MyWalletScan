@@ -1,4 +1,16 @@
-import {Button, Input, Space, Table, Modal, Form, notification, Spin, Tag, Popconfirm, Statistic} from 'antd';
+import {
+    Button,
+    Input,
+    Space,
+    Table,
+    Modal,
+    Form,
+    notification,
+    Spin,
+    Tag,
+    Popconfirm,
+    Row, Col, InputNumber, Badge
+} from 'antd';
 import {
     getEthBalance,
     getTxCount,
@@ -17,22 +29,37 @@ import {
     DeleteOutlined,
     DownloadOutlined,
     EditOutlined,
-    PlusOutlined,
+    PlusOutlined, SettingOutlined,
     SyncOutlined,
     UploadOutlined
 } from "@ant-design/icons";
+import usezkSyncStore from "@store";
 
 const {TextArea} = Input;
 
 function Zksync() {
+    const {zkSyncConfigStore, setZkSyncConfigStore} = usezkSyncStore();
     const [data, setData] = useState([]);
     const [isBatchModalVisible, setIsBatchModalVisible] = useState(false);
+    const [isWalletModalVisible, setIsWalletModalVisible] = useState(false);
     const [batchForm] = Form.useForm();
+    const [walletForm] = Form.useForm();
     const [selectedKeys, setSelectedKeys] = useState([]);
     const [form] = Form.useForm();
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [tableLoading, setTableLoading] = useState(false);
+    useEffect(() => {
+        const zksync_config = localStorage.getItem('zksync_config');
+        if (zksync_config) {
+            const config = JSON.parse(zksync_config);
+            setZkSyncConfigStore(config);
+            walletForm.setFieldsValue(config);
+        } else {
+            localStorage.setItem('zksync_config', {});
+            setZkSyncConfigStore({})
+        }
+    }, []);
     const handleOk = async () => {
         try {
             const values = await form.validateFields();
@@ -602,7 +629,15 @@ function Zksync() {
             dataIndex: "address",
             key: "address",
             align: "center",
-            // width: 375,
+            render: (text, record) => {
+                const isRowSatisfy = isRowSatisfyCondition(record);
+                if (isRowSatisfy) {
+                    return <Badge status="success" text={text}/>
+                } else {
+                    return text;
+                }
+            },
+            width: 375
         },
         {
             title: "ETH",
@@ -794,6 +829,42 @@ function Zksync() {
             ),
         },
     ];
+    const handleWalletOk = () => {
+        const values = walletForm.getFieldsValue();
+        localStorage.setItem('zksync_config', JSON.stringify(values));
+        setZkSyncConfigStore(values);
+        setIsWalletModalVisible(false);
+    };
+    const FormItem = ({name, addonBefore, addonAfter}) => (
+        <Form.Item name={name}>
+            <InputNumber min={0} style={{width: '100%'}}
+                         addonBefore={addonBefore} addonAfter={addonAfter}
+            />
+        </Form.Item>
+    );
+    const isRowSatisfyCondition = (record) => {
+        const conditionKeyMapping = {
+            "ETHTx": "eth_tx_amount",
+            "zkSyncLiteMinTx": "zks1_tx_amount",
+            "zkSyncEraMinTx": "zks2_tx_amount",
+            "L1ToL2Tx": "l1Tol2Times",
+            "L2ToL1Tx": "l2Tol1Times",
+            "L1ToL2ETH": "l1Tol2Amount",
+            "L2ToL1ETH": "l2Tol1Amount",
+            "contractMin": "contractActivity",
+            "dayMin": "dayActivity",
+            "weekMin": "weekActivity",
+            "monthMin": "monthActivity",
+            "gasFee": "totalFee"
+        };
+        return Object.keys(conditionKeyMapping).every((conditionKey) => {
+            if (!(conditionKey in zkSyncConfigStore) || zkSyncConfigStore[conditionKey] === null) {
+                return true;
+            }
+            const recordKey = conditionKeyMapping[conditionKey];
+            return Number(record[recordKey]) > zkSyncConfigStore[conditionKey];
+        });
+    };
 
     return (
         <div>
@@ -822,6 +893,41 @@ function Zksync() {
                         <Form.Item label="备注" name="name">
                             <Input placeholder="请输入备注"/>
                         </Form.Item>
+                    </Form>
+                </Modal>
+                <Modal title="zkSync"
+                       open={isWalletModalVisible}
+                       onOk={handleWalletOk}
+                       onCancel={() => {
+                           setIsWalletModalVisible(false);
+                       }}
+                       okText={"保存"}
+                       cancelText={"取消"}
+                       width={700}
+                >
+                    <Form form={walletForm} layout="vertical">
+                        <Card title="设置您的钱包预期标准" bordered={true} style={{width: '100%'}}>
+                            <Row gutter={[16, 16]}>
+                                <Col span={12}>
+                                    <FormItem name="ETHTx" addonBefore="ETH Tx数量 ≥ "
+                                              addonAfter="个"/>
+                                    <FormItem name="zkSyncLiteMinTx" addonBefore="zkSyncLite Tx数量 ≥ "
+                                              addonAfter="个"/>
+                                    <FormItem name="zkSyncEraMinTx" addonBefore="zkSyncEra Tx数量 ≥ " addonAfter="个"/>
+                                    <FormItem name="dayMin" addonBefore="日活跃天数 ≥ " addonAfter="天"/>
+                                    <FormItem name="weekMin" addonBefore="周活跃天数 ≥ " addonAfter="天"/>
+                                    <FormItem name="monthMin" addonBefore="月活跃天数 ≥ " addonAfter="天"/>
+                                </Col>
+                                <Col span={12}>
+                                    <FormItem name="L1ToL2Tx" addonBefore="L1->L2跨链Tx ≥ " addonAfter="个"/>
+                                    <FormItem name="L2ToL1Tx" addonBefore="L2->L1跨链Tx ≥ " addonAfter="个"/>
+                                    <FormItem name="L1ToL2ETH" addonBefore="L1->L2跨链金额 ≥ " addonAfter="ETH"/>
+                                    <FormItem name="L2ToL1ETH" addonBefore="L2->L1跨链金额 ≥ " addonAfter="ETH"/>
+                                    <FormItem name="gasFee" addonBefore="消耗gasFee（ETH）" addonAfter="ETH"/>
+                                    <FormItem name="contractMin" addonBefore="不同合约数 ≥ " addonAfter="个"/>
+                                </Col>
+                            </Row>
+                        </Card>
                     </Form>
                 </Modal>
                 <Spin spinning={tableLoading}>
@@ -880,6 +986,12 @@ function Zksync() {
                                     justifyContent: 'space-between',
                                     gap: '10px'
                                 }}>
+                                    <Button type="primary" onClick={() => {
+                                        setIsWalletModalVisible(true)
+                                    }} size={"large"} style={{width: "20%"}}
+                                            icon={<SettingOutlined/>}>
+                                        配置
+                                    </Button>
                                     <Button type="primary" onClick={showModal} size={"large"} style={{width: "20%"}}
                                             icon={<PlusOutlined/>}>
                                         添加地址

@@ -22,7 +22,6 @@ const EthPrice = () => {
     return <div>ETH Price: ${ethPrice}</div>
 }
 const MenuHeader = () => {
-    const [ethPrice, setEthPrice] = useState("/");
     const items = [
         {
             label: 'zkSync',
@@ -63,16 +62,6 @@ const MenuHeader = () => {
             key: 'ethPrice',
         }
     ];
-    useEffect(() => {
-        const timer = setInterval(() => {
-            getEthPrice().then(res => {
-                setEthPrice(res);
-            })
-        }, 10000);
-        return () => {
-            clearInterval(timer);
-        }
-    }, []);
     const navigate = useNavigate();
     const location = useLocation();
     const [current, setCurrent] = useState(location.pathname.replace('/', '') || 'zksync');
@@ -103,12 +92,8 @@ const MenuHeader = () => {
                 justifyContent: 'center'
             }}
             className="custom-menu"
+            items={items}
         >
-            {items.map(item =>
-                <Menu.Item key={item.key}>
-                    {item.label}
-                </Menu.Item>
-            )}
         </Menu>
     );
 
