@@ -68,7 +68,8 @@ function Zksync() {
                     "L1ToL2ETH": null,
                     "L2ToL1ETH": null,
                     "gasFee": null,
-                    "contractMin": null
+                    "contractMin": null,
+                    "totalAmount": null,
                 }
             )
         }
@@ -143,6 +144,7 @@ function Zksync() {
                     localStorage.setItem('addresses', JSON.stringify(data));
                 })
                 getZkSyncBridge(values.address).then(({
+                                                          totalExchangeAmount,
                                                           totalFee,
                                                           contractActivity,
                                                           dayActivity,
@@ -155,6 +157,7 @@ function Zksync() {
                                                       }) => {
                     updatedData[index] = {
                         ...updatedData[index],
+                        totalExchangeAmount,
                         totalFee,
                         contractActivity,
                         dayActivity,
@@ -190,6 +193,7 @@ function Zksync() {
                     l2Tol1Amount: null,
                     contractActivity: null,
                     totalFee: null,
+                    totalExchangeAmount: null,
                 };
                 const newData = [...data, newEntry];
                 setData(newData);
@@ -225,6 +229,7 @@ function Zksync() {
                     localStorage.setItem('addresses', JSON.stringify(newData));
                 })
                 getZkSyncBridge(values.address).then(({
+                                                          totalExchangeAmount,
                                                           totalFee,
                                                           contractActivity,
                                                           dayActivity,
@@ -244,6 +249,7 @@ function Zksync() {
                     newEntry.l1Tol2Amount = l1Tol2Amount;
                     newEntry.l2Tol1Times = l2Tol1Times;
                     newEntry.l2Tol1Amount = l2Tol1Amount;
+                    newEntry.totalExchangeAmount = totalExchangeAmount;
                     setData([...newData]);
                     localStorage.setItem('addresses', JSON.stringify(newData));
                 })
@@ -304,6 +310,7 @@ function Zksync() {
                     item.l2Tol1Amount = null;
                     item.contractActivity = null;
                     item.totalFee = null;
+                    item.totalExchangeAmount = null;
                     setData([...newData]);
                     promisesQueue.push(() => getZksEra(item.address).then(({balance2, tx2, usdcBalance}) => {
                         item.zks2_balance = balance2;
@@ -334,6 +341,7 @@ function Zksync() {
                         localStorage.setItem('addresses', JSON.stringify(data));
                     }))
                     promisesQueue.push(() => getZkSyncBridge(item.address).then(({
+                                                                                     totalExchangeAmount,
                                                                                      totalFee,
                                                                                      contractActivity,
                                                                                      dayActivity,
@@ -344,6 +352,7 @@ function Zksync() {
                                                                                      l2Tol1Times,
                                                                                      l2Tol1Amount
                                                                                  }) => {
+                        item.totalExchangeAmount = totalExchangeAmount;
                         item.totalFee = totalFee;
                         item.contractActivity = contractActivity;
                         item.dayActivity = dayActivity;
@@ -442,6 +451,7 @@ function Zksync() {
                     }));
 
                     promisesQueue.push(() => getZkSyncBridge(address).then(({
+                                                                                totalExchangeAmount,
                                                                                 totalFee,
                                                                                 contractActivity,
                                                                                 dayActivity,
@@ -452,6 +462,7 @@ function Zksync() {
                                                                                 l2Tol1Times,
                                                                                 l2Tol1Amount
                                                                             }) => {
+                        item.totalExchangeAmount = totalExchangeAmount;
                         item.totalFee = totalFee;
                         item.contractActivity = contractActivity;
                         item.dayActivity = dayActivity;
@@ -488,6 +499,7 @@ function Zksync() {
                         l2Tol1Amount: null,
                         contractActivity: null,
                         totalFee: null,
+                        totalExchangeAmount: null,
                     };
                     newData.push(newEntry);
                     setData(newData);
@@ -526,6 +538,7 @@ function Zksync() {
                     }));
 
                     promisesQueue.push(() => getZkSyncBridge(address).then(({
+                                                                                totalExchangeAmount,
                                                                                 totalFee,
                                                                                 contractActivity,
                                                                                 dayActivity,
@@ -545,6 +558,7 @@ function Zksync() {
                         newEntry.l1Tol2Amount = l1Tol2Amount;
                         newEntry.l2Tol1Times = l2Tol1Times;
                         newEntry.l2Tol1Amount = l2Tol1Amount;
+                        newEntry.totalExchangeAmount = totalExchangeAmount;
                         setData([...newData]);
                         localStorage.setItem('addresses', JSON.stringify(newData));
                     }));
@@ -661,7 +675,12 @@ function Zksync() {
             key: "address",
             align: "center",
             render: (text, record) => {
-                return isRowSatisfyCondition(record) ? <Badge status="success" text={text}/> : text || <Spin/>;
+                return isRowSatisfyCondition(record) ?
+                    <div
+                        style={{backgroundColor: '#bbeefa', borderRadius: '5px'}}
+                    >
+                        {text}</div> : text ||
+                    <Spin/>;
             },
             // width: 375
         },
@@ -831,6 +850,13 @@ function Zksync() {
                             // width: 73.5
                         },
                         {
+                            title: "金额(U)",
+                            dataIndex: "totalExchangeAmount",
+                            key: "totalExchangeAmount",
+                            align: "center",
+                            render: (text, record) => (text === null ? <Spin/> : text),
+                        },
+                        {
                             title: "FeeΞ",
                             dataIndex: "totalFee",
                             key: "totalFee",
@@ -882,7 +908,8 @@ function Zksync() {
             "dayMin": "dayActivity",
             "weekMin": "weekActivity",
             "monthMin": "monthActivity",
-            "gasFee": "totalFee"
+            "gasFee": "totalFee",
+            "totalAmount": "totalExchangeAmount",
         };
         return Object.keys(conditionKeyMapping).every((conditionKey) => {
             if (!(conditionKey in zkSyncConfigStore) || zkSyncConfigStore[conditionKey] === null || zkSyncConfigStore[conditionKey] === undefined) {
@@ -933,11 +960,12 @@ function Zksync() {
                        okText={"保存"}
                        cancelText={"取消"}
                        width={700}
+                       style={{top: 10}}
                     // style={{zIndex: 3}}
 
                 >
                     <Form form={walletForm} layout="vertical">
-                        <Card title="设置您的钱包预期标准，如果钱包达到您设置的标准，钱包前面会有绿色提示点"
+                        <Card title="设置钱包预期标准，若钱包达到设置标准，钱包地址背景会为蓝色，更清晰"
                               bordered={true}
                               style={{width: '100%'}}>
                             <Row gutter={[16, 16]}>
@@ -956,8 +984,9 @@ function Zksync() {
                                     <FormItem name="L2ToL1Tx" addonBefore="L2->L1跨链Tx ≥ " addonAfter="个"/>
                                     <FormItem name="L1ToL2ETH" addonBefore="L1->L2跨链金额 ≥ " addonAfter="ETH"/>
                                     <FormItem name="L2ToL1ETH" addonBefore="L2->L1跨链金额 ≥ " addonAfter="ETH"/>
-                                    <FormItem name="gasFee" addonBefore="消耗gasFee（ETH）" addonAfter="ETH"/>
+                                    <FormItem name="gasFee" addonBefore="消耗gasFee" addonAfter="ETH"/>
                                     <FormItem name="contractMin" addonBefore="不同合约数 ≥ " addonAfter="个"/>
+                                    <FormItem name="totalAmount" addonBefore="总交易金额 ≥ " addonAfter="U"/>
                                 </Col>
                             </Row>
                         </Card>
@@ -1000,13 +1029,14 @@ function Zksync() {
                                 <>
                                     <Table.Summary.Row>
                                         <Table.Summary.Cell index={0} colSpan={4}>总计</Table.Summary.Cell>
-                                        <Table.Summary.Cell index={4}>{ethBalance.toFixed(3)}</Table.Summary.Cell>
+                                        <Table.Summary.Cell index={4}>{ethBalance.toFixed(4)}</Table.Summary.Cell>
                                         <Table.Summary.Cell index={5}/>
-                                        <Table.Summary.Cell index={6}>{zks1Balance.toFixed(3)}</Table.Summary.Cell>
+                                        <Table.Summary.Cell index={6}>{zks1Balance.toFixed(4)}</Table.Summary.Cell>
                                         <Table.Summary.Cell index={7}/>
-                                        <Table.Summary.Cell index={8}>{zks2Balance.toFixed(3)}</Table.Summary.Cell>
+                                        <Table.Summary.Cell index={8}>{zks2Balance.toFixed(4)}</Table.Summary.Cell>
                                         <Table.Summary.Cell index={9}>{zks2UsdcBalance.toFixed(2)}</Table.Summary.Cell>
                                         {emptyCells}
+                                        <Table.Summary.Cell index={19}/>
                                         <Table.Summary.Cell index={20}>{totalFees.toFixed(3)}</Table.Summary.Cell>
                                     </Table.Summary.Row>
                                 </>

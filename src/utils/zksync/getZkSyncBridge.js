@@ -14,11 +14,40 @@ function getWeekNumber(d) {
 }
 
 function getMonthNumber(d) {
-    console.log(d.getUTCFullYear() + "-" + (d.getUTCMonth() + 1))
     return d.getUTCFullYear() + "-" + (d.getUTCMonth() + 1);
 }
 
+function getAmount(address, list) {
+    let totalExchangeAmount = 0;
+    for (let i = 0; i < list.length; i++) {
+        if (list[i]['from'].toLowerCase() === address.toLowerCase() && list[i]['to'].toLowerCase() !== "0x0000000000000000000000000000000000008001".toLowerCase()) {
+            const symbol = list[i]['tokenInfo']['symbol']
+            if (symbol === "ETH") {
+                const usdPrice = list[i]['tokenInfo']['usdPrice']
+                totalExchangeAmount += (parseInt(list[i]['amount'], 16) / 10 ** 18) * parseFloat(usdPrice)
+                break
+            } else if (list[i]['tokenInfo']['symbol'] === "USDC") {
+                totalExchangeAmount += parseInt(list[i]['amount'], 16) / 10 ** 6
+                break
+            }
+        } else if (list[i]['to'].toLowerCase() === address.toLowerCase() && list[i]['from'].toLowerCase() !== "0x0000000000000000000000000000000000008001".toLowerCase()) {
+            const symbol = list[i]['tokenInfo']['symbol']
+            if (symbol === "ETH") {
+                const usdPrice = list[i]['tokenInfo']['usdPrice']
+                totalExchangeAmount += (parseInt(list[i]['amount'], 16) / 10 ** 18) * parseFloat(usdPrice)
+                break
+            } else if (list[i]['tokenInfo']['symbol'] === "USDC") {
+                totalExchangeAmount += parseInt(list[i]['amount'], 16) / 10 ** 6
+                break
+            }
+        }
+    }
+    console.log(totalExchangeAmount)
+    return totalExchangeAmount;
+}
+
 async function processTransactions(
+    totalExchangeAmount,
     address,
     totalFee,
     contract,
@@ -33,6 +62,7 @@ async function processTransactions(
 ) {
     for (let i = 0; i < list.length; i++) {
         if (list[i]['balanceChanges'][0]['from'].toLowerCase() === address.toLowerCase()) {
+            totalExchangeAmount += getAmount(address, list[i]['erc20Transfers'])
             const receivedAt = new Date(Date.parse(list[i]['receivedAt']));
             const contractAddress = list[i].data.contractAddress;
             const fee = (parseInt(list[i].fee, 16) / 10 ** 18).toFixed(5)
@@ -55,7 +85,7 @@ async function processTransactions(
             l2Tol1Amount += parseFloat(value);
         }
     }
-    return [totalFee, contract, days, weeks, months, l1Tol2Times, l1Tol2Amount, l2Tol1Times,
+    return [totalExchangeAmount, totalFee, contract, days, weeks, months, l1Tol2Times, l1Tol2Amount, l2Tol1Times,
             l2Tol1Amount];
 }
 
@@ -74,14 +104,17 @@ async function getZkSyncBridge(address) {
         let l1Tol2Amount = 0;
         let l2Tol1Times = 0;
         let l2Tol1Amount = 0;
+        let totalExchangeAmount = 0;
         let offset = 0;
         let fromBlockNumber = null;
         let fromTxIndex = null;
         const initUrl = "https://zksync2-mainnet-explorer.zksync.io/transactions?limit=100&direction=older&accountAddress=" + address;
         const initResponse = await axios.get(initUrl)
         const initDataLength = initResponse.data.total;
-        [totalFee, contract, days, weeks, months, l1Tol2Times, l1Tol2Amount, l2Tol1Times, l2Tol1Amount] =
+        [totalExchangeAmount, totalFee, contract, days, weeks, months, l1Tol2Times, l1Tol2Amount, l2Tol1Times,
+         l2Tol1Amount] =
             await processTransactions(
+                totalExchangeAmount,
                 address,
                 totalFee,
                 contract,
@@ -105,8 +138,10 @@ async function getZkSyncBridge(address) {
                 const response = await axios.get(url);
                 const ListLength = response.data.list.length;
                 [
-                    totalFee, contract, days, weeks, months, l1Tol2Times, l1Tol2Amount, l2Tol1Times, l2Tol1Amount] =
+                    totalExchangeAmount, totalFee, contract, days, weeks, months, l1Tol2Times, l1Tol2Amount,
+                    l2Tol1Times, l2Tol1Amount] =
                     await processTransactions(
+                        totalExchangeAmount,
                         address,
                         totalFee,
                         contract,
@@ -131,6 +166,7 @@ async function getZkSyncBridge(address) {
         monthActivity = months.size;
         contractActivity = contract.size;
         return {
+            totalExchangeAmount: totalExchangeAmount.toFixed(2),
             totalFee: totalFee.toFixed(4),
             contractActivity,
             dayActivity,
@@ -144,6 +180,7 @@ async function getZkSyncBridge(address) {
     } catch (e) {
         console.log(e);
         return {
+            totalExchangeAmount: "Error",
             totalFee: "Error",
             contractActivity: "Error",
             dayActivity: "Error", weekActivity: "Error", monthActivity: "Error",
