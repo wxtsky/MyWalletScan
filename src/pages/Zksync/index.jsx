@@ -277,21 +277,20 @@ function Zksync() {
         }
         setIsLoading(true);
         try {
-            const limit = 20;
+            const limit = 50;
             let activePromises = 0;
             let promisesQueue = [];
             const newData = [...data];
             const processQueue = () => {
-                if (promisesQueue.length === 0) return;
-                if (activePromises >= limit) return;
+                while (activePromises < limit && promisesQueue.length > 0) {
+                    const promise = promisesQueue.shift();
+                    activePromises += 1;
 
-                const promise = promisesQueue.shift();
-                activePromises += 1;
-
-                promise().finally(() => {
-                    activePromises -= 1;
-                    processQueue();
-                });
+                    promise().finally(() => {
+                        activePromises -= 1;
+                        processQueue();
+                    });
+                }
             };
             for (let key of selectedKeys) {
                 const index = newData.findIndex(item => item.key === key);
@@ -381,9 +380,8 @@ function Zksync() {
                             localStorage.setItem('addresses', JSON.stringify(newData));
                         })
                     });
-
-                    processQueue();
                 }
+                processQueue();
             }
             while (activePromises > 0 || promisesQueue.length > 0) {
                 await new Promise(resolve => setTimeout(resolve, 100));
@@ -408,7 +406,7 @@ function Zksync() {
             const addresses = values.addresses.split("\n");
             setBatchLength(addresses.length);
             const newData = [...data];
-            const limit = 10;
+            const limit = 50;
             let activePromises = 0;
             let promisesQueue = [];
             setBatchProgress(0);
@@ -512,10 +510,9 @@ function Zksync() {
                     item.l2Tol1Amount = l2Tol1Amount;
                 }));
                 promisesQueue.push(promiseWithProgress);
+                processQueue();
+
             }
-
-            processQueue();
-
             while (activePromises > 0 || promisesQueue.length > 0) {
                 await new Promise(resolve => setTimeout(resolve, 100));
             }
