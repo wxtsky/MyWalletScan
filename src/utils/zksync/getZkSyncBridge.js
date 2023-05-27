@@ -17,6 +17,24 @@ function getMonthNumber(d) {
     return d.getUTCFullYear() + "-" + (d.getUTCMonth() + 1);
 }
 
+function getZkSyncLastTX(lastTxDatetime) {
+    const date = new Date(lastTxDatetime);
+    const offset = 8;
+    const utc8Date = new Date(date.getTime() + offset * 3600 * 1000);
+    const now = new Date();
+    const utc8Now = new Date(now.getTime() + offset * 3600 * 1000);
+    const diff = utc8Now - utc8Date;
+    const diffInHours = Math.floor(diff / (1000 * 60 * 60));
+    const diffInDays = Math.floor(diffInHours / 24);
+    if (diffInDays > 0) {
+        return `${diffInDays} 天前`
+    } else if (diffInHours > 0) {
+        return `${diffInHours} 小时前`
+    } else {
+        return "刚刚"
+    }
+}
+
 function getAmount(address, list) {
     let totalExchangeAmount = 0;
     for (let i = 0; i < list.length; i++) {
@@ -47,6 +65,7 @@ function getAmount(address, list) {
 }
 
 async function processTransactions(
+    zks2_last_tx,
     totalExchangeAmount,
     address,
     totalFee,
@@ -64,6 +83,10 @@ async function processTransactions(
         if (list[i]['balanceChanges'][0]['from'].toLowerCase() === address.toLowerCase()) {
             totalExchangeAmount += getAmount(address, list[i]['erc20Transfers'])
             const receivedAt = new Date(Date.parse(list[i]['receivedAt']));
+            if (zks2_last_tx === null) {
+                zks2_last_tx = getZkSyncLastTX(list[i]['receivedAt']);
+                console.log(zks2_last_tx)
+            }
             const contractAddress = list[i].data.contractAddress;
             const fee = (parseInt(list[i].fee, 16) / 10 ** 18).toFixed(5)
             totalFee += parseFloat(fee);
@@ -85,12 +108,14 @@ async function processTransactions(
             l2Tol1Amount += parseFloat(value);
         }
     }
-    return [totalExchangeAmount, totalFee, contract, days, weeks, months, l1Tol2Times, l1Tol2Amount, l2Tol1Times,
+    return [zks2_last_tx, totalExchangeAmount, totalFee, contract, days, weeks, months, l1Tol2Times, l1Tol2Amount,
+            l2Tol1Times,
             l2Tol1Amount];
 }
 
 async function getZkSyncBridge(address) {
     try {
+        let zks2_last_tx = null;
         let contract = new Set();
         let days = new Set();
         let weeks = new Set();
@@ -111,9 +136,11 @@ async function getZkSyncBridge(address) {
         const initUrl = "https://zksync2-mainnet-explorer.zksync.io/transactions?limit=100&direction=older&accountAddress=" + address;
         const initResponse = await axios.get(initUrl)
         const initDataLength = initResponse.data.total;
-        [totalExchangeAmount, totalFee, contract, days, weeks, months, l1Tol2Times, l1Tol2Amount, l2Tol1Times,
+        [zks2_last_tx, totalExchangeAmount, totalFee, contract, days, weeks, months, l1Tol2Times, l1Tol2Amount,
+         l2Tol1Times,
          l2Tol1Amount] =
             await processTransactions(
+                zks2_last_tx,
                 totalExchangeAmount,
                 address,
                 totalFee,
@@ -137,10 +164,11 @@ async function getZkSyncBridge(address) {
                 }
                 const response = await axios.get(url);
                 const ListLength = response.data.list.length;
-                [
-                    totalExchangeAmount, totalFee, contract, days, weeks, months, l1Tol2Times, l1Tol2Amount,
-                    l2Tol1Times, l2Tol1Amount] =
+                [zks2_last_tx,
+                 totalExchangeAmount, totalFee, contract, days, weeks, months, l1Tol2Times, l1Tol2Amount,
+                 l2Tol1Times, l2Tol1Amount] =
                     await processTransactions(
+                        zks2_last_tx,
                         totalExchangeAmount,
                         address,
                         totalFee,
@@ -165,7 +193,9 @@ async function getZkSyncBridge(address) {
         weekActivity = weeks.size;
         monthActivity = months.size;
         contractActivity = contract.size;
+        console.log("zks2_last_tx", zks2_last_tx);
         return {
+            zks2_last_tx: zks2_last_tx === null ? "无交易" : zks2_last_tx,
             totalExchangeAmount: totalExchangeAmount.toFixed(2),
             totalFee: totalFee.toFixed(4),
             contractActivity,
@@ -180,6 +210,7 @@ async function getZkSyncBridge(address) {
     } catch (e) {
         console.log(e);
         return {
+            zks2_last_tx: "Error",
             totalExchangeAmount: "Error",
             totalFee: "Error",
             contractActivity: "Error",

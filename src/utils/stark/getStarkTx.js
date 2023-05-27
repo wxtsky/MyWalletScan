@@ -19,9 +19,6 @@ async function getStarkTx(address) {
                 'after': null,
                 'input': {
                     'initiator_address': address,
-                    'transaction_types': [
-                        'INVOKE_FUNCTION'
-                    ],
                     'sort_by': 'timestamp',
                     'order_by': 'desc',
                     'min_block_number': null,
@@ -32,7 +29,11 @@ async function getStarkTx(address) {
             }
         }
         const response = await axios.post(url, Json_data, {headers: headers});
-        tx += response.data.data['transactions']['edges'].length;
+        for (let i = 0; i < response.data.data['transactions']['edges'].length; i++) {
+            if (response.data.data['transactions']['edges'][i]['node']['transaction_type'] === 'INVOKE_FUNCTION') {
+                tx += 1;
+            }
+        }
         hasNextPage = response.data.data['transactions']['pageInfo']['hasNextPage'];
         const timestamp = response.data.data['transactions']['edges'][0]['node']['timestamp'];
         const latestDate = new Date(timestamp * 1000);
@@ -49,7 +50,11 @@ async function getStarkTx(address) {
                 const response = await axios.post(url, Json_data, {headers: headers});
                 hasNextPage = response.data.data['transactions']['pageInfo']['hasNextPage'];
                 endCursor = response.data.data['transactions']['pageInfo']['endCursor'];
-                tx += response.data.data['transactions']['edges'].length;
+                for (let i = 0; i < response.data.data['transactions']['edges'].length; i++) {
+                    if (response.data.data['transactions']['edges'][i]['node']['transaction_type'] === 'INVOKE_FUNCTION') {
+                        tx += 1;
+                    }
+                }
             }
         }
         console.log(tx, formattedDate)

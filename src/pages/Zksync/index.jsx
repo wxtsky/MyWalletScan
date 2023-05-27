@@ -16,7 +16,6 @@ import {
     getTxCount,
     getZksEra,
     getZksLite,
-    getZkSyncLastTX,
     getZkSyncBridge,
     exportToExcel
 } from "@utils"
@@ -111,15 +110,6 @@ function Zksync() {
                     setData(updatedData);
                     localStorage.setItem('addresses', JSON.stringify(data));
                 })
-                getZkSyncLastTX(values.address).then(({zkSyncLastTx}) => {
-                    updatedData[index] = {
-                        ...updatedData[index],
-                        zks2_last_tx: zkSyncLastTx,
-                    };
-                    setData(updatedData);
-                    localStorage.setItem('addresses', JSON.stringify(data));
-
-                })
                 getZksLite(values.address).then(({balance1, tx1}) => {
                     updatedData[index] = {
                         ...updatedData[index],
@@ -148,6 +138,7 @@ function Zksync() {
                     localStorage.setItem('addresses', JSON.stringify(data));
                 })
                 getZkSyncBridge(values.address).then(({
+                                                          zks2_last_tx,
                                                           totalExchangeAmount,
                                                           totalFee,
                                                           contractActivity,
@@ -161,6 +152,7 @@ function Zksync() {
                                                       }) => {
                     updatedData[index] = {
                         ...updatedData[index],
+                        zks2_last_tx,
                         totalExchangeAmount,
                         totalFee,
                         contractActivity,
@@ -208,12 +200,6 @@ function Zksync() {
                     setData([...newData]);
                     localStorage.setItem('addresses', JSON.stringify(newData));
                 })
-                getZkSyncLastTX(values.address).then(({zkSyncLastTx}) => {
-                    newEntry.zks2_last_tx = zkSyncLastTx;
-                    setData([...newData]);
-                    localStorage.setItem('addresses', JSON.stringify(newData));
-
-                })
                 getZksLite(values.address).then(({balance1, tx1}) => {
                     newEntry.zks1_balance = balance1;
                     newEntry.zks1_tx_amount = tx1;
@@ -233,6 +219,7 @@ function Zksync() {
                     localStorage.setItem('addresses', JSON.stringify(newData));
                 })
                 getZkSyncBridge(values.address).then(({
+                                                          zks2_last_tx,
                                                           totalExchangeAmount,
                                                           totalFee,
                                                           contractActivity,
@@ -244,6 +231,7 @@ function Zksync() {
                                                           l2Tol1Times,
                                                           l2Tol1Amount
                                                       }) => {
+                    newEntry.zks2_last_tx = zks2_last_tx;
                     newEntry.totalFee = totalFee;
                     newEntry.contractActivity = contractActivity;
                     newEntry.dayActivity = dayActivity;
@@ -310,14 +298,6 @@ function Zksync() {
                         })
                     });
                     promisesQueue.push(() => {
-                        item.zks2_last_tx = null;
-                        return getZkSyncLastTX(item.address).then(({zkSyncLastTx}) => {
-                            item.zks2_last_tx = zkSyncLastTx;
-                            setData([...newData]);
-                            localStorage.setItem('addresses', JSON.stringify(newData));
-                        })
-                    });
-                    promisesQueue.push(() => {
                         item.zks1_balance = null;
                         item.zks1_tx_amount = null;
                         return getZksLite(item.address).then(({balance1, tx1}) => {
@@ -344,6 +324,7 @@ function Zksync() {
                         })
                     });
                     promisesQueue.push(() => {
+                        item.zks2_last_tx = null;
                         item.totalExchangeAmount = null;
                         item.totalFee = null;
                         item.contractActivity = null;
@@ -355,6 +336,7 @@ function Zksync() {
                         item.l2Tol1Times = null;
                         item.l2Tol1Amount = null;
                         return getZkSyncBridge(item.address).then(({
+                                                                       zks2_last_tx,
                                                                        totalExchangeAmount,
                                                                        totalFee,
                                                                        contractActivity,
@@ -366,6 +348,7 @@ function Zksync() {
                                                                        l2Tol1Times,
                                                                        l2Tol1Amount
                                                                    }) => {
+                            item.zks2_last_tx = zks2_last_tx;
                             item.totalExchangeAmount = totalExchangeAmount;
                             item.totalFee = totalFee;
                             item.contractActivity = contractActivity;
@@ -469,9 +452,6 @@ function Zksync() {
                     item.zks2_usdcBalance = usdcBalance;
                 }));
 
-                promisesQueue.push(() => getZkSyncLastTX(address).then(({zkSyncLastTx}) => {
-                    item.zks2_last_tx = zkSyncLastTx;
-                }));
 
                 promisesQueue.push(() => getZksLite(address).then(({balance1, tx1}) => {
                     item.zks1_balance = balance1;
@@ -487,6 +467,7 @@ function Zksync() {
                 }));
 
                 promisesQueue.push(() => getZkSyncBridge(address).then(({
+                                                                            zks2_last_tx,
                                                                             totalExchangeAmount,
                                                                             totalFee,
                                                                             contractActivity,
@@ -498,6 +479,7 @@ function Zksync() {
                                                                             l2Tol1Times,
                                                                             l2Tol1Amount
                                                                         }) => {
+                    item.zks2_last_tx = zks2_last_tx;
                     item.totalExchangeAmount = totalExchangeAmount;
                     item.totalFee = totalFee;
                     item.contractActivity = contractActivity;
@@ -929,9 +911,9 @@ function Zksync() {
                                               addonAfter="个"/>
                                     <FormItem name="zkSyncEraMinTx" addonBefore="zkSyncEra Tx数量 ≥ "
                                               addonAfter="个"/>
-                                    <FormItem name="dayMin" addonBefore="日活跃天数 ≥ " addonAfter="天"/>
-                                    <FormItem name="weekMin" addonBefore="周活跃天数 ≥ " addonAfter="天"/>
-                                    <FormItem name="monthMin" addonBefore="月活跃天数 ≥ " addonAfter="天"/>
+                                    <FormItem name="dayMin" addonBefore="日活跃数 ≥ " addonAfter="天"/>
+                                    <FormItem name="weekMin" addonBefore="周活跃数 ≥ " addonAfter="周"/>
+                                    <FormItem name="monthMin" addonBefore="月活跃数 ≥ " addonAfter="月"/>
                                 </Col>
                                 <Col span={12}>
                                     <FormItem name="L1ToL2Tx" addonBefore="L1->L2跨链Tx ≥ " addonAfter="个"/>
