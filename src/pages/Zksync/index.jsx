@@ -9,7 +9,7 @@ import {
     Spin,
     Tag,
     Popconfirm,
-    Row, Col, InputNumber, Badge, message, Switch, Pagination
+    Row, Col, InputNumber, message
 } from 'antd';
 import {
     getEthBalance,
@@ -863,7 +863,6 @@ function Zksync() {
                        okButtonProps={{loading: isLoading}}
                        okText={"添加地址"}
                        cancelText={"取消"}
-                    // style={{zIndex: 3}}
                 >
                     <Form form={batchForm} layout="vertical">
                         <Form.Item label="地址" name="addresses" rules={[{required: true}]}>
@@ -875,7 +874,6 @@ function Zksync() {
                        okButtonProps={{loading: isLoading}}
                        okText={"添加地址"}
                        cancelText={"取消"}
-                    // style={{zIndex: 3}}
                 >
                     <Form form={form} layout="vertical">
                         <Form.Item label="地址" name="address" rules={[{required: true}]}>
@@ -896,7 +894,6 @@ function Zksync() {
                        cancelText={"取消"}
                        width={700}
                        style={{top: 10}}
-                    // style={{zIndex: 3}}
 
                 >
                     <Form form={walletForm} layout="vertical">
@@ -937,7 +934,6 @@ function Zksync() {
                         style={{marginBottom: "20px", zIndex: 2}}
                         size={"small"}
                         columns={columns}
-                        // sticky
                         summary={pageData => {
                             let ethBalance = 0;
                             let zks1Balance = 0;
