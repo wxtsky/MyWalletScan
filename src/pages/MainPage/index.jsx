@@ -18,7 +18,7 @@ function MainPage() {
                 minHeight: "100vh",
             }}
         >
-            <Notice/>
+            {/*<Notice/>*/}
             <Layout>
                 <div
                     style={{

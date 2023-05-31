@@ -9,7 +9,7 @@ const Notice = () => {
     return (
         <div>
             <Modal
-                title="注意事项(2023-05-17)"
+                title="注意事项(2023-05-17)(24日关闭)"
                 open={modalIsOpen}
                 onOk={() => setModalIsOpen(false)}
                 onCancel={() => setModalIsOpen(false)}

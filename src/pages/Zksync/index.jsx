@@ -9,14 +9,13 @@ import {
     Spin,
     Tag,
     Popconfirm,
-    Row, Col, InputNumber, Badge
+    Row, Col, InputNumber, Badge, message, Switch, Pagination
 } from 'antd';
 import {
     getEthBalance,
     getTxCount,
     getZksEra,
     getZksLite,
-    getZkSyncLastTX,
     getZkSyncBridge,
     exportToExcel
 } from "@utils"
@@ -37,6 +36,9 @@ import {
 const {TextArea} = Input;
 
 function Zksync() {
+    const [batchProgress, setBatchProgress] = useState(0);
+    const [batchLength, setBatchLength] = useState(0);
+    const [batchloading, setBatchLoading] = useState(false);
     const [zkSyncConfigStore, setZkSyncConfigStore] = useState({});
     const [data, setData] = useState([]);
     const [isBatchModalVisible, setIsBatchModalVisible] = useState(false);
@@ -49,6 +51,7 @@ function Zksync() {
     const [isLoading, setIsLoading] = useState(false);
     const [tableLoading, setTableLoading] = useState(false);
     useEffect(() => {
+        setBatchProgress(0);
         const zksync_config = localStorage.getItem('zksync_config');
         if (zksync_config) {
             const config = JSON.parse(zksync_config);
@@ -68,7 +71,8 @@ function Zksync() {
                     "L1ToL2ETH": null,
                     "L2ToL1ETH": null,
                     "gasFee": null,
-                    "contractMin": null
+                    "contractMin": null,
+                    "totalAmount": null,
                 }
             )
         }
@@ -106,15 +110,6 @@ function Zksync() {
                     setData(updatedData);
                     localStorage.setItem('addresses', JSON.stringify(data));
                 })
-                getZkSyncLastTX(values.address).then(({zkSyncLastTx}) => {
-                    updatedData[index] = {
-                        ...updatedData[index],
-                        zks2_last_tx: zkSyncLastTx,
-                    };
-                    setData(updatedData);
-                    localStorage.setItem('addresses', JSON.stringify(data));
-
-                })
                 getZksLite(values.address).then(({balance1, tx1}) => {
                     updatedData[index] = {
                         ...updatedData[index],
@@ -143,6 +138,8 @@ function Zksync() {
                     localStorage.setItem('addresses', JSON.stringify(data));
                 })
                 getZkSyncBridge(values.address).then(({
+                                                          zks2_last_tx,
+                                                          totalExchangeAmount,
                                                           totalFee,
                                                           contractActivity,
                                                           dayActivity,
@@ -155,6 +152,8 @@ function Zksync() {
                                                       }) => {
                     updatedData[index] = {
                         ...updatedData[index],
+                        zks2_last_tx,
+                        totalExchangeAmount,
                         totalFee,
                         contractActivity,
                         dayActivity,
@@ -190,6 +189,7 @@ function Zksync() {
                     l2Tol1Amount: null,
                     contractActivity: null,
                     totalFee: null,
+                    totalExchangeAmount: null,
                 };
                 const newData = [...data, newEntry];
                 setData(newData);
@@ -199,12 +199,6 @@ function Zksync() {
                     newEntry.zks2_usdcBalance = usdcBalance;
                     setData([...newData]);
                     localStorage.setItem('addresses', JSON.stringify(newData));
-                })
-                getZkSyncLastTX(values.address).then(({zkSyncLastTx}) => {
-                    newEntry.zks2_last_tx = zkSyncLastTx;
-                    setData([...newData]);
-                    localStorage.setItem('addresses', JSON.stringify(newData));
-
                 })
                 getZksLite(values.address).then(({balance1, tx1}) => {
                     newEntry.zks1_balance = balance1;
@@ -225,6 +219,8 @@ function Zksync() {
                     localStorage.setItem('addresses', JSON.stringify(newData));
                 })
                 getZkSyncBridge(values.address).then(({
+                                                          zks2_last_tx,
+                                                          totalExchangeAmount,
                                                           totalFee,
                                                           contractActivity,
                                                           dayActivity,
@@ -235,6 +231,7 @@ function Zksync() {
                                                           l2Tol1Times,
                                                           l2Tol1Amount
                                                       }) => {
+                    newEntry.zks2_last_tx = zks2_last_tx;
                     newEntry.totalFee = totalFee;
                     newEntry.contractActivity = contractActivity;
                     newEntry.dayActivity = dayActivity;
@@ -244,6 +241,7 @@ function Zksync() {
                     newEntry.l1Tol2Amount = l1Tol2Amount;
                     newEntry.l2Tol1Times = l2Tol1Times;
                     newEntry.l2Tol1Amount = l2Tol1Amount;
+                    newEntry.totalExchangeAmount = totalExchangeAmount;
                     setData([...newData]);
                     localStorage.setItem('addresses', JSON.stringify(newData));
                 })
@@ -267,97 +265,106 @@ function Zksync() {
         }
         setIsLoading(true);
         try {
-            const limit = 10;
+            const limit = 50;
             let activePromises = 0;
             let promisesQueue = [];
             const newData = [...data];
             const processQueue = () => {
-                if (promisesQueue.length === 0) return;
-                if (activePromises >= limit) return;
+                while (activePromises < limit && promisesQueue.length > 0) {
+                    const promise = promisesQueue.shift();
+                    activePromises += 1;
 
-                const promise = promisesQueue.shift();
-                activePromises += 1;
-
-                promise().finally(() => {
-                    activePromises -= 1;
-                    processQueue();
-                });
+                    promise().finally(() => {
+                        activePromises -= 1;
+                        processQueue();
+                    });
+                }
             };
             for (let key of selectedKeys) {
                 const index = newData.findIndex(item => item.key === key);
                 if (index !== -1) {
                     const item = newData[index];
-                    item.eth_balance = null;
-                    item.eth_tx_amount = null;
-                    item.zks1_balance = null;
-                    item.zks1_tx_amount = null;
-                    item.zks2_balance = null;
-                    item.zks2_tx_amount = null;
-                    item.zks2_usdcBalance = null;
-                    item.zks2_last_tx = null;
-                    item.dayActivity = null;
-                    item.weekActivity = null;
-                    item.monthActivity = null;
-                    item.l1Tol2Times = null;
-                    item.l1Tol2Amount = null;
-                    item.l2Tol1Times = null;
-                    item.l2Tol1Amount = null;
-                    item.contractActivity = null;
-                    item.totalFee = null;
-                    setData([...newData]);
-                    promisesQueue.push(() => getZksEra(item.address).then(({balance2, tx2, usdcBalance}) => {
-                        item.zks2_balance = balance2;
-                        item.zks2_tx_amount = tx2;
-                        item.zks2_usdcBalance = usdcBalance;
-                        setData([...newData]);
-                        localStorage.setItem('addresses', JSON.stringify(data));
-                    }))
-                    promisesQueue.push(() => getZkSyncLastTX(item.address).then(({zkSyncLastTx}) => {
-                        item.zks2_last_tx = zkSyncLastTx;
-                        setData([...newData]);
-                        localStorage.setItem('addresses', JSON.stringify(data));
-                    }))
-                    promisesQueue.push(() => getZksLite(item.address).then(({balance1, tx1}) => {
-                        item.zks1_balance = balance1;
-                        item.zks1_tx_amount = tx1;
-                        setData([...newData]);
-                        localStorage.setItem('addresses', JSON.stringify(data));
-                    }))
-                    promisesQueue.push(() => getEthBalance(item.address, "ethereum").then((eth_balance) => {
-                        item.eth_balance = eth_balance;
-                        setData([...newData]);
-                        localStorage.setItem('addresses', JSON.stringify(data));
-                    }))
-                    promisesQueue.push(() => getTxCount(item.address, "ethereum").then((eth_tx_amount) => {
-                        item.eth_tx_amount = eth_tx_amount;
-                        setData([...newData]);
-                        localStorage.setItem('addresses', JSON.stringify(data));
-                    }))
-                    promisesQueue.push(() => getZkSyncBridge(item.address).then(({
-                                                                                     totalFee,
-                                                                                     contractActivity,
-                                                                                     dayActivity,
-                                                                                     weekActivity,
-                                                                                     monthActivity,
-                                                                                     l1Tol2Times,
-                                                                                     l1Tol2Amount,
-                                                                                     l2Tol1Times,
-                                                                                     l2Tol1Amount
-                                                                                 }) => {
-                        item.totalFee = totalFee;
-                        item.contractActivity = contractActivity;
-                        item.dayActivity = dayActivity;
-                        item.weekActivity = weekActivity;
-                        item.monthActivity = monthActivity;
-                        item.l1Tol2Times = l1Tol2Times;
-                        item.l1Tol2Amount = l1Tol2Amount;
-                        item.l2Tol1Times = l2Tol1Times;
-                        item.l2Tol1Amount = l2Tol1Amount;
-                        setData([...newData]);
-                        localStorage.setItem('addresses', JSON.stringify(data));
-                    }))
-                    processQueue();
+
+                    promisesQueue.push(() => {
+                        item.zks2_balance = null;
+                        item.zks2_tx_amount = null;
+                        item.zks2_usdcBalance = null;
+                        return getZksEra(item.address).then(({balance2, tx2, usdcBalance}) => {
+                            item.zks2_balance = balance2;
+                            item.zks2_tx_amount = tx2;
+                            item.zks2_usdcBalance = usdcBalance;
+                            setData([...newData]);
+                            localStorage.setItem('addresses', JSON.stringify(newData));
+                        })
+                    });
+                    promisesQueue.push(() => {
+                        item.zks1_balance = null;
+                        item.zks1_tx_amount = null;
+                        return getZksLite(item.address).then(({balance1, tx1}) => {
+                            item.zks1_balance = balance1;
+                            item.zks1_tx_amount = tx1;
+                            setData([...newData]);
+                            localStorage.setItem('addresses', JSON.stringify(newData));
+                        })
+                    });
+                    promisesQueue.push(() => {
+                        item.eth_balance = null;
+                        return getEthBalance(item.address, "ethereum").then((eth_balance) => {
+                            item.eth_balance = eth_balance;
+                            setData([...newData]);
+                            localStorage.setItem('addresses', JSON.stringify(newData));
+                        })
+                    });
+                    promisesQueue.push(() => {
+                        item.eth_tx_amount = null;
+                        return getTxCount(item.address, "ethereum").then((eth_tx_amount) => {
+                            item.eth_tx_amount = eth_tx_amount;
+                            setData([...newData]);
+                            localStorage.setItem('addresses', JSON.stringify(newData));
+                        })
+                    });
+                    promisesQueue.push(() => {
+                        item.zks2_last_tx = null;
+                        item.totalExchangeAmount = null;
+                        item.totalFee = null;
+                        item.contractActivity = null;
+                        item.dayActivity = null;
+                        item.weekActivity = null;
+                        item.monthActivity = null;
+                        item.l1Tol2Times = null;
+                        item.l1Tol2Amount = null;
+                        item.l2Tol1Times = null;
+                        item.l2Tol1Amount = null;
+                        return getZkSyncBridge(item.address).then(({
+                                                                       zks2_last_tx,
+                                                                       totalExchangeAmount,
+                                                                       totalFee,
+                                                                       contractActivity,
+                                                                       dayActivity,
+                                                                       weekActivity,
+                                                                       monthActivity,
+                                                                       l1Tol2Times,
+                                                                       l1Tol2Amount,
+                                                                       l2Tol1Times,
+                                                                       l2Tol1Amount
+                                                                   }) => {
+                            item.zks2_last_tx = zks2_last_tx;
+                            item.totalExchangeAmount = totalExchangeAmount;
+                            item.totalFee = totalFee;
+                            item.contractActivity = contractActivity;
+                            item.dayActivity = dayActivity;
+                            item.weekActivity = weekActivity;
+                            item.monthActivity = monthActivity;
+                            item.l1Tol2Times = l1Tol2Times;
+                            item.l1Tol2Amount = l1Tol2Amount;
+                            item.l2Tol1Times = l2Tol1Times;
+                            item.l2Tol1Amount = l2Tol1Amount;
+                            setData([...newData]);
+                            localStorage.setItem('addresses', JSON.stringify(newData));
+                        })
+                    });
                 }
+                processQueue();
             }
             while (activePromises > 0 || promisesQueue.length > 0) {
                 await new Promise(resolve => setTimeout(resolve, 100));
@@ -370,29 +377,32 @@ function Zksync() {
         } finally {
             setIsLoading(false);
             setSelectedKeys([]);
+            message.success("刷新成功");
         }
     };
+
     const handleBatchOk = async () => {
         try {
+            setBatchLoading(true);
             setIsBatchModalVisible(false);
             const values = await batchForm.validateFields();
             const addresses = values.addresses.split("\n");
+            setBatchLength(addresses.length);
             const newData = [...data];
-            const limit = 10;
+            const limit = 50;
             let activePromises = 0;
             let promisesQueue = [];
-
+            setBatchProgress(0);
             const processQueue = () => {
-                if (promisesQueue.length === 0) return;
-                if (activePromises >= limit) return;
+                while (promisesQueue.length > 0 && activePromises < limit) {
+                    const promise = promisesQueue.shift();
+                    activePromises += 1;
 
-                const promise = promisesQueue.shift();
-                activePromises += 1;
-
-                promise().finally(() => {
-                    activePromises -= 1;
-                    processQueue();
-                });
+                    promise().finally(() => {
+                        activePromises -= 1;
+                        processQueue();
+                    });
+                }
             };
 
             for (let address of addresses) {
@@ -404,168 +414,107 @@ function Zksync() {
                     });
                     continue;
                 }
+                let promiseWithProgress = () => {
+                    return new Promise((resolve, reject) => {
+                        setBatchProgress(prevProgress => prevProgress + 1);
+                        resolve();
+                    });
+                };
                 const index = newData.findIndex(item => item.address === address);
-                if (index !== -1) {
-                    const item = newData[index];
-
-                    promisesQueue.push(() => getZksEra(address).then(({balance2, tx2, usdcBalance}) => {
-                        item.zks2_balance = balance2;
-                        item.zks2_tx_amount = tx2;
-                        item.zks2_usdcBalance = usdcBalance;
-                        setData([...newData]);
-                        localStorage.setItem('addresses', JSON.stringify(newData));
-                    }));
-
-                    promisesQueue.push(() => getZkSyncLastTX(address).then(({zkSyncLastTx}) => {
-                        item.zks2_last_tx = zkSyncLastTx;
-                        setData([...newData]);
-                        localStorage.setItem('addresses', JSON.stringify(newData));
-                    }));
-
-                    promisesQueue.push(() => getZksLite(address).then(({balance1, tx1}) => {
-                        item.zks1_balance = balance1;
-                        item.zks1_tx_amount = tx1;
-                        setData([...newData]);
-                        localStorage.setItem('addresses', JSON.stringify(newData));
-                    }));
-
-                    promisesQueue.push(() => getEthBalance(address, "ethereum").then((eth_balance) => {
-                        item.eth_balance = eth_balance;
-                        setData([...newData]);
-                        localStorage.setItem('addresses', JSON.stringify(newData));
-                    }));
-
-                    promisesQueue.push(() => getTxCount(address, "ethereum").then((eth_tx_amount) => {
-                        item.eth_tx_amount = eth_tx_amount;
-                        setData([...newData]);
-                        localStorage.setItem('addresses', JSON.stringify(newData));
-                    }));
-
-                    promisesQueue.push(() => getZkSyncBridge(address).then(({
-                                                                                totalFee,
-                                                                                contractActivity,
-                                                                                dayActivity,
-                                                                                weekActivity,
-                                                                                monthActivity,
-                                                                                l1Tol2Times,
-                                                                                l1Tol2Amount,
-                                                                                l2Tol1Times,
-                                                                                l2Tol1Amount
-                                                                            }) => {
-                        item.totalFee = totalFee;
-                        item.contractActivity = contractActivity;
-                        item.dayActivity = dayActivity;
-                        item.weekActivity = weekActivity;
-                        item.monthActivity = monthActivity;
-                        item.l1Tol2Times = l1Tol2Times;
-                        item.l1Tol2Amount = l1Tol2Amount;
-                        item.l2Tol1Times = l2Tol1Times;
-                        item.l2Tol1Amount = l2Tol1Amount;
-                        setData([...newData]);
-                        localStorage.setItem('addresses', JSON.stringify(newData));
-                    }));
-
-                    processQueue();
-
-                } else {
-                    const newEntry = {
-                        key: newData.length.toString(),
-                        address: address,
-                        eth_balance: null,
-                        eth_tx_amount: null,
-                        zks2_balance: null,
-                        zks2_tx_amount: null,
-                        zks2_usdcBalance: null,
-                        zks1_balance: null,
-                        zks1_tx_amount: null,
-                        zks2_last_tx: null,
-                        dayActivity: null,
-                        weekActivity: null,
-                        monthActivity: null,
-                        l1Tol2Times: null,
-                        l1Tol2Amount: null,
-                        l2Tol1Times: null,
-                        l2Tol1Amount: null,
-                        contractActivity: null,
-                        totalFee: null,
-                    };
-                    newData.push(newEntry);
-                    setData(newData);
-
-                    promisesQueue.push(() => getZksEra(address).then(({balance2, tx2, usdcBalance}) => {
-                        newEntry.zks2_balance = balance2;
-                        newEntry.zks2_tx_amount = tx2;
-                        newEntry.zks2_usdcBalance = usdcBalance;
-                        setData([...newData]);
-                        localStorage.setItem('addresses', JSON.stringify(newData));
-                    }));
-
-                    promisesQueue.push(() => getZkSyncLastTX(address).then(({zkSyncLastTx}) => {
-                        newEntry.zks2_last_tx = zkSyncLastTx;
-                        setData([...newData]);
-                        localStorage.setItem('addresses', JSON.stringify(newData));
-                    }));
-
-                    promisesQueue.push(() => getZksLite(address).then(({balance1, tx1}) => {
-                        newEntry.zks1_balance = balance1;
-                        newEntry.zks1_tx_amount = tx1;
-                        setData([...newData]);
-                        localStorage.setItem('addresses', JSON.stringify(newData));
-                    }));
-
-                    promisesQueue.push(() => getEthBalance(address, "ethereum").then((eth_balance) => {
-                        newEntry.eth_balance = eth_balance;
-                        setData([...newData]);
-                        localStorage.setItem('addresses', JSON.stringify(newData));
-                    }));
-
-                    promisesQueue.push(() => getTxCount(address, "ethereum").then((eth_tx_amount) => {
-                        newEntry.eth_tx_amount = eth_tx_amount;
-                        setData([...newData]);
-                        localStorage.setItem('addresses', JSON.stringify(newData));
-                    }));
-
-                    promisesQueue.push(() => getZkSyncBridge(address).then(({
-                                                                                totalFee,
-                                                                                contractActivity,
-                                                                                dayActivity,
-                                                                                weekActivity,
-                                                                                monthActivity,
-                                                                                l1Tol2Times,
-                                                                                l1Tol2Amount,
-                                                                                l2Tol1Times,
-                                                                                l2Tol1Amount
-                                                                            }) => {
-                        newEntry.totalFee = totalFee;
-                        newEntry.contractActivity = contractActivity;
-                        newEntry.dayActivity = dayActivity;
-                        newEntry.weekActivity = weekActivity;
-                        newEntry.monthActivity = monthActivity;
-                        newEntry.l1Tol2Times = l1Tol2Times;
-                        newEntry.l1Tol2Amount = l1Tol2Amount;
-                        newEntry.l2Tol1Times = l2Tol1Times;
-                        newEntry.l2Tol1Amount = l2Tol1Amount;
-                        setData([...newData]);
-                        localStorage.setItem('addresses', JSON.stringify(newData));
-                    }));
-
-                    processQueue();
+                const item = index !== -1 ? newData[index] : {
+                    key: newData.length.toString(),
+                    address: address,
+                    eth_balance: null,
+                    eth_tx_amount: null,
+                    zks2_balance: null,
+                    zks2_tx_amount: null,
+                    zks2_usdcBalance: null,
+                    zks1_balance: null,
+                    zks1_tx_amount: null,
+                    zks2_last_tx: null,
+                    dayActivity: null,
+                    weekActivity: null,
+                    monthActivity: null,
+                    l1Tol2Times: null,
+                    l1Tol2Amount: null,
+                    l2Tol1Times: null,
+                    l2Tol1Amount: null,
+                    contractActivity: null,
+                    totalFee: null,
+                    totalExchangeAmount: null,
+                };
+                if (index === -1) {
+                    newData.push(item);
                 }
-            }
+                promisesQueue.push(() => getZksEra(address).then(({balance2, tx2, usdcBalance}) => {
+                    item.zks2_balance = balance2;
+                    item.zks2_tx_amount = tx2;
+                    item.zks2_usdcBalance = usdcBalance;
+                }));
 
+
+                promisesQueue.push(() => getZksLite(address).then(({balance1, tx1}) => {
+                    item.zks1_balance = balance1;
+                    item.zks1_tx_amount = tx1;
+                }));
+
+                promisesQueue.push(() => getEthBalance(address, "ethereum").then((eth_balance) => {
+                    item.eth_balance = eth_balance;
+                }));
+
+                promisesQueue.push(() => getTxCount(address, "ethereum").then((eth_tx_amount) => {
+                    item.eth_tx_amount = eth_tx_amount;
+                }));
+
+                promisesQueue.push(() => getZkSyncBridge(address).then(({
+                                                                            zks2_last_tx,
+                                                                            totalExchangeAmount,
+                                                                            totalFee,
+                                                                            contractActivity,
+                                                                            dayActivity,
+                                                                            weekActivity,
+                                                                            monthActivity,
+                                                                            l1Tol2Times,
+                                                                            l1Tol2Amount,
+                                                                            l2Tol1Times,
+                                                                            l2Tol1Amount
+                                                                        }) => {
+                    item.zks2_last_tx = zks2_last_tx;
+                    item.totalExchangeAmount = totalExchangeAmount;
+                    item.totalFee = totalFee;
+                    item.contractActivity = contractActivity;
+                    item.dayActivity = dayActivity;
+                    item.weekActivity = weekActivity;
+                    item.monthActivity = monthActivity;
+                    item.l1Tol2Times = l1Tol2Times;
+                    item.l1Tol2Amount = l1Tol2Amount;
+                    item.l2Tol1Times = l2Tol1Times;
+                    item.l2Tol1Amount = l2Tol1Amount;
+                }));
+                promisesQueue.push(promiseWithProgress);
+                processQueue();
+
+            }
             while (activePromises > 0 || promisesQueue.length > 0) {
                 await new Promise(resolve => setTimeout(resolve, 100));
             }
+
+            setData(newData);
+            localStorage.setItem('addresses', JSON.stringify(newData));
         } catch (error) {
             notification.error({
                 message: "错误",
                 description: error.message,
             });
         } finally {
+            setBatchLoading(false);
+            setBatchProgress(0);
             batchForm.resetFields();
             setSelectedKeys([]);
+            message.success("批量添加成功");
         }
     };
+
 
     const showModal = () => {
         setIsModalVisible(true);
@@ -661,7 +610,12 @@ function Zksync() {
             key: "address",
             align: "center",
             render: (text, record) => {
-                return isRowSatisfyCondition(record) ? <Badge status="success" text={text}/> : text || <Spin/>;
+                return isRowSatisfyCondition(record) ?
+                    <div
+                        style={{backgroundColor: '#bbeefa', borderRadius: '5px'}}
+                    >
+                        {text}</div> : text ||
+                    <Spin/>;
             },
             // width: 375
         },
@@ -831,6 +785,13 @@ function Zksync() {
                             // width: 73.5
                         },
                         {
+                            title: "金额(U)",
+                            dataIndex: "totalExchangeAmount",
+                            key: "totalExchangeAmount",
+                            align: "center",
+                            render: (text, record) => (text === null ? <Spin/> : text),
+                        },
+                        {
                             title: "FeeΞ",
                             dataIndex: "totalFee",
                             key: "totalFee",
@@ -882,7 +843,8 @@ function Zksync() {
             "dayMin": "dayActivity",
             "weekMin": "weekActivity",
             "monthMin": "monthActivity",
-            "gasFee": "totalFee"
+            "gasFee": "totalFee",
+            "totalAmount": "totalExchangeAmount",
         };
         return Object.keys(conditionKeyMapping).every((conditionKey) => {
             if (!(conditionKey in zkSyncConfigStore) || zkSyncConfigStore[conditionKey] === null || zkSyncConfigStore[conditionKey] === undefined) {
@@ -933,11 +895,12 @@ function Zksync() {
                        okText={"保存"}
                        cancelText={"取消"}
                        width={700}
+                       style={{top: 10}}
                     // style={{zIndex: 3}}
 
                 >
                     <Form form={walletForm} layout="vertical">
-                        <Card title="设置您的钱包预期标准，如果钱包达到您设置的标准，钱包前面会有绿色提示点"
+                        <Card title="设置钱包预期标准，若钱包达到设置标准，钱包地址背景会为蓝色，更清晰"
                               bordered={true}
                               style={{width: '100%'}}>
                             <Row gutter={[16, 16]}>
@@ -946,18 +909,20 @@ function Zksync() {
                                               addonAfter="个"/>
                                     <FormItem name="zkSyncLiteMinTx" addonBefore="zkSyncLite Tx数量 ≥ "
                                               addonAfter="个"/>
-                                    <FormItem name="zkSyncEraMinTx" addonBefore="zkSyncEra Tx数量 ≥ " addonAfter="个"/>
-                                    <FormItem name="dayMin" addonBefore="日活跃天数 ≥ " addonAfter="天"/>
-                                    <FormItem name="weekMin" addonBefore="周活跃天数 ≥ " addonAfter="天"/>
-                                    <FormItem name="monthMin" addonBefore="月活跃天数 ≥ " addonAfter="天"/>
+                                    <FormItem name="zkSyncEraMinTx" addonBefore="zkSyncEra Tx数量 ≥ "
+                                              addonAfter="个"/>
+                                    <FormItem name="dayMin" addonBefore="日活跃数 ≥ " addonAfter="天"/>
+                                    <FormItem name="weekMin" addonBefore="周活跃数 ≥ " addonAfter="周"/>
+                                    <FormItem name="monthMin" addonBefore="月活跃数 ≥ " addonAfter="月"/>
                                 </Col>
                                 <Col span={12}>
                                     <FormItem name="L1ToL2Tx" addonBefore="L1->L2跨链Tx ≥ " addonAfter="个"/>
                                     <FormItem name="L2ToL1Tx" addonBefore="L2->L1跨链Tx ≥ " addonAfter="个"/>
                                     <FormItem name="L1ToL2ETH" addonBefore="L1->L2跨链金额 ≥ " addonAfter="ETH"/>
                                     <FormItem name="L2ToL1ETH" addonBefore="L2->L1跨链金额 ≥ " addonAfter="ETH"/>
-                                    <FormItem name="gasFee" addonBefore="消耗gasFee（ETH）" addonAfter="ETH"/>
+                                    <FormItem name="gasFee" addonBefore="消耗gasFee" addonAfter="ETH"/>
                                     <FormItem name="contractMin" addonBefore="不同合约数 ≥ " addonAfter="个"/>
+                                    <FormItem name="totalAmount" addonBefore="总交易金额 ≥ " addonAfter="U"/>
                                 </Col>
                             </Row>
                         </Card>
@@ -1000,14 +965,16 @@ function Zksync() {
                                 <>
                                     <Table.Summary.Row>
                                         <Table.Summary.Cell index={0} colSpan={4}>总计</Table.Summary.Cell>
-                                        <Table.Summary.Cell index={4}>{ethBalance.toFixed(3)}</Table.Summary.Cell>
+                                        <Table.Summary.Cell index={4}>{ethBalance.toFixed(4)}</Table.Summary.Cell>
                                         <Table.Summary.Cell index={5}/>
-                                        <Table.Summary.Cell index={6}>{zks1Balance.toFixed(3)}</Table.Summary.Cell>
+                                        <Table.Summary.Cell index={6}>{zks1Balance.toFixed(4)}</Table.Summary.Cell>
                                         <Table.Summary.Cell index={7}/>
-                                        <Table.Summary.Cell index={8}>{zks2Balance.toFixed(3)}</Table.Summary.Cell>
-                                        <Table.Summary.Cell index={9}>{zks2UsdcBalance.toFixed(2)}</Table.Summary.Cell>
+                                        <Table.Summary.Cell index={8}>{zks2Balance.toFixed(4)}</Table.Summary.Cell>
+                                        <Table.Summary.Cell
+                                            index={9}>{zks2UsdcBalance.toFixed(2)}</Table.Summary.Cell>
                                         {emptyCells}
-                                        <Table.Summary.Cell index={20}>{totalFees.toFixed(3)}</Table.Summary.Cell>
+                                        <Table.Summary.Cell index={19}/>
+                                        <Table.Summary.Cell index={20}>{totalFees.toFixed(4)}</Table.Summary.Cell>
                                     </Table.Summary.Row>
                                 </>
                             )
@@ -1032,12 +999,15 @@ function Zksync() {
                                     </Button>
                                     <Button type="primary" onClick={showBatchModal} size={"large"}
                                             style={{width: "20%"}}
-                                            icon={<UploadOutlined/>}>
-                                        批量添加地址
+                                            icon={<UploadOutlined/>}
+                                            loading={batchloading}
+                                    >
+                                        {batchloading ? `添加中 进度:(${batchProgress}/${batchLength})` : "批量添加地址"}
                                     </Button>
-                                    <Button type="primary" onClick={handleRefresh} loading={isLoading} size={"large"}
+                                    <Button type="primary" onClick={handleRefresh} loading={isLoading}
+                                            size={"large"}
                                             style={{width: "20%"}} icon={<SyncOutlined/>}>
-                                        刷新选中地址
+                                        {isLoading ? "正在刷新" : "刷新选中地址"}
                                     </Button>
                                     <Popconfirm title={"确认删除" + selectedKeys.length + "个地址？"}
                                                 onConfirm={handleDeleteSelected}>
