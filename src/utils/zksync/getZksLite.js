@@ -1,10 +1,9 @@
 import axios from "axios";
-
+import { ZksLiteApi } from '@constants/apiKey'
 
 async function getZksLite(address) {
     try {
-        let url = "https://api.zksync.io/jsrpc"
-        const response = await axios.post(url, {
+        const response = await axios.post(ZksLiteApi, {
             'id': 1,
             'jsonrpc': '2.0',
             'method': 'account_info',

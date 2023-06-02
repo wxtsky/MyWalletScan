@@ -1,11 +1,12 @@
 import axios from "axios";
+import { StarkApi } from "../../constants/apiKey";
 
 async function getStarkTx(address) {
     try {
         let tx = 0;
         let hasNextPage;
         let endCursor;
-        const url = "https://starkscan.stellate.sh/";
+        const url = StarkApi;
         const headers = {
             'authority': 'starkscan.stellate.sh',
             'accept': 'application/json',

@@ -1,11 +1,12 @@
 import axios from 'axios';
+import { ArbRpc, BscRpc, EthRpc, OpRpc, PolygonRpc } from '@/constants/apiKey';
 
 const RPC_MAP = {
-    "ethereum": "https://cloudflare-eth.com",
-    "optimism": "https://optimism-mainnet.public.blastapi.io",
-    "arbitrum": "https://rpc.ankr.com/arbitrum",
-    "polygon": "https://polygon-bor.publicnode.com",
-    "bsc": "https://bscrpc.com"
+    "ethereum": EthRpc,
+    "optimism": OpRpc,
+    "arbitrum": ArbRpc,
+    "polygon": PolygonRpc,
+    "bsc": BscRpc
 };
 
 async function getEthBalance(walletAddress, network) {
