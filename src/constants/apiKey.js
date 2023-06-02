@@ -3,7 +3,7 @@ export const ZksEraApi = 'https://zksync2-mainnet-explorer.zksync.io';
 
 export const ZksLiteApi = 'https://api.zksync.io/jsrpc';
 
-export const EthRpc = 'https://eth.llamarpc.com';
+export const EthRpc = 'https://cloudflare-eth.com';
 
 export const OpRpc = 'https://optimism-mainnet.public.blastapi.io';
 

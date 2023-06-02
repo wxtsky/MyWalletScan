@@ -2,15 +2,14 @@
 
 ## 关于
 
-一款方便查看管理地址的工具，目前支持查看zkSync1.0和zkSync2.0，starkWare的地址信息，包括余额，哈希数量，官方桥跨链次数和金额等。
+一款方便查看管理地址的工具
 
 ## 安装和使用
 
 1. 运行:
 ```bash
 git clone 
-cd 
-npm install
+npm i
 npm run dev
 ```
 
@@ -24,8 +23,9 @@ npm run dev
 5. 大家卷起来吧！
 ```
 
-## 预览
-http://150.158.27.95
+## 使用
+
+https://bitboxtools.github.io/
 
 
 

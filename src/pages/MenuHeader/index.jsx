@@ -1,66 +1,87 @@
 import {Menu} from 'antd';
 import {useEffect, useState} from 'react';
 import {useLocation, useNavigate} from "react-router-dom";
+import {GithubOutlined, TwitterOutlined} from "@ant-design/icons";
+import './index.css'
+import {getEthPrice} from "@utils";
 
-const items = [
-    {
-        label: 'zkSync',
-        key: 'zksync',
-    },
-    {
-        label: 'StarkWare',
-        key: 'stark',
-    },
-    {
-        label: 'LayerZero',
-        key: 'layer',
-    },
-    {
-        label: 'Mirror',
-        key: 'mirror',
-    },
-    {
-        label: 'Deposit',
-        key: 'deposit',
-    },
-    {
-        label: 'Coffee',
-        key: 'coffee',
+const EthPrice = () => {
+    const [ethPrice, setEthPrice] = useState(null);
+    useEffect(() => {
+        const fetchPrice = async () => {
+            const price = await getEthPrice();
+            setEthPrice(price);
+        };
+        fetchPrice();
+        const interval = setInterval(fetchPrice, 10000);
+        return () => clearInterval(interval);
+    }, []);
+    if (ethPrice === null) {
+        return <div>Loading ETH Price...</div>;
     }
-];
+    return <div>ETH Price: ${ethPrice}</div>
+}
 const MenuHeader = () => {
+    const items = [
+        {
+            label: 'zkSync',
+            key: 'zksync',
+        },
+        {
+            label: 'Stark',
+            key: 'stark',
+        },
+        {
+            label: 'LayerZero',
+            key: 'layer',
+        },
+        {
+            label: 'Mirror',
+            key: 'mirror',
+        },
+        {
+            label: 'Deposit',
+            key: 'deposit',
+        },
+        {
+            label: 'Coffee',
+            key: 'coffee',
+        },
+        {
+            label: <a href="https://github.com/wxtsky/MyWalletScan" target="_blank"
+                      rel="noopener noreferrer"><GithubOutlined/></a>,
+            key: 'github',
+        },
+        {
+            label: <a href="https://twitter.com/jingluo0" target="_blank"
+                      rel="noopener noreferrer"><TwitterOutlined/></a>,
+            key: 'twitter',
+        },
+        {
+            label: <EthPrice/>,
+            key: 'ethPrice',
+        }
+    ];
     const navigate = useNavigate();
-    const [current, setCurrent] = useState();
+    const location = useLocation();
+    const [current, setCurrent] = useState(location.pathname.replace('/', '') || 'zksync');
     const onClick = (e) => {
-        console.log('click ', e);
         setCurrent(e.key);
     };
-    const location = useLocation();
     useEffect(() => {
-        if (location.pathname === '/') {
-            setCurrent('zksync');
+        if (location.pathname.replace('/', '') === 'twitter' || location.pathname.replace('/', '') === 'github') {
+            return;
         }
+        setCurrent(location.pathname.replace('/', '') || 'zksync');
     }, [location.pathname]);
+
     useEffect(() => {
-        if (current === 'zksync') {
-            navigate('/zksync');
+        if (current === 'twitter' || current === 'github') {
+            return;
         }
-        if (current === 'stark') {
-            navigate('/stark');
-        }
-        if (current === 'layer') {
-            navigate('/layer');
-        }
-        if (current === 'mirror') {
-            navigate('/mirror');
-        }
-        if (current === 'coffee') {
-            navigate('/coffee');
-        }
-        if (current === 'deposit') {
-            navigate('/deposit');
-        }
+        navigate(`/${current}`);
     }, [current]);
+
     return (
         <Menu
             onClick={onClick}
@@ -70,12 +91,9 @@ const MenuHeader = () => {
                 display: 'flex',
                 justifyContent: 'center'
             }}
+            className="custom-menu"
+            items={items}
         >
-            {items.map(item =>
-                <Menu.Item key={item.key}>
-                    {item.label}
-                </Menu.Item>
-            )}
         </Menu>
     );
 

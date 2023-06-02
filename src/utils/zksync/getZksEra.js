@@ -8,13 +8,13 @@ async function getZksEra(address) {
         let tx2, balance2, usdcBalance;
         if ("0x0000000000000000000000000000000000000000" in response.data.info.balances) {
             balance2 = (parseInt(response.data.info.balances["0x0000000000000000000000000000000000000000"]
-                .balance, 16) / 10 ** 18).toFixed(3)
+                .balance, 16) / 10 ** 18).toFixed(4)
         } else {
             balance2 = 0;
         }
         if ("0x3355df6d4c9c3035724fd0e3914de96a5a83aaf4" in response.data.info.balances) {
             usdcBalance = (parseInt(response.data.info.balances["0x3355df6d4c9c3035724fd0e3914de96a5a83aaf4"]
-                .balance, 16) / 10 ** 6).toFixed(3)
+                .balance, 16) / 10 ** 6).toFixed(2)
         } else {
             usdcBalance = 0;
         }
