@@ -13,6 +13,7 @@ export default defineConfig({
             '@utils': resolve(__dirname, './src/utils'),
             '@constants': resolve(__dirname, './src/constants'),
             '@store': resolve(__dirname, './src/store'),
+            '@address': resolve(__dirname, './address.json')
         }
     },
     base: './',

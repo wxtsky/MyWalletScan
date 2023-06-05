@@ -3,7 +3,7 @@ import { ZksEraApi } from '@constants/apiKey';
 
 async function getZksEra(address) {
     try {
-        let url = ZksEraApiKey + "/address/" + address;
+        let url = ZksEraApi + "/address/" + address;
         const response = await axios.get(url);
         let tx2, balance2, usdcBalance;
         if ("0x0000000000000000000000000000000000000000" in response.data.info.balances) {

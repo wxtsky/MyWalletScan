@@ -62,7 +62,6 @@ function getAmount(address, list) {
             }
         }
     }
-    console.log(totalExchangeAmount)
     return totalExchangeAmount;
 }
 
@@ -87,7 +86,6 @@ async function processTransactions(
             const receivedAt = new Date(Date.parse(list[i]['receivedAt']));
             if (zks2_last_tx === null) {
                 zks2_last_tx = getZkSyncLastTX(list[i]['receivedAt']);
-                console.log(zks2_last_tx)
             }
             const contractAddress = list[i].data.contractAddress;
             const fee = (parseInt(list[i].fee, 16) / 10 ** 18).toFixed(5)
@@ -195,7 +193,6 @@ async function getZkSyncBridge(address) {
         weekActivity = weeks.size;
         monthActivity = months.size;
         contractActivity = contract.size;
-        console.log("zks2_last_tx", zks2_last_tx);
         return {
             zks2_last_tx: zks2_last_tx === null ? "无交易" : zks2_last_tx,
             totalExchangeAmount: totalExchangeAmount.toFixed(2),
