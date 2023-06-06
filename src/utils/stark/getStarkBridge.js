@@ -100,8 +100,6 @@ async function getStarkBridge(address) {
             total_widthdraw_count += widthdraw_data[key]["count"]
         }
 
-        console.log(deposit_data)
-        console.log(widthdraw_data)
         return {
             "d_eth_amount": deposit_data["StarkGate: ETH"] ? parseFloat(deposit_data["StarkGate: ETH"]["amount"]).toFixed(3) : 0,
             "d_eth_count": deposit_data["StarkGate: ETH"] ? deposit_data["StarkGate: ETH"]["count"] : 0,
@@ -127,7 +125,6 @@ async function getStarkBridge(address) {
             "total_widthdraw_count": total_widthdraw_count
         }
     } catch (e) {
-        console.log(e)
         return {
             "d_eth_amount": "Error",
             "d_eth_count": "Error",

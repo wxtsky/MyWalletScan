@@ -17,6 +17,10 @@ import {
 } from "@ant-design/icons";
 import './index.css'
 
+import { initSNAddress } from '@/composable/importAddress';
+import { batchRefresh } from '@/composable/refreshTableData';
+
+
 const {TextArea} = Input;
 
 const {Content} = Layout;
@@ -30,14 +34,12 @@ const Stark = () => {
     const [tableLoading, setTableLoading] = useState(false);
     const [form] = Form.useForm();
     useEffect(() => {
-        setTableLoading(true)
-        const storedAddresses = localStorage.getItem('stark_addresses');
-        setTimeout(() => {
+        setTableLoading(true);
+        const adrs = initSNAddress();
+        batchRefresh(adrs, 'sn').then((val) => {
             setTableLoading(false);
-        }, 500);
-        if (storedAddresses) {
-            setData(JSON.parse(storedAddresses));
-        }
+            setData(val);
+        });
     }, []);
     const handleDelete = (key) => {
         setData(data.filter(item => item.key !== key));

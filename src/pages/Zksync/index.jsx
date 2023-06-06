@@ -40,11 +40,11 @@ import {
     UploadOutlined,
 } from '@ant-design/icons';
 
-import { initZKAddress } from '@/composable/getZkAddress';
+import { initZKAddress } from '@/composable/importAddress';
+import { batchRefresh } from '@/composable/refreshTableData';
 
 const { TextArea } = Input;
 
-import { batchRefresh } from '@/composable/refreshTableData';
 
 function Zksync() {
     const [batchProgress, setBatchProgress] = useState(0);
@@ -310,7 +310,7 @@ function Zksync() {
                     ...item,
                 }
             });
-            const newData = await batchRefresh(needRefreshList)
+            const newData = await batchRefresh(needRefreshList, 'zk')
             setData(data.map(item => {
                 const adr = item.address;
                 const nData = newData.find(nItem => nItem.address === adr)
@@ -497,7 +497,7 @@ function Zksync() {
     useEffect(() => {
         setTableLoading(true);
         const adrs = initZKAddress();
-        batchRefresh(adrs).then((val) => {
+        batchRefresh(adrs, 'zk').then((val) => {
             setTableLoading(false);
             setData(val);
         });

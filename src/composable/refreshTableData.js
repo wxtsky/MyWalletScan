@@ -5,6 +5,9 @@ import {
     getZksEra,
     getZksLite,
     getZkSyncBridge,
+    getStarkTx,
+    getStarkBridge,
+    getStarkInfo,
 } from "@utils"
 
 export const refreshZkAddress = async (address) => {
@@ -84,9 +87,97 @@ export const refreshZkAddress = async (address) => {
     return item;
 }
 
+
+export const refreshSNAddress = async (address) => {
+    const item = {
+        address,
+    };
+    let promises = [];
+    item.stark_tx_amount = null;
+    item.stark_latest_tx = null;
+    item.stark_eth_balance = null;
+    item.stark_id = null;
+    item.create_time = null;
+    item.d_eth_amount = null;
+    item.d_eth_count = null;
+    item.d_usdc_amount = null;
+    item.d_usdc_count = null;
+    item.d_usdt_amount = null;
+    item.d_usdt_count = null;
+    item.d_dai_amount = null;
+    item.d_dai_count = null;
+    item.d_wbtc_amount = null;
+    item.d_wbtc_count = null;
+    item.w_eth_amount = null;
+    item.w_eth_count = null;
+    item.w_usdc_amount = null;
+    item.w_usdc_count = null;
+    item.w_usdt_amount = null;
+    item.w_usdt_count = null;
+    item.w_dai_amount = null;
+    item.w_dai_count = null;
+    item.w_wbtc_amount = null;
+    item.w_wbtc_count = null;
+    item.total_widthdraw_count = null;
+    item.total_deposit_count = null;
+    promises.push(getStarkTx(item.address).then(({ tx, stark_latest_tx }) => {
+        item.stark_tx_amount = tx;
+        item.stark_latest_tx = stark_latest_tx;
+    }))
+    promises.push(getStarkInfo(item.address).then(({ eth_balance, stark_id, deployed_at_timestamp }) => {
+        item.stark_eth_balance = eth_balance;
+        item.stark_id = stark_id;
+        item.create_time = deployed_at_timestamp;
+    }))
+    promises.push(getStarkBridge(item.address).then(({
+        d_eth_amount, d_eth_count,
+        d_usdc_amount, d_usdc_count,
+        d_usdt_amount, d_usdt_count,
+        d_dai_amount, d_dai_count,
+        d_wbtc_amount,
+        d_wbtc_count,
+        w_eth_amount, w_eth_count,
+        w_usdc_amount, w_usdc_count,
+        w_usdt_amount, w_usdt_count,
+        w_dai_amount, w_dai_count,
+        w_wbtc_amount, w_wbtc_count,
+        total_widthdraw_count, total_deposit_count
+    }) => {
+        item.d_eth_amount = d_eth_amount;
+        item.d_eth_count = d_eth_count;
+        item.d_usdc_amount = d_usdc_amount;
+        item.d_usdc_count = d_usdc_count;
+        item.d_usdt_amount = d_usdt_amount;
+        item.d_usdt_count = d_usdt_count;
+        item.d_dai_amount = d_dai_amount;
+        item.d_dai_count = d_dai_count;
+        item.d_wbtc_amount = d_wbtc_amount;
+        item.d_wbtc_count = d_wbtc_count;
+        item.w_eth_amount = w_eth_amount;
+        item.w_eth_count = w_eth_count;
+        item.w_usdc_amount = w_usdc_amount;
+        item.w_usdc_count = w_usdc_count;
+        item.w_usdt_amount = w_usdt_amount;
+        item.w_usdt_count = w_usdt_count;
+        item.w_dai_amount = w_dai_amount;
+        item.w_dai_count = w_dai_count;
+        item.w_wbtc_amount = w_wbtc_amount;
+        item.w_wbtc_count = w_wbtc_count;
+        item.total_widthdraw_count = total_widthdraw_count;
+        item.total_deposit_count = total_deposit_count;
+    }))
+    await Promise.all(promises);
+    return item;
+}
+
 export const batchRefresh = async (list, type) => {
-    const queue = list.map(item => refreshZkAddress(item.address));
-    const data =  await Promise.all(queue);
+    let queue;
+    if (type === 'zk') {
+        queue = list.map(item => refreshZkAddress(item.address));
+    } else if (type === 'sn') {
+        queue = list.map(item => refreshSNAddress(item.address));
+    }
+    const data = await Promise.all(queue);
     return list.map(item => {
         const adr = item.address;
         const val = data.find(d => d.address === adr);
