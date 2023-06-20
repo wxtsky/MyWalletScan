@@ -10,6 +10,9 @@ import {
     UploadOutlined
 } from "@ant-design/icons";
 
+import { initLayerZeroAddress } from '@/composable/importAddress';
+import { batchRefresh } from '@/composable/refreshTableData';
+
 const {Content} = Layout;
 const {TextArea} = Input;
 
@@ -404,14 +407,12 @@ const Layer = () => {
         ]
     ;
     useEffect(() => {
-        setTableLoading(true)
-        const storedAddresses = localStorage.getItem('l0_addresses');
-        setTimeout(() => {
+        setTableLoading(true);
+        const adrs = initLayerZeroAddress();
+        batchRefresh(adrs, 'l0').then((val) => {
             setTableLoading(false);
-        }, 500);
-        if (storedAddresses) {
-            setData(JSON.parse(storedAddresses));
-        }
+            setData(val);
+        });
     }, []);
     const handleChangeApiOk = () => {
         localStorage.setItem('l0_api_key', JSON.stringify(changeApiForm.getFieldsValue()));

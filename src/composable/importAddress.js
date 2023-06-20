@@ -3,7 +3,7 @@ import localAddressInfo from '@address'
 import { zkRow, snRow } from './tableRow';
 
 export const initZKAddress = () => {
-    const localAddress = localAddressInfo.ZK;
+    const localAddress = localAddressInfo.ETH;
     return localAddress.map(item => {
         return {
             ...zkRow,
@@ -18,6 +18,17 @@ export const initSNAddress = () => {
     return localAddress.map(item => {
         return {
             ...snRow,
+            ...item,
+            key: item.address,
+        }
+    })
+}
+
+export const initLayerZeroAddress = () => {
+    const localAddress = localAddressInfo.ETH;
+    return localAddress.map(item => {
+        return {
+            ...zkRow,
             ...item,
             key: item.address,
         }

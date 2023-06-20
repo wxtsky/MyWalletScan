@@ -8,6 +8,7 @@ import {
     getStarkTx,
     getStarkBridge,
     getStarkInfo,
+    getLayerData
 } from "@utils"
 
 export const refreshZkAddress = async (address) => {
@@ -170,12 +171,31 @@ export const refreshSNAddress = async (address) => {
     return item;
 }
 
+export const refreshL0Address = async (address) => {
+    const {arb, avax, bsc, eth, ftm, matic, metis, op, total} = await getLayerData(address, {});
+    const item = {
+        address,
+        arb,
+        avax,
+        bsc,
+        eth,
+        ftm,
+        matic,
+        metis,
+        op,
+        total,
+    };
+    return item;
+}
+
 export const batchRefresh = async (list, type) => {
     let queue;
     if (type === 'zk') {
         queue = list.map(item => refreshZkAddress(item.address));
     } else if (type === 'sn') {
         queue = list.map(item => refreshSNAddress(item.address));
+    } else if (type === 'l0') {
+        queue = list.map(item => refreshL0Address(item.address));
     }
     const data = await Promise.all(queue);
     return list.map(item => {
