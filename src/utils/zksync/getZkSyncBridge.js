@@ -2,12 +2,20 @@ import axios from "axios";
 import {ethers} from "ethers";
 
 async function getEthPrice() {
-    const resp = await axios.get("https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd")
-    return resp.data.ethereum.usd
+    const resp = await axios.post("https://mainnet.era.zksync.io/", {
+        'method': 'zks_getTokenPrice',
+        'params': [
+            '0x0000000000000000000000000000000000000000'
+        ],
+        'id': 42,
+        'jsonrpc': '2.0'
+    });
+    return resp.data.result;
 }
 
 async function getExchangeAmountProcessData(data, address) {
     try {
+        let exchangeAmounts = {};
         let totalExchangeAmount = 0;
         const ethPrice = await getEthPrice();
         for (let i = 0; i < data.length; i++) {
@@ -15,22 +23,44 @@ async function getExchangeAmountProcessData(data, address) {
             // const toAddress = data[i].to;
             const tokenAddress = data[i].tokenAddress;
             const amount = data[i].amount;
-            // if (fromAddress.toLowerCase() == address.toLowerCase()) {
-            if (
-                tokenAddress.toLowerCase() ===
-                "0x000000000000000000000000000000000000800A".toLowerCase()
-            ) {
-                totalExchangeAmount +=
-                    (Number(15524963206945200) / 10 ** 18) * parseFloat(ethPrice);
+            const transactionHash = data[i].transactionHash;
+            if (exchangeAmounts[transactionHash]) {
+                const existingAmount = exchangeAmounts[transactionHash];
+                // Compare tokenAddress values and update the larger amount
+                if (
+                    tokenAddress.toLowerCase() ===
+                    "0x000000000000000000000000000000000000800A".toLowerCase() &&
+                    existingAmount < (Number(amount) / 10 ** 18) * parseFloat(ethPrice)
+                ) {
+                    exchangeAmounts[transactionHash] = (Number(amount) / 10 ** 18) * parseFloat(ethPrice)
+                }
+                if (
+                    tokenAddress.toLowerCase() ===
+                    "0x3355df6D4c9C3035724Fd0e3914dE96A5a83aaf4".toLowerCase() &&
+                    existingAmount < Number(amount) / 10 ** 6
+                ) {
+                    exchangeAmounts[transactionHash] = Number(amount) / 10 ** 6;
+                }
+            } else {
+                // Add new tx to exchangeAmounts
+                if (
+                    tokenAddress.toLowerCase() ===
+                    "0x000000000000000000000000000000000000800A".toLowerCase()
+                ) {
+                    exchangeAmounts[transactionHash] = (Number(amount) / 10 ** 18) * parseFloat(ethPrice)
+                }
+                if (
+                    tokenAddress.toLowerCase() ===
+                    "0x3355df6D4c9C3035724Fd0e3914dE96A5a83aaf4".toLowerCase()
+                ) {
+                    exchangeAmounts[transactionHash] = Number(amount) / 10 ** 6;
+                }
             }
-            if (
-                tokenAddress.toLowerCase() ===
-                "0x3355df6D4c9C3035724Fd0e3914dE96A5a83aaf4".toLowerCase()
-            ) {
-                totalExchangeAmount += Number(29665268) / 10 ** 6;
-            }
-            // }
         }
+        for (const tx in exchangeAmounts) {
+            totalExchangeAmount += exchangeAmounts[tx];
+        }
+        console.log(exchangeAmounts)
         return {totalExchangeAmount: totalExchangeAmount.toFixed(2)};
     } catch (e) {
         console.log(e)
