@@ -5,15 +5,15 @@ async function getZksEra(address) {
         let url = "https://block-explorer-api.mainnet.zksync.io/address/" + address;
         const response = await axios.get(url);
         let tx2, balance2, usdcBalance;
-        if ("0x0000000000000000000000000000000000000000" in response.data.balances) {
-            balance2 = (parseInt(response.data.balances["0x0000000000000000000000000000000000000000"]
-                .balance, 16) / 10 ** 18).toFixed(4)
+        if ("0x000000000000000000000000000000000000800A" in response.data.balances) {
+            balance2 = response.data.balances["0x000000000000000000000000000000000000800A"].balance;
+            balance2 = (Number(balance2) / 10 ** 18).toFixed(3);
         } else {
             balance2 = 0;
         }
-        if ("0x3355df6d4c9c3035724fd0e3914de96a5a83aaf4" in response.data.balances) {
-            usdcBalance = (parseInt(response.data.balances["0x3355df6d4c9c3035724fd0e3914de96a5a83aaf4"]
-                .balance, 16) / 10 ** 6).toFixed(2)
+        if ("0x3355df6D4c9C3035724Fd0e3914dE96A5a83aaf4" in response.data.balances) {
+            usdcBalance = response.data.balances["0x3355df6D4c9C3035724Fd0e3914dE96A5a83aaf4"].balance;
+            usdcBalance = (Number(usdcBalance) / 10 ** 6).toFixed(3);
         } else {
             usdcBalance = 0;
         }
