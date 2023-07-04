@@ -32,7 +32,7 @@ import {
     SyncOutlined,
     UploadOutlined
 } from "@ant-design/icons";
-
+import {EyeOutlined, EyeInvisibleOutlined} from "@ant-design/icons"
 const {TextArea} = Input;
 
 function Zksync() {
@@ -41,6 +41,7 @@ function Zksync() {
     const [batchloading, setBatchLoading] = useState(false);
     const [zkSyncConfigStore, setZkSyncConfigStore] = useState({});
     const [data, setData] = useState([]);
+    const [hideColumn, setHideColumn] = useState(false);
     const [isBatchModalVisible, setIsBatchModalVisible] = useState(false);
     const [isWalletModalVisible, setIsWalletModalVisible] = useState(false);
     const [batchForm] = Form.useForm();
@@ -513,6 +514,16 @@ function Zksync() {
             message.success("批量添加成功");
         }
     };
+    const toggleHideColumn = () => {
+        setHideColumn(!hideColumn);
+    };
+
+    const getEyeIcon = () => {
+        if (hideColumn) {
+            return <EyeInvisibleOutlined/>;
+        }
+        return <EyeOutlined/>;
+    };
     const showModal = () => {
         setIsModalVisible(true);
     };
@@ -603,11 +614,22 @@ function Zksync() {
             },
         },
         {
-            title: "钱包地址",
+            title: (
+                <span>
+                钱包地址
+                    <span onClick={toggleHideColumn} style={{marginLeft: 8, cursor: 'pointer'}}>
+                        {getEyeIcon()}
+                    </span>
+                </span>
+            ),
             dataIndex: "address",
             key: "address",
             align: "center",
             render: (text, record) => {
+                if (hideColumn) {
+                    // 取前4位和后4位
+                    return text.slice(0, 4) + '***' + text.slice(-4);
+                }
                 return isRowSatisfyCondition(record) ?
                     <div
                         style={{backgroundColor: '#bbeefa', borderRadius: '5px'}}
