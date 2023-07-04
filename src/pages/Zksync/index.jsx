@@ -27,7 +27,7 @@ const {Content} = Layout;
 import {
     DeleteOutlined,
     DownloadOutlined,
-    EditOutlined,
+    EditOutlined, HeartOutlined,
     PlusOutlined, SettingOutlined,
     SyncOutlined,
     UploadOutlined
@@ -380,7 +380,6 @@ function Zksync() {
             message.success("刷新成功");
         }
     };
-
     const handleBatchOk = async () => {
         try {
             setBatchLoading(true);
@@ -514,8 +513,6 @@ function Zksync() {
             message.success("批量添加成功");
         }
     };
-
-
     const showModal = () => {
         setIsModalVisible(true);
     };
@@ -550,6 +547,9 @@ function Zksync() {
             }, 2);
             return;
         }
+        console.log(selectedKeys);
+        const newData = data.filter(item => !selectedKeys.includes(item.key));
+        console.log(newData);
         setData(data.filter(item => !selectedKeys.includes(item.key)));
         localStorage.setItem('addresses', JSON.stringify(data.filter(item => !selectedKeys.includes(item.key))));
         setSelectedKeys([]);
@@ -570,7 +570,6 @@ function Zksync() {
             key: "index",
             align: "center",
             render: (text, record, index) => index + 1,
-            // width: 34.5,
         },
         {
             title: "备注",
@@ -602,7 +601,6 @@ function Zksync() {
                     </>
                 );
             },
-            // width: 70
         },
         {
             title: "钱包地址",
@@ -617,7 +615,6 @@ function Zksync() {
                         {text}</div> : text ||
                     <Spin/>;
             },
-            // width: 375
         },
         {
             title: "ETH",
@@ -630,7 +627,6 @@ function Zksync() {
                     key: "eth_balance",
                     align: "center",
                     render: (text, record) => (text === null ? <Spin/> : text),
-                    // width: 60
                 },
                 {
                     title: "Tx",
@@ -638,7 +634,6 @@ function Zksync() {
                     key: "eth_tx_amount",
                     align: "center",
                     render: (text, record) => (text === null ? <Spin/> : text),
-                    // width: 40
                 },
             ],
         },
@@ -653,7 +648,6 @@ function Zksync() {
                     key: "zks1_balance",
                     align: "center",
                     render: (text, record) => (text === null ? <Spin/> : text),
-                    // width: 60
                 },
                 {
                     title: "Tx",
@@ -661,9 +655,9 @@ function Zksync() {
                     key: "zks1_tx_amount",
                     align: "center",
                     render: (text, record) => (text === null ? <Spin/> : text),
-                    // width: 34.5
                 },
             ],
+
         },
         {
             title: "zkSyncEra",
@@ -676,7 +670,6 @@ function Zksync() {
                     key: "zks2_balance",
                     align: "center",
                     render: (text, record) => (text === null ? <Spin/> : text),
-                    // width: 60
                 },
                 {
                     title: "USDC",
@@ -684,7 +677,6 @@ function Zksync() {
                     key: "zks2_usdcBalance",
                     align: "center",
                     render: (text, record) => (text === null ? <Spin/> : text),
-                    // width: 63
                 },
                 {
                     title: "Tx",
@@ -692,7 +684,6 @@ function Zksync() {
                     key: "zks2_tx_amount",
                     align: "center",
                     render: (text, record) => (text === null ? <Spin/> : text),
-                    // width: 34.2
                 },
                 {
                     title: "最后交易",
@@ -702,7 +693,6 @@ function Zksync() {
                     render: (text, record) => (text === null ? <Spin/> :
                         <a href={"https://explorer.zksync.io/address/" + record.address}
                            target={"_blank"}>{text}</a>),
-                    // width: 77
                 },
                 {
                     title: "官方桥跨链Tx数",
@@ -714,7 +704,6 @@ function Zksync() {
                             key: "l1Tol2Times",
                             align: "center",
                             render: (text, record) => (text === null ? <Spin/> : text),
-                            // width: 60
                         },
                         {
                             title: "L2->L1",
@@ -722,7 +711,6 @@ function Zksync() {
                             key: "l2Tol1Times",
                             align: "center",
                             render: (text, record) => (text === null ? <Spin/> : text),
-                            // width: 60
                         },
                     ],
                 },
@@ -736,7 +724,6 @@ function Zksync() {
                             key: "l1Tol2Amount",
                             align: "center",
                             render: (text, record) => (text === null ? <Spin/> : text),
-                            // width: 75
                         },
                         {
                             title: "L2->L1",
@@ -744,7 +731,6 @@ function Zksync() {
                             key: "l2Tol1Amount",
                             align: "center",
                             render: (text, record) => (text === null ? <Spin/> : text),
-                            // width: 75
                         },
                     ],
                 },
@@ -758,7 +744,6 @@ function Zksync() {
                             key: "dayActivity",
                             align: "center",
                             render: (text, record) => (text === null ? <Spin/> : text),
-                            // width: 34
                         },
                         {
                             title: "周",
@@ -766,7 +751,6 @@ function Zksync() {
                             key: "weekActivity",
                             align: "center",
                             render: (text, record) => (text === null ? <Spin/> : text),
-                            // width: 34
                         },
                         {
                             title: "月",
@@ -774,7 +758,6 @@ function Zksync() {
                             key: "monthActivity",
                             align: "center",
                             render: (text, record) => (text === null ? <Spin/> : text),
-                            // width: 34
                         },
                         {
                             title: "不同合约",
@@ -782,7 +765,6 @@ function Zksync() {
                             key: "contractActivity",
                             align: "center",
                             render: (text, record) => (text === null ? <Spin/> : text),
-                            // width: 73.5
                         },
                         {
                             title: "金额(U)",
@@ -797,7 +779,6 @@ function Zksync() {
                             key: "totalFee",
                             align: "center",
                             render: (text, record) => (text === null ? <Spin/> : text),
-                            // width: 61.5
                         }
                     ],
                 },
@@ -927,6 +908,7 @@ function Zksync() {
                 </Modal>
                 <Spin spinning={tableLoading}>
                     <Table
+                        rowKey={record => record.key}
                         rowSelection={rowSelection}
                         dataSource={data}
                         pagination={false}
