@@ -1,6 +1,120 @@
 import axios from "axios";
 import {ethers} from "ethers";
 
+async function getEthPrice() {
+    const resp = await axios.post("https://mainnet.era.zksync.io/", {
+        'method': 'zks_getTokenPrice',
+        'params': [
+            '0x0000000000000000000000000000000000000000'
+        ],
+        'id': 42,
+        'jsonrpc': '2.0'
+    });
+    return resp.data.result;
+}
+
+async function getExchangeAmountProcessData(data, address) {
+    try {
+        let exchangeAmounts = {};
+        let totalExchangeAmount = 0;
+        const ethPrice = await getEthPrice();
+        for (let i = 0; i < data.length; i++) {
+            const fromAddress = data[i].from;
+            // const toAddress = data[i].to;
+            const tokenAddress = data[i].tokenAddress;
+            const amount = data[i].amount;
+            const transactionHash = data[i].transactionHash;
+            if (exchangeAmounts[transactionHash]) {
+                const existingAmount = exchangeAmounts[transactionHash];
+                // Compare tokenAddress values and update the larger amount
+                if (
+                    tokenAddress.toLowerCase() ===
+                    "0x000000000000000000000000000000000000800A".toLowerCase() &&
+                    existingAmount < (Number(amount) / 10 ** 18) * parseFloat(ethPrice)
+                ) {
+                    exchangeAmounts[transactionHash] = (Number(amount) / 10 ** 18) * parseFloat(ethPrice)
+                }
+                if (
+                    tokenAddress.toLowerCase() ===
+                    "0x3355df6D4c9C3035724Fd0e3914dE96A5a83aaf4".toLowerCase() &&
+                    existingAmount < Number(amount) / 10 ** 6
+                ) {
+                    exchangeAmounts[transactionHash] = Number(amount) / 10 ** 6;
+                }
+            } else {
+                // Add new tx to exchangeAmounts
+                if (
+                    tokenAddress.toLowerCase() ===
+                    "0x000000000000000000000000000000000000800A".toLowerCase()
+                ) {
+                    exchangeAmounts[transactionHash] = (Number(amount) / 10 ** 18) * parseFloat(ethPrice)
+                }
+                if (
+                    tokenAddress.toLowerCase() ===
+                    "0x3355df6D4c9C3035724Fd0e3914dE96A5a83aaf4".toLowerCase()
+                ) {
+                    exchangeAmounts[transactionHash] = Number(amount) / 10 ** 6;
+                }
+            }
+        }
+        for (const tx in exchangeAmounts) {
+            totalExchangeAmount += exchangeAmounts[tx];
+        }
+        console.log(exchangeAmounts)
+        return {totalExchangeAmount: totalExchangeAmount.toFixed(2)};
+    } catch (e) {
+        console.log(e)
+        return {totalExchangeAmount: "-"}
+    }
+}
+
+async function getExchangeAmount(address) {
+    let AllData = [];
+    let nextLinks = "";
+    const url =
+        "https://block-explorer-api.mainnet.zksync.io/address/" +
+        address +
+        "/transfers?toDate=" +
+        encodeURIComponent(new Date().toISOString()) +
+        "&pageSize=10&page=1";
+    const response = await axios.get(url);
+    AllData = [...AllData, ...response.data.items];
+    nextLinks =
+        "https://block-explorer-api.mainnet.zksync.io/" + response.data.links.next;
+    while (nextLinks !== "https://block-explorer-api.mainnet.zksync.io/") {
+        const response = await axios.get(nextLinks);
+        AllData = [...AllData, ...response.data.items];
+        nextLinks =
+            "https://block-explorer-api.mainnet.zksync.io/" +
+            response.data.links.next;
+    }
+    return getExchangeAmountProcessData(AllData, address);
+}
+
+function getZkSyncLastTX(lastTxDatetime) {
+    try {
+        const date = new Date(lastTxDatetime);
+        const offset = 8;
+        const utc8Date = new Date(date.getTime() + offset * 3600 * 1000);
+        const now = new Date();
+        const utc8Now = new Date(now.getTime() + offset * 3600 * 1000);
+        const diff = utc8Now - utc8Date;
+        const diffInHours = Math.floor(diff / (1000 * 60 * 60));
+        const diffInDays = Math.floor(diffInHours / 24);
+        if (diffInDays > 0) {
+            return `${diffInDays}天前`;
+        } else if (diffInHours > 0) {
+            return `${diffInHours}小时前`;
+        } else {
+            return "刚刚";
+        }
+    } catch (e) {
+        console.log(e)
+        return "-"
+    }
+
+}
+
 function getDayNumber(d) {
     return `${d.getUTCFullYear()}-${d.getUTCMonth() + 1}-${d.getUTCDate()}`;
 }
@@ -9,7 +123,7 @@ function getWeekNumber(d) {
     d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
     d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
     let yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-    let weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+    let weekNo = Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
     return d.getUTCFullYear() + "W" + weekNo;
 }
 
@@ -17,207 +131,109 @@ function getMonthNumber(d) {
     return d.getUTCFullYear() + "-" + (d.getUTCMonth() + 1);
 }
 
-function getZkSyncLastTX(lastTxDatetime) {
-    const date = new Date(lastTxDatetime);
-    const offset = 8;
-    const utc8Date = new Date(date.getTime() + offset * 3600 * 1000);
-    const now = new Date();
-    const utc8Now = new Date(now.getTime() + offset * 3600 * 1000);
-    const diff = utc8Now - utc8Date;
-    const diffInHours = Math.floor(diff / (1000 * 60 * 60));
-    const diffInDays = Math.floor(diffInHours / 24);
-    if (diffInDays > 0) {
-        return `${diffInDays} 天前`
-    } else if (diffInHours > 0) {
-        return `${diffInHours} 小时前`
-    } else {
-        return "刚刚"
-    }
-}
-
-function getAmount(address, list) {
-    let totalExchangeAmount = 0;
-    for (let i = 0; i < list.length; i++) {
-        if (list[i]['from'].toLowerCase() === address.toLowerCase() && list[i]['to'].toLowerCase() !== "0x0000000000000000000000000000000000008001".toLowerCase()) {
-            const symbol = list[i]['tokenInfo']['symbol']
-            if (symbol === "ETH") {
-                const usdPrice = list[i]['tokenInfo']['usdPrice']
-                totalExchangeAmount += (parseInt(list[i]['amount'], 16) / 10 ** 18) * parseFloat(usdPrice)
-                break
-            } else if (list[i]['tokenInfo']['symbol'] === "USDC") {
-                totalExchangeAmount += parseInt(list[i]['amount'], 16) / 10 ** 6
-                break
+function processData(data, address) {
+    let zks2_last_tx = "";
+    let totalFee = 0;
+    let l1Tol2Times = 0;
+    let l1Tol2Amount = 0;
+    let l2Tol1Times = 0;
+    let l2Tol1Amount = 0;
+    let contractActivity = new Set();
+    let dayActivity = new Set();
+    let weekActivity = new Set();
+    let monthActivity = new Set();
+    for (let i = 0; i < data.length; i++) {
+        const fromAddress = data[i].from;
+        const toAddress = data[i].to;
+        const fee = (parseInt(data[i].fee, 16) / 10 ** 18).toFixed(5);
+        const receivedAt = data[i].receivedAt;
+        const isL1Originated = data[i].isL1Originated;
+        if (fromAddress.toLowerCase() === address.toLowerCase()) {
+            dayActivity.add(getDayNumber(new Date(Date.parse(receivedAt))));
+            weekActivity.add(getWeekNumber(new Date(Date.parse(receivedAt))));
+            monthActivity.add(getMonthNumber(new Date(Date.parse(receivedAt))));
+            if (zks2_last_tx === "") {
+                zks2_last_tx = getZkSyncLastTX(receivedAt);
             }
-        } else if (list[i]['to'].toLowerCase() === address.toLowerCase() && list[i]['from'].toLowerCase() !== "0x0000000000000000000000000000000000008001".toLowerCase()) {
-            const symbol = list[i]['tokenInfo']['symbol']
-            if (symbol === "ETH") {
-                const usdPrice = list[i]['tokenInfo']['usdPrice']
-                totalExchangeAmount += (parseInt(list[i]['amount'], 16) / 10 ** 18) * parseFloat(usdPrice)
-                break
-            } else if (list[i]['tokenInfo']['symbol'] === "USDC") {
-                totalExchangeAmount += parseInt(list[i]['amount'], 16) / 10 ** 6
-                break
-            }
-        }
-    }
-    console.log(totalExchangeAmount)
-    return totalExchangeAmount;
-}
-
-async function processTransactions(
-    zks2_last_tx,
-    totalExchangeAmount,
-    address,
-    totalFee,
-    contract,
-    days,
-    weeks,
-    months,
-    list,
-    l1Tol2Times,
-    l1Tol2Amount,
-    l2Tol1Times,
-    l2Tol1Amount
-) {
-    for (let i = 0; i < list.length; i++) {
-        if (list[i]['balanceChanges'][0]['from'].toLowerCase() === address.toLowerCase()) {
-            totalExchangeAmount += getAmount(address, list[i]['erc20Transfers'])
-            const receivedAt = new Date(Date.parse(list[i]['receivedAt']));
-            if (zks2_last_tx === null) {
-                zks2_last_tx = getZkSyncLastTX(list[i]['receivedAt']);
-                console.log(zks2_last_tx)
-            }
-            const contractAddress = list[i].data.contractAddress;
-            const fee = (parseInt(list[i].fee, 16) / 10 ** 18).toFixed(5)
             totalFee += parseFloat(fee);
-            contract.add(contractAddress)
-            days.add(getDayNumber(receivedAt));
-            weeks.add(getWeekNumber(receivedAt));
-            months.add(getMonthNumber(receivedAt));
+            if (isL1Originated) {
+                l1Tol2Times++;
+                const value = ethers.formatEther(data[i].value);
+                l1Tol2Amount += parseFloat(value);
+            }
+            if (
+                toAddress.toLowerCase() ===
+                "0x000000000000000000000000000000000000800A".toLowerCase()
+            ) {
+                l2Tol1Times++;
+                const value = ethers.formatEther(data[i].value);
+                l2Tol1Amount += parseFloat(value);
+            }
         }
-        if (list[i].isL1Originated === true) {
-            l1Tol2Times++;
-            const value = ethers.formatEther(list[i].data.value, "ether");
-            l1Tol2Amount += parseFloat(value);
-        } else if (
-            list[i].data.contractAddress ===
-            "0x000000000000000000000000000000000000800a"
-        ) {
-            l2Tol1Times++;
-            const value = ethers.formatEther(list[i].data.value, "ether");
-            l2Tol1Amount += parseFloat(value);
-        }
+        contractActivity.add(toAddress);
     }
-    return [zks2_last_tx, totalExchangeAmount, totalFee, contract, days, weeks, months, l1Tol2Times, l1Tol2Amount,
-            l2Tol1Times,
-            l2Tol1Amount];
+    contractActivity = contractActivity.size;
+    dayActivity = dayActivity.size;
+    weekActivity = weekActivity.size;
+    monthActivity = monthActivity.size;
+    return {
+        zks2_last_tx: zks2_last_tx === "" ? "无交易" : zks2_last_tx,
+        totalFee: totalFee.toFixed(4),
+        l1Tol2Times,
+        l1Tol2Amount: l1Tol2Amount.toFixed(4),
+        l2Tol1Times,
+        l2Tol1Amount: l2Tol1Amount.toFixed(4),
+        contractActivity,
+        dayActivity,
+        weekActivity,
+        monthActivity,
+    };
 }
 
 async function getZkSyncBridge(address) {
     try {
-        let zks2_last_tx = null;
-        let contract = new Set();
-        let days = new Set();
-        let weeks = new Set();
-        let months = new Set();
-        let dayActivity;
-        let weekActivity;
-        let monthActivity;
-        let contractActivity;
-        let totalFee = 0;
-        let l1Tol2Times = 0;
-        let l1Tol2Amount = 0;
-        let l2Tol1Times = 0;
-        let l2Tol1Amount = 0;
-        let totalExchangeAmount = 0;
-        let offset = 0;
-        let fromBlockNumber = null;
-        let fromTxIndex = null;
-        const initUrl = "https://zksync2-mainnet-explorer.zksync.io/transactions?limit=100&direction=older&accountAddress=" + address;
-        const initResponse = await axios.get(initUrl)
-        const initDataLength = initResponse.data.total;
-        [zks2_last_tx, totalExchangeAmount, totalFee, contract, days, weeks, months, l1Tol2Times, l1Tol2Amount,
-         l2Tol1Times,
-         l2Tol1Amount] =
-            await processTransactions(
-                zks2_last_tx,
-                totalExchangeAmount,
-                address,
-                totalFee,
-                contract,
-                days,
-                weeks,
-                months,
-                initResponse.data.list,
-                l1Tol2Times,
-                l1Tol2Amount,
-                l2Tol1Times,
-                l2Tol1Amount
-            );
-        if (initDataLength > 100) {
-            fromBlockNumber = initResponse.data.list[0].blockNumber;
-            fromTxIndex = initResponse.data.list[0].indexInBlock;
-            while (true) {
-                let url = `https://zksync2-mainnet-explorer.zksync.io/transactions?limit=100&direction=older&accountAddress=${address}`;
-                if (fromBlockNumber !== undefined && fromTxIndex !== undefined && offset !== 0) {
-                    url += `&fromBlockNumber=${fromBlockNumber}&fromTxIndex=${fromTxIndex}&offset=${offset}`;
-                }
-                const response = await axios.get(url);
-                const ListLength = response.data.list.length;
-                [zks2_last_tx,
-                 totalExchangeAmount, totalFee, contract, days, weeks, months, l1Tol2Times, l1Tol2Amount,
-                 l2Tol1Times, l2Tol1Amount] =
-                    await processTransactions(
-                        zks2_last_tx,
-                        totalExchangeAmount,
-                        address,
-                        totalFee,
-                        contract,
-                        days,
-                        weeks,
-                        months,
-                        response.data.list,
-                        l1Tol2Times,
-                        l1Tol2Amount,
-                        l2Tol1Times,
-                        l2Tol1Amount
-                    );
-                if (ListLength === 100) {
-                    offset += ListLength;
-                } else {
-                    break;
-                }
-            }
+        let AllData = [];
+        let nextLinks = "";
+        const url =
+            "https://block-explorer-api.mainnet.zksync.io/transactions?address=" +
+            address +
+            "&pageSize=10&page=1&toDate=" +
+            encodeURIComponent(new Date().toISOString());
+        const response = await axios.get(url);
+        AllData = [...AllData, ...response.data.items];
+        nextLinks =
+            "https://block-explorer-api.mainnet.zksync.io/" + response.data.links.next;
+        while (nextLinks !== "https://block-explorer-api.mainnet.zksync.io/") {
+            const response = await axios.get(nextLinks);
+            AllData = [...AllData, ...response.data.items];
+            nextLinks =
+                "https://block-explorer-api.mainnet.zksync.io/" +
+                response.data.links.next;
         }
-        dayActivity = days.size;
-        weekActivity = weeks.size;
-        monthActivity = months.size;
-        contractActivity = contract.size;
-        console.log("zks2_last_tx", zks2_last_tx);
+        const promise = [processData(AllData, address), getExchangeAmount(address)];
+        const [result, totalExchangeAmount] = await Promise.all(promise);
+        console.log({...result, ...totalExchangeAmount})
         return {
-            zks2_last_tx: zks2_last_tx === null ? "无交易" : zks2_last_tx,
-            totalExchangeAmount: totalExchangeAmount.toFixed(2),
-            totalFee: totalFee.toFixed(4),
-            contractActivity,
-            dayActivity,
-            weekActivity,
-            monthActivity,
-            l1Tol2Times,
-            l1Tol2Amount: l1Tol2Amount.toFixed(3),
-            l2Tol1Times,
-            l2Tol1Amount: l2Tol1Amount.toFixed(3)
-        }
+            ...result,
+            ...totalExchangeAmount,
+        };
     } catch (e) {
-        console.log(e);
+        console.log(e)
         return {
-            zks2_last_tx: "Error",
-            totalExchangeAmount: "Error",
-            totalFee: "Error",
-            contractActivity: "Error",
-            dayActivity: "Error", weekActivity: "Error", monthActivity: "Error",
-            l1Tol2Times: "Error", l1Tol2Amount: "Error", l2Tol1Times: "Error", l2Tol1Amount: "Error"
+            zks2_last_tx: "-",
+            totalFee: "-",
+            l1Tol2Times: "-",
+            l1Tol2Amount: "-",
+            l2Tol1Times: "-",
+            l2Tol1Amount: "-",
+            contractActivity: "-",
+            dayActivity: "-",
+            weekActivity: "-",
+            monthActivity: "-",
+            totalExchangeAmount: "-",
         }
     }
+
 }
 
 export default getZkSyncBridge;
