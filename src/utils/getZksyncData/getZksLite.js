@@ -1,7 +1,7 @@
 import axios from "axios";
 
 
-async function getZksLite(address) {
+export async function getZksLite(address) {
     try {
         let url = "https://api.zksync.io/jsrpc"
         const response = await axios.post(url, {
@@ -12,18 +12,16 @@ async function getZksLite(address) {
                 address
             ]
         });
-        let balance1
+        let zks1_balance
         if ("ETH" in response.data.result.committed.balances) {
-            balance1 = (response.data.result.committed.balances.ETH / 10 ** 18).toFixed(4)
+            zks1_balance = (response.data.result.committed.balances.ETH / 10 ** 18).toFixed(4)
         } else {
-            balance1 = 0;
+            zks1_balance = 0;
         }
-        let tx1 = response.data.result.committed.nonce;
-        return {balance1, tx1};
+        let zks1_tx_amount = response.data.result.committed.nonce;
+        return {zks1_balance, zks1_tx_amount};
     } catch (error) {
         console.error(error);
-        return {balance1: "Error", tx1: "Error"};
+        return {zks1_balance: "Error", zks1_tx_amount: "Error"};
     }
 }
-
-export default getZksLite;

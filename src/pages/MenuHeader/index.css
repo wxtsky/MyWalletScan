@@ -1,32 +1,15 @@
-
-.custom-menu {
-    background-color: #f8f8f8;
+.menu-item.twitter {
+    margin-right: 10px;
 }
 
-.custom-menu .ant-menu-item {
-    color: #333333;
+.menu-item.twitter a {
+    color: #1DA1F2; /* 推特蓝色 */
 }
 
-.custom-menu .ant-menu-item-selected,
-.custom-menu .ant-menu-item:hover,
-.custom-menu .ant-menu-item-active,
-.custom-menu .ant-menu-item-active:hover {
-    color: #1890ff;
-    background-color: #e6f7ff;
+.menu-item.github a {
+    color: #333; /* GitHub 黑色 */
 }
 
-
-.custom-menu .ant-menu-item::after,
-.custom-menu .ant-menu-item-active::after,
-.custom-menu .ant-menu-item-selected::after,
-.custom-menu .ant-menu-item-active:hover::after {
-    border-bottom: none !important;
-}
-
-
-.custom-menu .ant-menu-item > a::after,
-.custom-menu .ant-menu-item-active > a::after,
-.custom-menu .ant-menu-item-selected > a::after,
-.custom-menu .ant-menu-item-active:hover > a::after {
-    border-bottom: none !important;
+.menu-item.github a:hover {
+    color: #4078c0; /* GitHub 链接悬停时的颜色 */
 }

@@ -8,7 +8,7 @@ const RPC_MAP = {
     "bsc": "https://bscrpc.com"
 };
 
-async function getTxCount(address, network) {
+export async function getTxCount(address, network) {
     try {
         let rpcLink = RPC_MAP[network];
         if (!rpcLink) {
@@ -27,5 +27,3 @@ async function getTxCount(address, network) {
         return "Error";
     }
 }
-
-export default getTxCount;

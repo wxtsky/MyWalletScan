@@ -8,7 +8,7 @@ const RPC_MAP = {
     "bsc": "https://bscrpc.com"
 };
 
-async function getEthBalance(walletAddress, network) {
+export async function getEthBalance(walletAddress, network) {
     try {
         let rpcLink = RPC_MAP[network];
         if (!rpcLink) {
@@ -27,5 +27,3 @@ async function getEthBalance(walletAddress, network) {
         return "Error";
     }
 }
-
-export default getEthBalance;
