@@ -31,4 +31,7 @@
 .ant-table {
     font-weight: 600;
 }
-
+.ant-table th,
+.ant-table td {
+  border: 1px solid rgb(0, 12, 0);     // 设置单元格的所有框线为黑色
+}
