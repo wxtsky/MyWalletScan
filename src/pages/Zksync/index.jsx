@@ -9,7 +9,7 @@ import {
     Spin,
     Tag,
     Popconfirm,
-    Row, Col, InputNumber, message
+    Row, Col, InputNumber, message, Badge
 } from 'antd';
 import {exportToExcel} from "@utils"
 import {useEffect, useState} from "react";
@@ -18,6 +18,7 @@ import {Layout, Card} from 'antd';
 
 const {Content} = Layout;
 import {
+    AppstoreAddOutlined,
     DeleteOutlined,
     DownloadOutlined,
     EditOutlined,
@@ -27,6 +28,7 @@ import {
 } from "@ant-design/icons";
 import {EyeOutlined, EyeInvisibleOutlined} from "@ant-design/icons"
 import {getAllZksSyncData} from "@utils/getZksyncData/index.js";
+import EcosystemModal from "@components/EcosystemModal/index.jsx";
 
 const {TextArea} = Input;
 
@@ -39,6 +41,7 @@ function Zksync() {
     const [hideColumn, setHideColumn] = useState(false);
     const [isBatchModalVisible, setIsBatchModalVisible] = useState(false);
     const [isWalletModalVisible, setIsWalletModalVisible] = useState(false);
+    const [ecosystemModalVisible, setEcosystemModalVisible] = useState(false);
     const [batchForm] = Form.useForm();
     const [walletForm] = Form.useForm();
     const [selectedKeys, setSelectedKeys] = useState([]);
@@ -467,6 +470,13 @@ function Zksync() {
                     align: "center",
                     render: (text, record) => (text === null ? <Spin/> : text),
                 },
+                {
+                    title: "最后交易",
+                    dataIndex: "zks1_latest_tx",
+                    key: "zks1_latest_tx",
+                    align: "center",
+                    render: (text, record) => (text === null ? <Spin/> : text),
+                }
             ],
 
         },
@@ -710,6 +720,7 @@ function Zksync() {
     return (
         <div>
             <Content>
+                <EcosystemModal open={ecosystemModalVisible} onCancel={() => setEcosystemModalVisible(false)}/>
                 <Modal
                     title={addressDetail && addressDetail.address + '  交互数据详情'}
                     open={showAddressDetailModal !== null}
@@ -798,6 +809,7 @@ function Zksync() {
                         </Card>
                     </Form>
                 </Modal>
+
                 <Spin spinning={tableLoading}>
                     <Table
                         rowKey={record => record.key}
@@ -835,16 +847,17 @@ function Zksync() {
                                 <>
                                     <Table.Summary.Row>
                                         <Table.Summary.Cell index={0} colSpan={4}>总计</Table.Summary.Cell>
-                                        <Table.Summary.Cell index={4}>{ethBalance.toFixed(4)}</Table.Summary.Cell>
-                                        <Table.Summary.Cell index={5}/>
-                                        <Table.Summary.Cell index={6}>{zks1Balance.toFixed(4)}</Table.Summary.Cell>
-                                        <Table.Summary.Cell index={7}/>
-                                        <Table.Summary.Cell index={8}>{zks2Balance.toFixed(4)}</Table.Summary.Cell>
+                                        <Table.Summary.Cell index={5}>{ethBalance.toFixed(4)}</Table.Summary.Cell>
+                                        <Table.Summary.Cell index={6}/>
+                                        <Table.Summary.Cell index={7}>{zks1Balance.toFixed(4)}</Table.Summary.Cell>
+                                        <Table.Summary.Cell index={8}/>
+                                        <Table.Summary.Cell index={9}/>
+                                        <Table.Summary.Cell index={10}>{zks2Balance.toFixed(3)}</Table.Summary.Cell>
                                         <Table.Summary.Cell
                                             index={9}>{zks2UsdcBalance.toFixed(2)}</Table.Summary.Cell>
                                         {emptyCells}
-                                        <Table.Summary.Cell index={19}/>
-                                        <Table.Summary.Cell index={20}>{totalFees.toFixed(4)}</Table.Summary.Cell>
+                                        <Table.Summary.Cell index={20}/>
+                                        <Table.Summary.Cell index={21}>{totalFees.toFixed(2)}</Table.Summary.Cell>
                                     </Table.Summary.Row>
                                 </>
                             )
@@ -857,6 +870,18 @@ function Zksync() {
                                     justifyContent: 'space-between',
                                     gap: '10px'
                                 }}>
+                                    <Button type="primary"
+                                            onClick={() => {
+                                                setEcosystemModalVisible(true)
+                                            }}
+                                            size="large"
+                                            style={{width: "20%"}}
+                                            icon={<AppstoreAddOutlined/>}
+                                    >
+                                        <Badge count={"New"} offset={[30, 0]}>
+                                            <span style={{color: 'white'}}>生态应用</span>
+                                        </Badge>
+                                    </Button>
                                     <Button type="primary" onClick={() => {
                                         setIsWalletModalVisible(true)
                                     }} size={"large"} style={{width: "20%"}}
@@ -889,12 +914,6 @@ function Zksync() {
                                     <Button type="primary" icon={<DownloadOutlined/>} size={"large"}
                                             style={{width: "8%"}}
                                             onClick={exportToExcelFile}/>
-                                    {/*<Button type="primary" onClick={async () => {*/}
-                                    {/*    const result = await getAllZksSyncData("0xcE9471cBE175fE91dA7Feb9C80478fE7f3443358");*/}
-                                    {/*    console.log(result);*/}
-                                    {/*}} size={"large"} style={{width: "8%"}}>*/}
-                                    {/*    测试*/}
-                                    {/*</Button>*/}
                                 </div>
                             </Card>
                         )
