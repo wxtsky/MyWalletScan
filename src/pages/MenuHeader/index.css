@@ -1,15 +1,46 @@
-.menu-item.twitter {
-    margin-right: 10px;
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap');
+
+.custom-menu {
+    font-family: 'Poppins', sans-serif;
 }
 
-.menu-item.twitter a {
-    color: #1DA1F2; /* 推特蓝色 */
+/* 初始化菜单项样式 */
+.custom-menu .ant-menu-item {
+    color: #333;
+    position: relative;
 }
 
-.menu-item.github a {
-    color: #333; /* GitHub 黑色 */
+/* 创建下划线并隐藏 */
+.custom-menu .ant-menu-item::before {
+    content: "";
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: 0;
+    left: 50%;
+    background-color: #1890ff;
+    transition: all 0.3s;
 }
 
-.menu-item.github a:hover {
-    color: #4078c0; /* GitHub 链接悬停时的颜色 */
+/* 悬停或选中时显示并展开下划线 */
+.custom-menu .ant-menu-item:hover::before,
+.custom-menu .ant-menu-item-selected::before {
+    width: 100%;
+    left: 0;
+}
+
+/* 初始化链接样式 */
+.custom-menu .ant-menu-item a {
+    color: #333;
+}
+
+/* 悬停或选中时改变链接颜色 */
+.custom-menu .ant-menu-item a:hover,
+.custom-menu .ant-menu-item-selected a {
+    color: #1890ff;
+}
+
+.custom-menu .ant-menu-item::before {
+    height: 1px;
+    /* 其他样式 */
 }
