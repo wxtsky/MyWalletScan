@@ -41,25 +41,23 @@ const MenuHeader = () => {
             label: 'LayerZero',
             key: 'layer',
         },
-        {
-            label: 'Mirror',
-            key: 'mirror',
-        },
-        {
-            label: 'Deposit',
-            key: 'deposit',
-        },
+        // {
+        //     label: 'Mirror',
+        //     key: 'mirror',
+        // },
+        // {
+        //     label: 'Deposit',
+        //     key: 'deposit',
+        // },
         {
             label: 'Coffee',
             key: 'coffee',
         },
         {
             label: (
-                <Badge dot>
-                    <a href="https://twitter.com/jingluo0" target="_blank" rel="noopener noreferrer">
-                        <TwitterOutlined/>
-                    </a>
-                </Badge>
+                <a href="https://twitter.com/jingluo0" target="_blank" rel="noopener noreferrer">
+                    <TwitterOutlined/>
+                </a>
             ),
             key: 'twitter',
         },

@@ -38,7 +38,7 @@ function Zksync() {
     const [batchloading, setBatchLoading] = useState(false);
     const [zkSyncConfigStore, setZkSyncConfigStore] = useState({});
     const [data, setData] = useState([]);
-    const [hideColumn, setHideColumn] = useState(false);
+    const [hideColumn, setHideColumn] = useState(true);
     const [isBatchModalVisible, setIsBatchModalVisible] = useState(false);
     const [isWalletModalVisible, setIsWalletModalVisible] = useState(false);
     const [ecosystemModalVisible, setEcosystemModalVisible] = useState(false);
@@ -469,6 +469,7 @@ function Zksync() {
                     key: "zks1_tx_amount",
                     align: "center",
                     render: (text, record) => (text === null ? <Spin/> : text),
+                    sorter: (a, b) => a.zks1_tx_amount - b.zks1_tx_amount,
                 },
                 {
                     title: "最后交易",
@@ -505,6 +506,7 @@ function Zksync() {
                     key: "zks2_tx_amount",
                     align: "center",
                     render: (text, record) => (text === null ? <Spin/> : text),
+                    sorter: (a, b) => a.zks2_tx_amount - b.zks2_tx_amount,
                 },
                 {
                     title: "最后交易",
@@ -593,6 +595,7 @@ function Zksync() {
                             key: "totalExchangeAmount",
                             align: "center",
                             render: (text, record) => (text === null ? <Spin/> : text),
+                            sorter: (a, b) => a.totalExchangeAmount - b.totalExchangeAmount,
                         },
                         {
                             title: "Fee(U)",
@@ -809,117 +812,117 @@ function Zksync() {
                         </Card>
                     </Form>
                 </Modal>
+                <div style={{marginBottom: "50px"}}>
+                    <Spin spinning={tableLoading}>
+                        <Table
+                            rowKey={record => record.key}
+                            rowSelection={rowSelection}
+                            dataSource={data}
+                            pagination={false}
+                            bordered={true}
+                            style={{marginBottom: "20px", zIndex: 2}}
+                            size={"small"}
+                            columns={columns}
+                            summary={pageData => {
+                                let ethBalance = 0;
+                                let zks1Balance = 0;
+                                let zks2Balance = 0;
+                                let zks2UsdcBalance = 0;
+                                let totalFees = 0;
+                                pageData.forEach(({
+                                                      eth_balance,
+                                                      zks1_balance,
+                                                      zks2_balance,
+                                                      zks2_usdcBalance,
+                                                      totalFee
+                                                  }) => {
+                                    ethBalance += Number(eth_balance);
+                                    zks1Balance += Number(zks1_balance);
+                                    zks2Balance += Number(zks2_balance);
+                                    zks2UsdcBalance += Number(zks2_usdcBalance);
+                                    totalFees += Number(totalFee);
+                                })
 
-                <Spin spinning={tableLoading}>
-                    <Table
-                        rowKey={record => record.key}
-                        rowSelection={rowSelection}
-                        dataSource={data}
-                        pagination={false}
-                        bordered={true}
-                        style={{marginBottom: "20px", zIndex: 2}}
-                        size={"small"}
-                        columns={columns}
-                        summary={pageData => {
-                            let ethBalance = 0;
-                            let zks1Balance = 0;
-                            let zks2Balance = 0;
-                            let zks2UsdcBalance = 0;
-                            let totalFees = 0;
-                            pageData.forEach(({
-                                                  eth_balance,
-                                                  zks1_balance,
-                                                  zks2_balance,
-                                                  zks2_usdcBalance,
-                                                  totalFee
-                                              }) => {
-                                ethBalance += Number(eth_balance);
-                                zks1Balance += Number(zks1_balance);
-                                zks2Balance += Number(zks2_balance);
-                                zks2UsdcBalance += Number(zks2_usdcBalance);
-                                totalFees += Number(totalFee);
-                            })
+                                const emptyCells = Array(10).fill().map((_, index) => <Table.Summary.Cell
+                                    index={index + 6}/>);
 
-                            const emptyCells = Array(10).fill().map((_, index) => <Table.Summary.Cell
-                                index={index + 6}/>);
-
-                            return (
-                                <>
-                                    <Table.Summary.Row>
-                                        <Table.Summary.Cell index={0} colSpan={4}>总计</Table.Summary.Cell>
-                                        <Table.Summary.Cell index={5}>{ethBalance.toFixed(4)}</Table.Summary.Cell>
-                                        <Table.Summary.Cell index={6}/>
-                                        <Table.Summary.Cell index={7}>{zks1Balance.toFixed(4)}</Table.Summary.Cell>
-                                        <Table.Summary.Cell index={8}/>
-                                        <Table.Summary.Cell index={9}/>
-                                        <Table.Summary.Cell index={10}>{zks2Balance.toFixed(3)}</Table.Summary.Cell>
-                                        <Table.Summary.Cell
-                                            index={9}>{zks2UsdcBalance.toFixed(2)}</Table.Summary.Cell>
-                                        {emptyCells}
-                                        <Table.Summary.Cell index={20}/>
-                                        <Table.Summary.Cell index={21}>{totalFees.toFixed(2)}</Table.Summary.Cell>
-                                    </Table.Summary.Row>
-                                </>
-                            )
-                        }}
-                        footer={() => (
-                            <Card>
-                                <div style={{
-                                    width: '100%',
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                    gap: '10px'
-                                }}>
-                                    <Button type="primary"
-                                            onClick={() => {
-                                                setEcosystemModalVisible(true)
-                                            }}
-                                            size="large"
-                                            style={{width: "20%"}}
-                                            icon={<AppstoreAddOutlined/>}
-                                    >
-                                        <Badge count={"New"} offset={[30, 0]}>
-                                            <span style={{color: 'white'}}>生态应用</span>
-                                        </Badge>
-                                    </Button>
-                                    <Button type="primary" onClick={() => {
-                                        setIsWalletModalVisible(true)
-                                    }} size={"large"} style={{width: "20%"}}
-                                            icon={<SettingOutlined/>}>
-                                        配置
-                                    </Button>
-                                    <Button type="primary" onClick={showModal} size={"large"} style={{width: "20%"}}
-                                            icon={<PlusOutlined/>}>
-                                        添加地址
-                                    </Button>
-                                    <Button type="primary" onClick={showBatchModal} size={"large"}
-                                            style={{width: "20%"}}
-                                            icon={<UploadOutlined/>}
-                                            loading={batchloading}
-                                    >
-                                        {batchloading ? `添加中 进度:(${batchProgress}/${batchLength})` : "批量添加地址"}
-                                    </Button>
-                                    <Button type="primary" onClick={handleRefresh} loading={isLoading}
-                                            size={"large"}
-                                            style={{width: "20%"}} icon={<SyncOutlined/>}>
-                                        {isLoading ? "正在刷新" : "刷新选中地址"}
-                                    </Button>
-                                    <Popconfirm title={"确认删除" + selectedKeys.length + "个地址？"}
-                                                onConfirm={handleDeleteSelected}>
-                                        <Button type="primary" danger size={"large"}
-                                                style={{width: "20%"}} icon={<DeleteOutlined/>}>
-                                            删除选中地址
-                                        </Button>
-                                    </Popconfirm>
-                                    <Button type="primary" icon={<DownloadOutlined/>} size={"large"}
-                                            style={{width: "8%"}}
-                                            onClick={exportToExcelFile}/>
-                                </div>
-                            </Card>
-                        )
-                        }
-                    />
-                </Spin>
+                                return (
+                                    <>
+                                        <Table.Summary.Row>
+                                            <Table.Summary.Cell index={0} colSpan={4}>总计</Table.Summary.Cell>
+                                            <Table.Summary.Cell index={5}>{ethBalance.toFixed(4)}</Table.Summary.Cell>
+                                            <Table.Summary.Cell index={6}/>
+                                            <Table.Summary.Cell index={7}>{zks1Balance.toFixed(4)}</Table.Summary.Cell>
+                                            <Table.Summary.Cell index={8}/>
+                                            <Table.Summary.Cell index={9}/>
+                                            <Table.Summary.Cell index={10}>{zks2Balance.toFixed(3)}</Table.Summary.Cell>
+                                            <Table.Summary.Cell
+                                                index={9}>{zks2UsdcBalance.toFixed(2)}</Table.Summary.Cell>
+                                            {emptyCells}
+                                            <Table.Summary.Cell index={20}/>
+                                            <Table.Summary.Cell index={21}>{totalFees.toFixed(2)}</Table.Summary.Cell>
+                                        </Table.Summary.Row>
+                                    </>
+                                )
+                            }}
+                        />
+                    </Spin>
+                </div>
+                <div className="zks_footer">
+                    <Card size={"small"} style={{width: '100%'}}>
+                        <div style={{
+                            width: '100%',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            gap: '10px'
+                        }}>
+                            <Button type="primary"
+                                    onClick={() => {
+                                        setEcosystemModalVisible(true)
+                                    }}
+                                    size="large"
+                                    style={{width: "20%"}}
+                                    icon={<AppstoreAddOutlined/>}
+                            >
+                                <Badge count={"New"} offset={[30, 0]}>
+                                    <span style={{color: 'white'}}>生态应用</span>
+                                </Badge>
+                            </Button>
+                            <Button type="primary" onClick={() => {
+                                setIsWalletModalVisible(true)
+                            }} size={"large"} style={{width: "20%"}}
+                                    icon={<SettingOutlined/>}>
+                                配置
+                            </Button>
+                            <Button type="primary" onClick={showModal} size={"large"} style={{width: "20%"}}
+                                    icon={<PlusOutlined/>}>
+                                添加地址
+                            </Button>
+                            <Button type="primary" onClick={showBatchModal} size={"large"}
+                                    style={{width: "20%"}}
+                                    icon={<UploadOutlined/>}
+                                    loading={batchloading}
+                            >
+                                {batchloading ? `添加中 进度:(${batchProgress}/${batchLength})` : "批量添加地址"}
+                            </Button>
+                            <Button type="primary" onClick={handleRefresh} loading={isLoading}
+                                    size={"large"}
+                                    style={{width: "20%"}} icon={<SyncOutlined/>}>
+                                {isLoading ? "正在刷新" : "刷新选中地址"}
+                            </Button>
+                            <Popconfirm title={"确认删除" + selectedKeys.length + "个地址？"}
+                                        onConfirm={handleDeleteSelected}>
+                                <Button type="primary" danger size={"large"}
+                                        style={{width: "20%"}} icon={<DeleteOutlined/>}>
+                                    删除选中地址
+                                </Button>
+                            </Popconfirm>
+                            <Button type="primary" icon={<DownloadOutlined/>} size={"large"}
+                                    style={{width: "8%"}}
+                                    onClick={exportToExcelFile}/>
+                        </div>
+                    </Card>
+                </div>
             </Content>
         </div>
     );

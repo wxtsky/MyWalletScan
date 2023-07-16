@@ -17,3 +17,16 @@
     background-color: #4e9ed4;
     color: white;
 }
+
+/*stark_activity*/
+.ant-table-thead > tr > th.stark_activity {
+    background-color: #03b3ff;
+    color: white;
+}
+
+.stark_footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    z-index: 2;
+}

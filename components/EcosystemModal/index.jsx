@@ -94,7 +94,7 @@ const data = [
         logo: 'meson.png',
         name: "meson",
         category: "Bridge",
-        url: "https://meson.fi/",
+        url: "https://meson.fi/?from=bitboxtools",
         description: "Meson是一个领先的稳定币跨链协议，它允许稳定币在不同的区块链之间进行跨链交易。该协议支持 USDC、USDT 和 BUSD 等主流稳定币在 zkSync 和其他20条主流公链之间的跨链操作。",
     }
 ];
