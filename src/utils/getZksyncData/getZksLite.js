@@ -1,24 +1,25 @@
 import axios from "axios";
+import i18n from "i18next";
 
 const getTimeAgo = (date) => {
     const seconds = (new Date().getTime() - new Date(date).getTime()) / 1000;
 
     if (seconds < 60) {
-        return Math.round(seconds) + ' 秒前';
+        return i18n.t('secondsAgo', {count: Math.round(seconds)});
     }
 
     const minutes = seconds / 60;
     if (minutes < 60) {
-        return Math.round(minutes) + ' 分前';
+        return i18n.t('minutesAgo', {count: Math.round(minutes)});
     }
 
     const hours = minutes / 60;
     if (hours < 24) {
-        return Math.round(hours) + ' 时前';
+        return i18n.t('hoursAgo', {count: Math.round(hours)});
     }
 
     const days = hours / 24;
-    return Math.round(days) + ' 天前';
+    return i18n.t('daysAgo', {count: Math.round(days)});
 };
 
 async function getLatestTx(address) {
@@ -29,25 +30,12 @@ async function getLatestTx(address) {
                 'limit': '25',
                 'direction': 'older'
             },
-            headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/115.0',
-                'Accept': 'application/json, text/plain, */*',
-                'Accept-Language': 'zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2',
-                'Accept-Encoding': 'gzip, deflate, br',
-                'Referer': 'https://portal.zksync.io/',
-                'Origin': 'https://portal.zksync.io',
-                'Sec-Fetch-Dest': 'empty',
-                'Sec-Fetch-Mode': 'cors',
-                'Sec-Fetch-Site': 'same-site',
-                'Connection': 'keep-alive',
-                'TE': 'trailers'
-            }
         });
         const txs = response.data;
         if (txs.result.list.length === 0) {
-            return '无交易'
+            return i18n.t('noTransaction');
         } else {
-            return getTimeAgo(txs.result.list[0]['createdAt'])
+            return getTimeAgo(txs.result.list[0]['createdAt']);
         }
     } catch (error) {
         console.log(error)
@@ -68,7 +56,7 @@ export async function getZksLite(address) {
         });
         let zks1_balance
         if ("ETH" in response.data.result.committed.balances) {
-            zks1_balance = (response.data.result.committed.balances.ETH / 10 ** 18).toFixed(4)
+            zks1_balance = (response.data.result.committed.balances.ETH / 10 ** 18).toFixed(3)
         } else {
             zks1_balance = 0;
         }

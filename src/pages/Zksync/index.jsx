@@ -29,18 +29,20 @@ import {
 import {EyeOutlined, EyeInvisibleOutlined} from "@ant-design/icons"
 import {getAllZksSyncData} from "@utils/getZksyncData/index.js";
 import EcosystemModal from "@components/EcosystemModal/index.jsx";
+import {useTranslation} from "react-i18next";
 
 const {TextArea} = Input;
 
 function Zksync() {
+    const {t} = useTranslation();
     const [batchProgress, setBatchProgress] = useState(0);
     const [batchLength, setBatchLength] = useState(0);
     const [batchloading, setBatchLoading] = useState(false);
-    const [zkSyncConfigStore, setZkSyncConfigStore] = useState({});
+    // const [zkSyncConfigStore, setZkSyncConfigStore] = useState({});
     const [data, setData] = useState([]);
     const [hideColumn, setHideColumn] = useState(true);
     const [isBatchModalVisible, setIsBatchModalVisible] = useState(false);
-    const [isWalletModalVisible, setIsWalletModalVisible] = useState(false);
+    // const [isWalletModalVisible, setIsWalletModalVisible] = useState(false);
     const [ecosystemModalVisible, setEcosystemModalVisible] = useState(false);
     const [batchForm] = Form.useForm();
     const [walletForm] = Form.useForm();
@@ -51,40 +53,40 @@ function Zksync() {
     const [tableLoading, setTableLoading] = useState(false);
     const [showAddressDetailModal, setShowAddressDetailModal] = useState(null);
     const [addressDetail, setAddressDetail] = useState(null);
-    useEffect(() => {
-        setBatchProgress(0);
-        const zksync_config = localStorage.getItem('zksync_config');
-        if (zksync_config) {
-            const config = JSON.parse(zksync_config);
-            setZkSyncConfigStore(config);
-            walletForm.setFieldsValue(config);
-        } else {
-            setZkSyncConfigStore(
-                {
-                    "ETHTx": null,
-                    "zkSyncLiteMinTx": null,
-                    "zkSyncEraMinTx": null,
-                    "dayMin": null,
-                    "weekMin": null,
-                    "monthMin": null,
-                    "L1ToL2Tx": null,
-                    "L2ToL1Tx": null,
-                    "L1ToL2ETH": null,
-                    "L2ToL1ETH": null,
-                    "gasFee": null,
-                    "contractMin": null,
-                    "totalAmount": null,
-                }
-            )
-        }
-    }, []);
+    // useEffect(() => {
+    //     setBatchProgress(0);
+    //     const zksync_config = localStorage.getItem('zksync_config');
+    //     if (zksync_config) {
+    //         const config = JSON.parse(zksync_config);
+    //         setZkSyncConfigStore(config);
+    //         walletForm.setFieldsValue(config);
+    //     } else {
+    //         setZkSyncConfigStore(
+    //             {
+    //                 "ETHTx": null,
+    //                 "zkSyncLiteMinTx": null,
+    //                 "zkSyncEraMinTx": null,
+    //                 "dayMin": null,
+    //                 "weekMin": null,
+    //                 "monthMin": null,
+    //                 "L1ToL2Tx": null,
+    //                 "L2ToL1Tx": null,
+    //                 "L1ToL2ETH": null,
+    //                 "L2ToL1ETH": null,
+    //                 "gasFee": null,
+    //                 "contractMin": null,
+    //                 "totalAmount": null,
+    //             }
+    //         )
+    //     }
+    // }, []);
     const handleOk = async () => {
         try {
             const values = await form.validateFields();
             if (values.address.length !== 42) {
                 notification.error({
-                    message: "错误",
-                    description: "请输入正确的地址",
+                    message: t('zk_error'),
+                    description: t('zk_error_msg'),
                 }, 2);
                 return;
             }
@@ -145,7 +147,7 @@ function Zksync() {
             }
         } catch (error) {
             notification.error({
-                message: "错误",
+                message: t('zk_error'),
                 description: error.message,
             }, 2);
         } finally {
@@ -155,8 +157,8 @@ function Zksync() {
     const handleRefresh = async () => {
         if (!selectedKeys.length) {
             notification.error({
-                message: "错误",
-                description: "请先选择要刷新的地址",
+                message: t('zk_error'),
+                description: t('zk_error_msg3'),
             }, 2);
             return;
         }
@@ -205,13 +207,13 @@ function Zksync() {
             }
         } catch (error) {
             notification.error({
-                message: "错误",
+                message: t('zk_error'),
                 description: error.message,
             }, 2);
         } finally {
             setIsLoading(false);
             setSelectedKeys([]);
-            message.success("刷新成功");
+            message.success(t('zk_message'));
         }
     };
     const handleBatchOk = async () => {
@@ -242,8 +244,8 @@ function Zksync() {
                 address = address.trim();
                 if (address.length !== 42) {
                     notification.error({
-                        message: "错误",
-                        description: "请输入正确的地址",
+                        message: t('zk_error'),
+                        description: t('zk_error_msg'),
                     });
                     continue;
                 }
@@ -296,7 +298,7 @@ function Zksync() {
             localStorage.setItem('addresses', JSON.stringify(newData));
         } catch (error) {
             notification.error({
-                message: "错误",
+                message: t('zk_error'),
                 description: error.message,
             });
         } finally {
@@ -304,7 +306,7 @@ function Zksync() {
             setBatchProgress(0);
             batchForm.resetFields();
             setSelectedKeys([]);
-            message.success("批量添加成功");
+            message.success(t('zk_message_batch_add_success'));
         }
     };
     const toggleHideColumn = () => {
@@ -346,8 +348,8 @@ function Zksync() {
     const handleDeleteSelected = () => {
         if (!selectedKeys.length) {
             notification.error({
-                message: "错误",
-                description: "请先选择要删除的地址",
+                message: t('zk_error'),
+                description: t('zk_error_msg2'),
             }, 2);
             return;
         }
@@ -376,7 +378,7 @@ function Zksync() {
             render: (text, record, index) => index + 1,
         },
         {
-            title: "备注",
+            title: t("notes"),
             dataIndex: "name",
             key: "name",
             align: "center",
@@ -384,7 +386,7 @@ function Zksync() {
                 const isEditing = record.key === editingKey;
                 return isEditing ? (
                     <Input
-                        placeholder="请输入备注"
+                        placeholder={t("notes_placeholder")}
                         defaultValue={text}
                         onPressEnter={(e) => {
                             record.name = e.target.value;
@@ -409,7 +411,7 @@ function Zksync() {
         {
             title: (
                 <span>
-                钱包地址
+                {t("address")}
                     <span onClick={toggleHideColumn} style={{marginLeft: 8, cursor: 'pointer'}}>
                         {getEyeIcon()}
                     </span>
@@ -422,12 +424,13 @@ function Zksync() {
                 if (hideColumn) {
                     return text.slice(0, 4) + '***' + text.slice(-4);
                 }
-                return isRowSatisfyCondition(record) ?
-                    <div
-                        style={{backgroundColor: '#bbeefa', borderRadius: '5px'}}
-                    >
-                        {text}</div> : text ||
-                    <Spin/>;
+                return text;
+                // return isRowSatisfyCondition(record) ?
+                //     <div
+                //         style={{backgroundColor: '#bbeefa', borderRadius: '5px'}}
+                //     >
+                //         {text}</div> : text ||
+                //     <Spin/>;
             },
         },
         {
@@ -472,7 +475,7 @@ function Zksync() {
                     sorter: (a, b) => a.zks1_tx_amount - b.zks1_tx_amount,
                 },
                 {
-                    title: "最后交易",
+                    title: t('last_tx'),
                     dataIndex: "zks1_latest_tx",
                     key: "zks1_latest_tx",
                     align: "center",
@@ -509,7 +512,7 @@ function Zksync() {
                     sorter: (a, b) => a.zks2_tx_amount - b.zks2_tx_amount,
                 },
                 {
-                    title: "最后交易",
+                    title: t("last_tx"),
                     dataIndex: "zks2_last_tx",
                     key: "zks2_last_tx",
                     align: "center",
@@ -518,7 +521,7 @@ function Zksync() {
                            target={"_blank"}>{text}</a>),
                 },
                 {
-                    title: "官方桥跨链Tx数",
+                    title: t('official_bridge_tx'),
                     key: "cross_chain_tx_count_group",
                     children: [
                         {
@@ -538,7 +541,7 @@ function Zksync() {
                     ],
                 },
                 {
-                    title: "官方桥跨链金额(ETH)",
+                    title: t('official_bridge_amount'),
                     key: "cross_chain_amount_group",
                     children: [
                         {
@@ -558,39 +561,39 @@ function Zksync() {
                     ],
                 },
                 {
-                    title: "活跃统计",
+                    title: t('activities'),
                     key: "activity_stats_group",
                     children: [
                         {
-                            title: "日",
+                            title: t('day'),
                             dataIndex: "dayActivity",
                             key: "dayActivity",
                             align: "center",
                             render: (text, record) => (text === null ? <Spin/> : text),
                         },
                         {
-                            title: "周",
+                            title: t('week'),
                             dataIndex: "weekActivity",
                             key: "weekActivity",
                             align: "center",
                             render: (text, record) => (text === null ? <Spin/> : text),
                         },
                         {
-                            title: "月",
+                            title: t('month'),
                             dataIndex: "monthActivity",
                             key: "monthActivity",
                             align: "center",
                             render: (text, record) => (text === null ? <Spin/> : text),
                         },
                         {
-                            title: "不同合约",
+                            title: t('contract'),
                             dataIndex: "contractActivity",
                             key: "contractActivity",
                             align: "center",
                             render: (text, record) => (text === null ? <Spin/> : text),
                         },
                         {
-                            title: "金额(U)",
+                            title: t('amount'),
                             dataIndex: "totalExchangeAmount",
                             key: "totalExchangeAmount",
                             align: "center",
@@ -598,7 +601,7 @@ function Zksync() {
                             sorter: (a, b) => a.totalExchangeAmount - b.totalExchangeAmount,
                         },
                         {
-                            title: "Fee(U)",
+                            title: t('fee'),
                             dataIndex: "totalFee",
                             key: "totalFee",
                             align: "center",
@@ -609,12 +612,12 @@ function Zksync() {
             ],
         },
         {
-            title: "操作",
+            title: t('operation'),
             key: "action",
             align: "center",
             render: (text, record) => (
                 <Space size="small">
-                    <Popconfirm title={"确认删除？"} onConfirm={() => handleDelete(record.key)}>
+                    <Popconfirm title={t('zk_message_confirm_delete')} onConfirm={() => handleDelete(record.key)}>
                         <Button icon={<DeleteOutlined/>}/>
                     </Popconfirm>
                     <Button icon={<SearchOutlined/>} onClick={() => setShowAddressDetailModal(record.key)}/>
@@ -622,44 +625,44 @@ function Zksync() {
             ),
         },
     ];
-    const handleWalletOk = () => {
-        const values = walletForm.getFieldsValue();
-        localStorage.setItem('zksync_config', JSON.stringify(values));
-        setZkSyncConfigStore(values);
-        setIsWalletModalVisible(false);
-        console.log(zkSyncConfigStore)
-    };
-    const FormItem = ({name, addonBefore, addonAfter}) => (
-        <Form.Item name={name}>
-            <InputNumber min={0} style={{width: '100%'}}
-                         addonBefore={addonBefore} addonAfter={addonAfter}
-            />
-        </Form.Item>
-    );
-    const isRowSatisfyCondition = (record) => {
-        const conditionKeyMapping = {
-            "ETHTx": "eth_tx_amount",
-            "zkSyncLiteMinTx": "zks1_tx_amount",
-            "zkSyncEraMinTx": "zks2_tx_amount",
-            "L1ToL2Tx": "l1Tol2Times",
-            "L2ToL1Tx": "l2Tol1Times",
-            "L1ToL2ETH": "l1Tol2Amount",
-            "L2ToL1ETH": "l2Tol1Amount",
-            "contractMin": "contractActivity",
-            "dayMin": "dayActivity",
-            "weekMin": "weekActivity",
-            "monthMin": "monthActivity",
-            "gasFee": "totalFee",
-            "totalAmount": "totalExchangeAmount",
-        };
-        return Object.keys(conditionKeyMapping).every((conditionKey) => {
-            if (!(conditionKey in zkSyncConfigStore) || zkSyncConfigStore[conditionKey] === null || zkSyncConfigStore[conditionKey] === undefined) {
-                return true;
-            }
-            const recordKey = conditionKeyMapping[conditionKey];
-            return Number(record[recordKey]) >= Number(zkSyncConfigStore[conditionKey])
-        });
-    };
+    // const handleWalletOk = () => {
+    //     const values = walletForm.getFieldsValue();
+    //     localStorage.setItem('zksync_config', JSON.stringify(values));
+    //     setZkSyncConfigStore(values);
+    //     setIsWalletModalVisible(false);
+    //     console.log(zkSyncConfigStore)
+    // };
+    // const FormItem = ({name, addonBefore, addonAfter}) => (
+    //     <Form.Item name={name}>
+    //         <InputNumber min={0} style={{width: '100%'}}
+    //                      addonBefore={addonBefore} addonAfter={addonAfter}
+    //         />
+    //     </Form.Item>
+    // );
+    // const isRowSatisfyCondition = (record) => {
+    //     const conditionKeyMapping = {
+    //         "ETHTx": "eth_tx_amount",
+    //         "zkSyncLiteMinTx": "zks1_tx_amount",
+    //         "zkSyncEraMinTx": "zks2_tx_amount",
+    //         "L1ToL2Tx": "l1Tol2Times",
+    //         "L2ToL1Tx": "l2Tol1Times",
+    //         "L1ToL2ETH": "l1Tol2Amount",
+    //         "L2ToL1ETH": "l2Tol1Amount",
+    //         "contractMin": "contractActivity",
+    //         "dayMin": "dayActivity",
+    //         "weekMin": "weekActivity",
+    //         "monthMin": "monthActivity",
+    //         "gasFee": "totalFee",
+    //         "totalAmount": "totalExchangeAmount",
+    //     };
+    //     return Object.keys(conditionKeyMapping).every((conditionKey) => {
+    //         if (!(conditionKey in zkSyncConfigStore) || zkSyncConfigStore[conditionKey] === null || zkSyncConfigStore[conditionKey] === undefined) {
+    //             return true;
+    //         }
+    //         const recordKey = conditionKeyMapping[conditionKey];
+    //         return Number(record[recordKey]) >= Number(zkSyncConfigStore[conditionKey])
+    //     });
+    // };
     useEffect(() => {
         let address;
         let protocols;
@@ -686,7 +689,7 @@ function Zksync() {
             ),
         },
         {
-            title: '协议',
+            title: t('protocol'),
             dataIndex: 'name',
             key: 'name',
             align: 'center',
@@ -704,14 +707,14 @@ function Zksync() {
             align: 'center',
         },
         {
-            title: '最后交易时间',
+            title: t('last_tx'),
             dataIndex: 'lastActivity',
             key: 'lastActivity',
             align: 'center',
             render: (text, record) => (text === '' ? '无' : new Date(text).toLocaleString('zh-CN', {timeZone: 'Asia/Shanghai'})),
         },
         {
-            title: '交易金额(U)',
+            title: t('amount'),
             dataIndex: 'volume',
             key: 'volume',
             align: 'center',
@@ -725,7 +728,7 @@ function Zksync() {
             <Content>
                 <EcosystemModal open={ecosystemModalVisible} onCancel={() => setEcosystemModalVisible(false)}/>
                 <Modal
-                    title={addressDetail && addressDetail.address + '  交互数据详情'}
+                    title={addressDetail && addressDetail.address + '  ' + t('address_detail')}
                     open={showAddressDetailModal !== null}
                     onCancel={() => setShowAddressDetailModal(null)}
                     footer={null}
@@ -745,75 +748,75 @@ function Zksync() {
                         )}
                     </div>
                 </Modal>
-                <Modal title="批量添加地址" open={isBatchModalVisible} onOk={handleBatchOk}
+                <Modal title={t('batch_add_address')} open={isBatchModalVisible} onOk={handleBatchOk}
                        onCancel={handleBatchCancel}
                        okButtonProps={{loading: isLoading}}
-                       okText={"添加地址"}
-                       cancelText={"取消"}
+                       okText={"OK"}
+                       cancelText={"Cancel"}
                 >
                     <Form form={batchForm} layout="vertical">
-                        <Form.Item label="地址" name="addresses" rules={[{required: true}]}>
-                            <TextArea placeholder="请输入地址，每行一个" style={{width: "500px", height: "200px"}}/>
+                        <Form.Item label={t('address')} name="addresses" rules={[{required: true}]}>
+                            <TextArea placeholder={t('zk_msg')} style={{width: "500px", height: "200px"}}/>
                         </Form.Item>
                     </Form>
                 </Modal>
-                <Modal title="添加地址" open={isModalVisible} onOk={handleOk} onCancel={handleCancel}
+                <Modal title={t('add_address')} open={isModalVisible} onOk={handleOk} onCancel={handleCancel}
                        okButtonProps={{loading: isLoading}}
-                       okText={"添加地址"}
-                       cancelText={"取消"}
+                       okText={t('add_address')}
+                       cancelText={t('cancel')}
                 >
                     <Form form={form} layout="vertical">
-                        <Form.Item label="地址" name="address" rules={[{required: true}]}>
-                            <Input placeholder="请输入地址"/>
+                        <Form.Item label={t('address')} name="address" rules={[{required: true}]}>
+                            <Input placeholder={t('zk_msg2')}/>
                         </Form.Item>
-                        <Form.Item label="备注" name="name">
-                            <Input placeholder="请输入备注"/>
+                        <Form.Item label={t('notes')} name="name">
+                            <Input placeholder={t('notes_placeholder')}/>
                         </Form.Item>
                     </Form>
                 </Modal>
-                <Modal title="zkSync"
-                       open={isWalletModalVisible}
-                       onOk={handleWalletOk}
-                       onCancel={() => {
-                           setIsWalletModalVisible(false);
-                       }}
-                       okText={"保存"}
-                       cancelText={"取消"}
-                       width={700}
-                       style={{top: 10}}
+                {/*<Modal title="zkSync"*/}
+                {/*       open={isWalletModalVisible}*/}
+                {/*       onOk={handleWalletOk}*/}
+                {/*       onCancel={() => {*/}
+                {/*           setIsWalletModalVisible(false);*/}
+                {/*       }}*/}
+                {/*       okText={"OK"}*/}
+                {/*       cancelText={t('cancel')}*/}
+                {/*       width={700}*/}
+                {/*       style={{top: 10}}*/}
 
-                >
-                    <Form form={walletForm} layout="vertical">
-                        <Card title="设置钱包预期标准，若钱包达到设置标准，钱包地址背景会为蓝色，更清晰"
-                              bordered={true}
-                              style={{width: '100%'}}>
-                            <Row gutter={[16, 16]}>
-                                <Col span={12}>
-                                    <FormItem name="ETHTx" addonBefore="ETH Tx数量 ≥ "
-                                              addonAfter="个"/>
-                                    <FormItem name="zkSyncLiteMinTx" addonBefore="zkSyncLite Tx数量 ≥ "
-                                              addonAfter="个"/>
-                                    <FormItem name="zkSyncEraMinTx" addonBefore="zkSyncEra Tx数量 ≥ "
-                                              addonAfter="个"/>
-                                    <FormItem name="dayMin" addonBefore="日活跃数 ≥ " addonAfter="天"/>
-                                    <FormItem name="weekMin" addonBefore="周活跃数 ≥ " addonAfter="周"/>
-                                    <FormItem name="monthMin" addonBefore="月活跃数 ≥ " addonAfter="月"/>
-                                </Col>
-                                <Col span={12}>
-                                    <FormItem name="L1ToL2Tx" addonBefore="L1->L2跨链Tx ≥ " addonAfter="个"/>
-                                    <FormItem name="L2ToL1Tx" addonBefore="L2->L1跨链Tx ≥ " addonAfter="个"/>
-                                    <FormItem name="L1ToL2ETH" addonBefore="L1->L2跨链金额 ≥ " addonAfter="ETH"/>
-                                    <FormItem name="L2ToL1ETH" addonBefore="L2->L1跨链金额 ≥ " addonAfter="ETH"/>
-                                    <FormItem name="gasFee" addonBefore="消耗gasFee" addonAfter="ETH"/>
-                                    <FormItem name="contractMin" addonBefore="不同合约数 ≥ " addonAfter="个"/>
-                                    <FormItem name="totalAmount" addonBefore="总交易金额 ≥ " addonAfter="U"/>
-                                </Col>
-                            </Row>
-                        </Card>
-                    </Form>
-                </Modal>
+                {/*>*/}
+                {/*    <Form form={walletForm} layout="vertical">*/}
+                {/*        <Card title={t('zk_msg3')}*/}
+                {/*              bordered={true}*/}
+                {/*              style={{width: '100%'}}>*/}
+                {/*            <Row gutter={[16, 16]}>*/}
+                {/*                <Col span={12}>*/}
+                {/*                    <FormItem name="ETHTx" addonBefore="ETH Tx ≥ "*/}
+                {/*                              addonAfter="个"/>*/}
+                {/*                    <FormItem name="zkSyncLiteMinTx" addonBefore="zkSyncLite Tx ≥ "*/}
+                {/*                              addonAfter="个"/>*/}
+                {/*                    <FormItem name="zkSyncEraMinTx" addonBefore="zkSyncEra Tx ≥ "*/}
+                {/*                              addonAfter="个"/>*/}
+                {/*                    <FormItem name="dayMin" addonBefore="日活跃数 ≥ " addonAfter="天"/>*/}
+                {/*                    <FormItem name="weekMin" addonBefore="周活跃数 ≥ " addonAfter="周"/>*/}
+                {/*                    <FormItem name="monthMin" addonBefore="月活跃数 ≥ " addonAfter="月"/>*/}
+                {/*                </Col>*/}
+                {/*                <Col span={12}>*/}
+                {/*                    <FormItem name="L1ToL2Tx" addonBefore="L1->L2跨链Tx ≥ " addonAfter="个"/>*/}
+                {/*                    <FormItem name="L2ToL1Tx" addonBefore="L2->L1跨链Tx ≥ " addonAfter="个"/>*/}
+                {/*                    <FormItem name="L1ToL2ETH" addonBefore="L1->L2跨链金额 ≥ " addonAfter="ETH"/>*/}
+                {/*                    <FormItem name="L2ToL1ETH" addonBefore="L2->L1跨链金额 ≥ " addonAfter="ETH"/>*/}
+                {/*                    <FormItem name="gasFee" addonBefore="消耗gasFee" addonAfter="ETH"/>*/}
+                {/*                    <FormItem name="contractMin" addonBefore="不同合约数 ≥ " addonAfter="个"/>*/}
+                {/*                    <FormItem name="totalAmount" addonBefore="总交易金额 ≥ " addonAfter="U"/>*/}
+                {/*                </Col>*/}
+                {/*            </Row>*/}
+                {/*        </Card>*/}
+                {/*    </Form>*/}
+                {/*</Modal>*/}
                 <div style={{marginBottom: "50px"}}>
-                    <Spin spinning={tableLoading}>
+                    <Spin spinning={tableLoading} size={"large"}>
                         <Table
                             rowKey={record => record.key}
                             rowSelection={rowSelection}
@@ -849,10 +852,10 @@ function Zksync() {
                                 return (
                                     <>
                                         <Table.Summary.Row>
-                                            <Table.Summary.Cell index={0} colSpan={4}>总计</Table.Summary.Cell>
-                                            <Table.Summary.Cell index={5}>{ethBalance.toFixed(4)}</Table.Summary.Cell>
+                                            <Table.Summary.Cell index={0} colSpan={4}>{t('total')}</Table.Summary.Cell>
+                                            <Table.Summary.Cell index={5}>{ethBalance.toFixed(3)}</Table.Summary.Cell>
                                             <Table.Summary.Cell index={6}/>
-                                            <Table.Summary.Cell index={7}>{zks1Balance.toFixed(4)}</Table.Summary.Cell>
+                                            <Table.Summary.Cell index={7}>{zks1Balance.toFixed(3)}</Table.Summary.Cell>
                                             <Table.Summary.Cell index={8}/>
                                             <Table.Summary.Cell index={9}/>
                                             <Table.Summary.Cell index={10}>{zks2Balance.toFixed(3)}</Table.Summary.Cell>
@@ -874,7 +877,7 @@ function Zksync() {
                             width: '100%',
                             display: 'flex',
                             justifyContent: 'space-between',
-                            gap: '10px'
+                            gap: '10px',
                         }}>
                             <Button type="primary"
                                     onClick={() => {
@@ -885,36 +888,36 @@ function Zksync() {
                                     icon={<AppstoreAddOutlined/>}
                             >
                                 <Badge count={"New"} offset={[30, 0]}>
-                                    <span style={{color: 'white'}}>生态应用</span>
+                                    <span style={{color: 'white'}}>{t('ecosystem')}</span>
                                 </Badge>
                             </Button>
-                            <Button type="primary" onClick={() => {
-                                setIsWalletModalVisible(true)
-                            }} size={"large"} style={{width: "20%"}}
-                                    icon={<SettingOutlined/>}>
-                                配置
-                            </Button>
+                            {/*<Button type="primary" onClick={() => {*/}
+                            {/*    setIsWalletModalVisible(true)*/}
+                            {/*}} size={"large"} style={{width: "20%"}}*/}
+                            {/*        icon={<SettingOutlined/>}>*/}
+                            {/*    {t('config')}*/}
+                            {/*</Button>*/}
                             <Button type="primary" onClick={showModal} size={"large"} style={{width: "20%"}}
                                     icon={<PlusOutlined/>}>
-                                添加地址
+                                {t('add_address')}
                             </Button>
                             <Button type="primary" onClick={showBatchModal} size={"large"}
                                     style={{width: "20%"}}
                                     icon={<UploadOutlined/>}
                                     loading={batchloading}
                             >
-                                {batchloading ? `添加中 进度:(${batchProgress}/${batchLength})` : "批量添加地址"}
+                                {batchloading ? t('adding') + `:(${batchProgress}/${batchLength})` : t('batch_add_address')}
                             </Button>
                             <Button type="primary" onClick={handleRefresh} loading={isLoading}
                                     size={"large"}
                                     style={{width: "20%"}} icon={<SyncOutlined/>}>
-                                {isLoading ? "正在刷新" : "刷新选中地址"}
+                                {isLoading ? t('refreshing') : t('refresh_selected_address')}
                             </Button>
-                            <Popconfirm title={"确认删除" + selectedKeys.length + "个地址？"}
+                            <Popconfirm title={t('confirm_delete ') + selectedKeys.length + t(' address_count') + "?"}
                                         onConfirm={handleDeleteSelected}>
                                 <Button type="primary" danger size={"large"}
                                         style={{width: "20%"}} icon={<DeleteOutlined/>}>
-                                    删除选中地址
+                                    {t('delete_selected_address')}
                                 </Button>
                             </Popconfirm>
                             <Button type="primary" icon={<DownloadOutlined/>} size={"large"}

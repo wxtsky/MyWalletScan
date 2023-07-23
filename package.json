@@ -15,8 +15,10 @@
     "copy-to-clipboard": "^3.3.3",
     "ethers": "^6.3.0",
     "file-saver": "^2.0.5",
+    "i18next": "^23.2.11",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-i18next": "^13.0.2",
     "react-router-dom": "^6.11.0",
     "xlsx": "^0.18.5"
   },

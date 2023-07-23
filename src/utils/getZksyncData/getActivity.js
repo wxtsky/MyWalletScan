@@ -1,22 +1,24 @@
+import i18n from 'i18next';
+
 const getTimeAgo = (date) => {
     const seconds = (new Date().getTime() - new Date(date).getTime()) / 1000;
 
     if (seconds < 60) {
-        return Math.round(seconds) + ' 秒前';
+        return i18n.t('secondsAgo', {count: Math.round(seconds)});
     }
 
     const minutes = seconds / 60;
     if (minutes < 60) {
-        return Math.round(minutes) + ' 分前';
+        return i18n.t('minutesAgo', {count: Math.round(minutes)});
     }
 
     const hours = minutes / 60;
     if (hours < 24) {
-        return Math.round(hours) + ' 时前';
+        return i18n.t('hoursAgo', {count: Math.round(hours)});
     }
 
     const days = hours / 24;
-    return Math.round(days) + ' 天前';
+    return i18n.t('daysAgo', {count: Math.round(days)});
 };
 const getWeekNumber = (date) => {
     const year = date.getFullYear();
@@ -59,7 +61,7 @@ export const getActivities = async (address, transactions) => {
         weekActivity: 0,
         monthActivity: 0,
         contractActivity: 0,
-        zks2_last_tx: '无交易',
+        zks2_last_tx: i18n.t('noTransaction'),
     })
     const {
         dayActivity,
@@ -68,7 +70,7 @@ export const getActivities = async (address, transactions) => {
         contractActivity
     } = countAllTransactionPeriods(address, transactions);
     const lastTransaction = transactions[0];
-    const zks2_last_tx = getTimeAgo(lastTransaction.receivedAt) || '无交易';
+    const zks2_last_tx = getTimeAgo(lastTransaction.receivedAt) || i18n.t('noTransaction');
     return {
         dayActivity,
         weekActivity,

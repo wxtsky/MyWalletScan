@@ -1,9 +1,31 @@
-import {Menu, Badge} from 'antd';
+import {Menu} from 'antd';
 import {useEffect, useState} from 'react';
 import {useLocation, useNavigate} from "react-router-dom";
 import {GithubOutlined, TwitterOutlined} from "@ant-design/icons";
 import './index.css'
 import {getEthPrice} from "@utils";
+import React from "react";
+import {useTranslation} from "react-i18next";
+import {Select} from 'antd';
+
+const {Option} = Select;
+
+function LanguageSwitcher() {
+    const {i18n} = useTranslation();
+
+    const changeLanguage = (language) => {
+        i18n.changeLanguage(language);
+        localStorage.setItem('i18nextLng', language);
+    };
+
+    return (
+        <Select defaultValue={i18n.language} style={{width: 120}} onChange={changeLanguage}>
+            <Option value="zh">中文</Option>
+            <Option value="en">English</Option>
+        </Select>
+    );
+}
+
 
 const EthPrice = () => {
     const [ethPrice, setEthPrice] = useState(null);
@@ -72,7 +94,11 @@ const MenuHeader = () => {
         {
             label: <EthPrice/>,
             key: 'ethPrice',
-        }
+        },
+        {
+            label: <LanguageSwitcher/>,
+            key: 'languageSwitch',
+        },
     ];
 
     const navigate = useNavigate();
@@ -80,6 +106,10 @@ const MenuHeader = () => {
     const [current, setCurrent] = useState(location.pathname.replace('/', '') || 'zksync');
 
     const onClick = (e) => {
+        if (e.key === 'languageSwitch' || e.key === 'ethPrice') {
+            return;
+        }
+
         setCurrent(e.key);
     };
 

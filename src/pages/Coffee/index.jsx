@@ -15,21 +15,21 @@ const Coffee = () => {
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
-        height: 'calc(100vh - 64px)', // Subtracting Header height
+        height: 'calc(100vh - 64px)',
         padding: '20px',
-        backgroundColor: '#F0F2F5' // Adding a light grey background color
+        backgroundColor: '#F0F2F5'
     };
 
     const qrCodeStyle = {
         marginTop: '20px',
         marginBottom: '20px',
         padding: '20px',
-        backgroundColor: '#fff', // Adding a white background to the QR code
-        borderRadius: '8px' // Adding some rounded corners to the QR code background
+        backgroundColor: '#fff',
+        borderRadius: '8px'
     };
 
     const textStyle = {
-        marginBottom: '20px' // Adding some space below the text
+        marginBottom: '20px'
     };
 
     const copyAddress = () => {
@@ -40,7 +40,7 @@ const Coffee = () => {
     return (
         <Layout>
             <Content style={contentStyle}>
-                <Title level={3} style={textStyle}>如果你觉得这款工具对你有所帮助，可以请作者喝杯咖啡提提神吗😄</Title>
+                <Title level={3} style={textStyle}>捐赠作者一杯咖啡😄</Title>
                 <div style={textStyle}>
                     <Space>
                         <Text><strong>EVM地址：</strong>{ethAddress}</Text>

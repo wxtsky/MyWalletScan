@@ -330,6 +330,7 @@ const Stark = () => {
     }
     const handleBatchOk = async () => {
         try {
+            setIsBatchModalVisible(false);
             const values = await batchForm.validateFields();
             const addresses = values.addresses.split("\n");
             for (let address of addresses) {
@@ -379,7 +380,6 @@ const Stark = () => {
                     });
                 }
             }
-            setIsBatchModalVisible(false);
         } catch (error) {
             notification.error({
                 message: "错误",
@@ -390,8 +390,6 @@ const Stark = () => {
             setSelectedKeys([]);
         }
     };
-
-
     const handleRefresh = async () => {
         if (!selectedKeys.length) {
             notification.error({
@@ -400,12 +398,13 @@ const Stark = () => {
             }, 2);
             return;
         }
+
         setIsLoading(true);
+
         try {
             for (let key of selectedKeys) {
                 const index = data.findIndex(item => item.key === key);
                 if (index !== -1) {
-                    // Clear the data fields except for address and name
                     setData(prevData => {
                         const updatedData = [...prevData];
                         for (let field in updatedData[index]) {
@@ -416,8 +415,8 @@ const Stark = () => {
                         return updatedData;
                     });
 
-                    // Await each request instead of pushing into promises array
                     const response = await getStarkData(data[index].address);
+
                     setData(prevData => {
                         const updatedData = [...prevData];
                         updatedData[index] = {
@@ -429,6 +428,10 @@ const Stark = () => {
                     });
                 }
             }
+            notification.success({
+                message: "完成",
+                description: "刷新地址数据完成",
+            }, 2);
         } catch (error) {
             notification.error({
                 message: "错误",
@@ -438,7 +441,7 @@ const Stark = () => {
             setIsLoading(false);
             setSelectedKeys([]);
         }
-    }
+    };
 
 
     const handleDeleteSelected = () => {
@@ -499,7 +502,7 @@ const Stark = () => {
                     </Form>
                 </Modal>
                 <div style={{marginBottom: "50px"}}>
-                    <Spin spinning={tableLoading}>
+                    <Spin spinning={tableLoading} size={"large"}>
                         <Table
                             rowSelection={rowSelection}
                             dataSource={data}

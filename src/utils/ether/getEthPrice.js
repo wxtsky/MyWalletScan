@@ -4,10 +4,10 @@ const getEthPrice = async () => {
     try {
         const options = {
             method: 'GET',
-            url: 'https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD',
+            url: 'https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd',
         }
         let response = await axios.request(options)
-        return response.data['USD']
+        return response.data['ethereum']['usd']
     } catch (e) {
         console.log(e)
         return 0

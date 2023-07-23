@@ -6,17 +6,31 @@ import {getTokenBalance} from "@utils/getStarkData/getTokenBalance.js";
 import {getVolume} from "@utils/getStarkData/getVolume.js";
 
 export const getStarkData = async (address) => {
-    const transactions = await getTransactionsList(address);
-    const activity = await getActivities(address, transactions);
-    const bridge = await getBridge(address);
-    const account = await getAccountInfo(address);
-    const tokenBalance = await getTokenBalance(address);
+    let transactions;
+    try {
+        transactions = await getTransactionsList(address);
+    } catch (e) {
+        transactions = [];
+    }
+    const [
+        activity,
+        bridge,
+        account,
+        tokenBalance
+    ] = await Promise.all([
+        getActivities(address, transactions),
+        getBridge(address),
+        getAccountInfo(address),
+        getTokenBalance(address)
+    ]);
+
     const volume = getVolume(transactions);
+
     return {
         activity,
         bridge,
         account,
         tokenBalance,
         volume,
-    }
+    };
 }

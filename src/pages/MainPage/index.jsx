@@ -18,7 +18,7 @@ function MainPage() {
                 minHeight: "100vh",
             }}
         >
-            {/*<Notice/>*/}
+            {/*<Notice message={"Stark功能已更新。"}/>*/}
             <Layout>
                 <div
                     style={{
