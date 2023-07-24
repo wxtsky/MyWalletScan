@@ -1,4 +1,5 @@
 import axios from 'axios';
+
 const tokenMapping = {
     ethereum: 'ETH',
     dai: 'DAI',
@@ -10,7 +11,6 @@ const tokenMapping = {
 async function fetchTokenPrices() {
     const tokens = Object.keys(tokenMapping);
     const url = `https://api.coingecko.com/api/v3/simple/price?ids=${tokens.join(',')}&vs_currencies=usd`;
-
     try {
         const response = await axios.get(url);
         const price = {};
