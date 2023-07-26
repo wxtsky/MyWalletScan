@@ -14,7 +14,7 @@ async function getTokenPrices() {
     try {
         const response = await axios.get(url);
         for (const token in response.data) {
-            price[tokenList[token].sym] = response.data[token].usd / 10 ** tokenList[token].dec;
+            price[tokenList[token].sym] = response.data[token]['usd'] / 10 ** tokenList[token].dec;
         }
         return price;
     } catch (error) {

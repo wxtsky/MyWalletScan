@@ -20,6 +20,7 @@ const {Content} = Layout;
 const Stark = () => {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [isBatchModalVisible, setIsBatchModalVisible] = useState(false);
+    const [batchLoading, setBatchLoading] = useState(false);
     const [data, setData] = useState([]);
     const [batchForm] = Form.useForm();
     const [isLoading, setIsLoading] = useState(false);
@@ -266,7 +267,7 @@ const Stark = () => {
                 notification.error({
                     message: "错误",
                     description: "请输入正确的stark地址(64位)",
-                }, 2);
+                }, 1);
                 return;
             }
             if (!values.address.startsWith('0x')) {
@@ -291,7 +292,7 @@ const Stark = () => {
                             ...updatedData[index],
                             ...response,
                         }
-                        localStorage.setItem('stark_addresses', JSON.stringify(updatedData));  // 更新 localStorage
+                        localStorage.setItem('stark_addresses', JSON.stringify(updatedData));
                         return updatedData;
                     });
                 })
@@ -309,7 +310,7 @@ const Stark = () => {
                             ...newData[newData.length - 1],
                             ...response,
                         }
-                        localStorage.setItem('stark_addresses', JSON.stringify(newData));  // 更新 localStorage
+                        localStorage.setItem('stark_addresses', JSON.stringify(newData));
                         return newData;
                     });
                 })
@@ -318,7 +319,7 @@ const Stark = () => {
             notification.error({
                 message: "错误",
                 description: error.message,
-            }, 2);
+            }, 1);
         } finally {
             form.resetFields();
         }
@@ -330,6 +331,7 @@ const Stark = () => {
     }
     const handleBatchOk = async () => {
         try {
+            setBatchLoading(true)
             setIsBatchModalVisible(false);
             const values = await batchForm.validateFields();
             const addresses = values.addresses.split("\n");
@@ -345,9 +347,17 @@ const Stark = () => {
                 if (!address.startsWith("0x")) {
                     address = "0x" + address;
                 }
-
                 const index = data.findIndex(item => item.address === address);
                 if (index !== -1) {
+                    setData(prevData => {
+                        const updatedData = [...prevData];
+                        for (let field in updatedData[index]) {
+                            if (field !== 'address' && field !== 'name' && field !== 'key') {
+                                updatedData[index][field] = null;
+                            }
+                        }
+                        return updatedData;
+                    });
                     const response = await getStarkData(address);
                     setData(prevData => {
                         const updatedData = [...prevData];
@@ -363,11 +373,8 @@ const Stark = () => {
                         key: idCounter.toString(),
                         address: address,
                     };
-
-                    idCounter++; // Increment the counter for each new entry
-
+                    idCounter++;
                     setData(prevData => [...prevData, newEntry]);
-
                     const response = await getStarkData(address);
                     setData(prevData => {
                         const newData = [...prevData];
@@ -388,6 +395,7 @@ const Stark = () => {
         } finally {
             batchForm.resetFields();
             setSelectedKeys([]);
+            setBatchLoading(false)
         }
     };
     const handleRefresh = async () => {
@@ -395,7 +403,7 @@ const Stark = () => {
             notification.error({
                 message: "错误",
                 description: "请先选择要刷新的地址",
-            }, 2);
+            }, 1);
             return;
         }
 
@@ -431,12 +439,12 @@ const Stark = () => {
             notification.success({
                 message: "完成",
                 description: "刷新地址数据完成",
-            }, 2);
+            }, 1);
         } catch (error) {
             notification.error({
                 message: "错误",
                 description: error.message,
-            }, 2);
+            }, 1);
         } finally {
             setIsLoading(false);
             setSelectedKeys([]);
@@ -449,7 +457,7 @@ const Stark = () => {
             notification.error({
                 message: "错误",
                 description: "请先选择要删除的地址",
-            }, 2);
+            }, 1);
             return;
         }
         setData(data.filter(item => !selectedKeys.includes(item.key)));
@@ -524,8 +532,8 @@ const Stark = () => {
                             </Button>
                             <Button type="primary" onClick={() => {
                                 setIsBatchModalVisible(true)
-                            }} size={"large"} style={{width: "20%"}} icon={<UploadOutlined/>}>
-                                批量添加地址
+                            }} size={"large"} style={{width: "20%"}} icon={<UploadOutlined/>} loading={batchLoading}>
+                                {batchLoading ? "添加中..." : "批量添加地址"}
                             </Button>
                             <Button type="primary" onClick={handleRefresh} loading={isLoading} size={"large"}
                                     style={{width: "20%"}}

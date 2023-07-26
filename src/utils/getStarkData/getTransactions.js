@@ -1,28 +1,27 @@
 import axios from 'axios';
+import {getEthPrice} from "@utils";
 
-const tokenMapping = {
-    ethereum: 'ETH',
-    dai: 'DAI',
-    'usd-coin': 'USDC',
-    tether: 'USDT',
-    'wrapped-bitcoin': 'WBTC',
-};
+// const tokenMapping = {
+//     ethereum: 'ETH',
+//     dai: 'DAI',
+//     'usd-coin': 'USDC',
+//     tether: 'USDT',
+//     'wrapped-bitcoin': 'WBTC',
+// };
 
 async function fetchTokenPrices() {
-    const tokens = Object.keys(tokenMapping);
-    const url = `https://api.coingecko.com/api/v3/simple/price?ids=${tokens.join(',')}&vs_currencies=usd`;
+    const ethPrice = await getEthPrice()
     try {
-        const response = await axios.get(url);
-        const price = {};
-        for (const token in response.data) {
-            const symbol = tokenMapping[token];
-            if (symbol) {
-                price[symbol] = response.data[token].usd;
-            }
-        }
-        return price;
+        // const response = await axios.get(url);
+        return {
+            "DAI": 1,
+            "USDC": 1,
+            "USDT": 1,
+            "WBTC": 30000,
+            "ETH": ethPrice,
+        };
     } catch (error) {
-        throw new Error('Error fetching token prices:', error.message);
+        console.log(error);
     }
 }
 
@@ -65,34 +64,38 @@ async function getTokenTransfer(address) {
 }
 
 export async function getTransactionsList(address) {
-    let transactionsList = [];
-    let page = 1;
-    while (true) {
-        const url = `https://voyager.online/api/txns?to=${address}&ps=50&p=${page}&type=null`
-        const response = await axios.get(url);
-        const {items, lastPage} = response.data;
-        items.forEach(item => {
-            const {actual_fee, hash, timestamp} = item;
-            const data = {
-                actual_fee: Number(actual_fee) / 10 ** 18,
-                hash,
-                timestamp,
-                transfer: [],
+    try {
+        let transactionsList = [];
+        let page = 1;
+        while (true) {
+            const url = `https://voyager.online/api/txns?to=${address}&ps=50&p=${page}&type=null`
+            const response = await axios.get(url);
+            const {items, lastPage} = response.data;
+            items.forEach(item => {
+                const {actual_fee, hash, timestamp} = item;
+                const data = {
+                    actual_fee: Number(actual_fee) / 10 ** 18,
+                    hash,
+                    timestamp,
+                    transfer: [],
+                }
+                transactionsList.push(data);
+            })
+            if (lastPage === page || lastPage === 0) {
+                break;
             }
-            transactionsList.push(data);
-        })
-        if (lastPage === page) {
-            break;
+            page++;
         }
-        page++;
-    }
-    const tokenTransfer = await getTokenTransfer(address);
-    tokenTransfer.forEach(transfer => {
-        transactionsList.forEach(tx => {
-            if (tx.hash === transfer.tx_hash) {
-                tx.transfer.push(transfer);
-            }
+        const tokenTransfer = await getTokenTransfer(address);
+        tokenTransfer.forEach(transfer => {
+            transactionsList.forEach(tx => {
+                if (tx.hash === transfer.tx_hash) {
+                    tx.transfer.push(transfer);
+                }
+            })
         })
-    })
-    return transactionsList;
+        return transactionsList;
+    } catch (e) {
+        return [];
+    }
 }

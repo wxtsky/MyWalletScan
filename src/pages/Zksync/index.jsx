@@ -38,14 +38,11 @@ function Zksync() {
     const [batchProgress, setBatchProgress] = useState(0);
     const [batchLength, setBatchLength] = useState(0);
     const [batchloading, setBatchLoading] = useState(false);
-    // const [zkSyncConfigStore, setZkSyncConfigStore] = useState({});
     const [data, setData] = useState([]);
     const [hideColumn, setHideColumn] = useState(true);
     const [isBatchModalVisible, setIsBatchModalVisible] = useState(false);
-    // const [isWalletModalVisible, setIsWalletModalVisible] = useState(false);
     const [ecosystemModalVisible, setEcosystemModalVisible] = useState(false);
     const [batchForm] = Form.useForm();
-    const [walletForm] = Form.useForm();
     const [selectedKeys, setSelectedKeys] = useState([]);
     const [form] = Form.useForm();
     const [isModalVisible, setIsModalVisible] = useState(false);
@@ -53,33 +50,6 @@ function Zksync() {
     const [tableLoading, setTableLoading] = useState(false);
     const [showAddressDetailModal, setShowAddressDetailModal] = useState(null);
     const [addressDetail, setAddressDetail] = useState(null);
-    // useEffect(() => {
-    //     setBatchProgress(0);
-    //     const zksync_config = localStorage.getItem('zksync_config');
-    //     if (zksync_config) {
-    //         const config = JSON.parse(zksync_config);
-    //         setZkSyncConfigStore(config);
-    //         walletForm.setFieldsValue(config);
-    //     } else {
-    //         setZkSyncConfigStore(
-    //             {
-    //                 "ETHTx": null,
-    //                 "zkSyncLiteMinTx": null,
-    //                 "zkSyncEraMinTx": null,
-    //                 "dayMin": null,
-    //                 "weekMin": null,
-    //                 "monthMin": null,
-    //                 "L1ToL2Tx": null,
-    //                 "L2ToL1Tx": null,
-    //                 "L1ToL2ETH": null,
-    //                 "L2ToL1ETH": null,
-    //                 "gasFee": null,
-    //                 "contractMin": null,
-    //                 "totalAmount": null,
-    //             }
-    //         )
-    //     }
-    // }, []);
     const handleOk = async () => {
         try {
             const values = await form.validateFields();
@@ -87,7 +57,7 @@ function Zksync() {
                 notification.error({
                     message: t('zk_error'),
                     description: t('zk_error_msg'),
-                }, 2);
+                }, 1);
                 return;
             }
             setIsModalVisible(false);
@@ -425,12 +395,6 @@ function Zksync() {
                     return text.slice(0, 4) + '***' + text.slice(-4);
                 }
                 return text;
-                // return isRowSatisfyCondition(record) ?
-                //     <div
-                //         style={{backgroundColor: '#bbeefa', borderRadius: '5px'}}
-                //     >
-                //         {text}</div> : text ||
-                //     <Spin/>;
             },
         },
         {
@@ -625,44 +589,6 @@ function Zksync() {
             ),
         },
     ];
-    // const handleWalletOk = () => {
-    //     const values = walletForm.getFieldsValue();
-    //     localStorage.setItem('zksync_config', JSON.stringify(values));
-    //     setZkSyncConfigStore(values);
-    //     setIsWalletModalVisible(false);
-    //     console.log(zkSyncConfigStore)
-    // };
-    // const FormItem = ({name, addonBefore, addonAfter}) => (
-    //     <Form.Item name={name}>
-    //         <InputNumber min={0} style={{width: '100%'}}
-    //                      addonBefore={addonBefore} addonAfter={addonAfter}
-    //         />
-    //     </Form.Item>
-    // );
-    // const isRowSatisfyCondition = (record) => {
-    //     const conditionKeyMapping = {
-    //         "ETHTx": "eth_tx_amount",
-    //         "zkSyncLiteMinTx": "zks1_tx_amount",
-    //         "zkSyncEraMinTx": "zks2_tx_amount",
-    //         "L1ToL2Tx": "l1Tol2Times",
-    //         "L2ToL1Tx": "l2Tol1Times",
-    //         "L1ToL2ETH": "l1Tol2Amount",
-    //         "L2ToL1ETH": "l2Tol1Amount",
-    //         "contractMin": "contractActivity",
-    //         "dayMin": "dayActivity",
-    //         "weekMin": "weekActivity",
-    //         "monthMin": "monthActivity",
-    //         "gasFee": "totalFee",
-    //         "totalAmount": "totalExchangeAmount",
-    //     };
-    //     return Object.keys(conditionKeyMapping).every((conditionKey) => {
-    //         if (!(conditionKey in zkSyncConfigStore) || zkSyncConfigStore[conditionKey] === null || zkSyncConfigStore[conditionKey] === undefined) {
-    //             return true;
-    //         }
-    //         const recordKey = conditionKeyMapping[conditionKey];
-    //         return Number(record[recordKey]) >= Number(zkSyncConfigStore[conditionKey])
-    //     });
-    // };
     useEffect(() => {
         let address;
         let protocols;
@@ -774,47 +700,6 @@ function Zksync() {
                         </Form.Item>
                     </Form>
                 </Modal>
-                {/*<Modal title="zkSync"*/}
-                {/*       open={isWalletModalVisible}*/}
-                {/*       onOk={handleWalletOk}*/}
-                {/*       onCancel={() => {*/}
-                {/*           setIsWalletModalVisible(false);*/}
-                {/*       }}*/}
-                {/*       okText={"OK"}*/}
-                {/*       cancelText={t('cancel')}*/}
-                {/*       width={700}*/}
-                {/*       style={{top: 10}}*/}
-
-                {/*>*/}
-                {/*    <Form form={walletForm} layout="vertical">*/}
-                {/*        <Card title={t('zk_msg3')}*/}
-                {/*              bordered={true}*/}
-                {/*              style={{width: '100%'}}>*/}
-                {/*            <Row gutter={[16, 16]}>*/}
-                {/*                <Col span={12}>*/}
-                {/*                    <FormItem name="ETHTx" addonBefore="ETH Tx ≥ "*/}
-                {/*                              addonAfter="个"/>*/}
-                {/*                    <FormItem name="zkSyncLiteMinTx" addonBefore="zkSyncLite Tx ≥ "*/}
-                {/*                              addonAfter="个"/>*/}
-                {/*                    <FormItem name="zkSyncEraMinTx" addonBefore="zkSyncEra Tx ≥ "*/}
-                {/*                              addonAfter="个"/>*/}
-                {/*                    <FormItem name="dayMin" addonBefore="日活跃数 ≥ " addonAfter="天"/>*/}
-                {/*                    <FormItem name="weekMin" addonBefore="周活跃数 ≥ " addonAfter="周"/>*/}
-                {/*                    <FormItem name="monthMin" addonBefore="月活跃数 ≥ " addonAfter="月"/>*/}
-                {/*                </Col>*/}
-                {/*                <Col span={12}>*/}
-                {/*                    <FormItem name="L1ToL2Tx" addonBefore="L1->L2跨链Tx ≥ " addonAfter="个"/>*/}
-                {/*                    <FormItem name="L2ToL1Tx" addonBefore="L2->L1跨链Tx ≥ " addonAfter="个"/>*/}
-                {/*                    <FormItem name="L1ToL2ETH" addonBefore="L1->L2跨链金额 ≥ " addonAfter="ETH"/>*/}
-                {/*                    <FormItem name="L2ToL1ETH" addonBefore="L2->L1跨链金额 ≥ " addonAfter="ETH"/>*/}
-                {/*                    <FormItem name="gasFee" addonBefore="消耗gasFee" addonAfter="ETH"/>*/}
-                {/*                    <FormItem name="contractMin" addonBefore="不同合约数 ≥ " addonAfter="个"/>*/}
-                {/*                    <FormItem name="totalAmount" addonBefore="总交易金额 ≥ " addonAfter="U"/>*/}
-                {/*                </Col>*/}
-                {/*            </Row>*/}
-                {/*        </Card>*/}
-                {/*    </Form>*/}
-                {/*</Modal>*/}
                 <div style={{marginBottom: "50px"}}>
                     <Spin spinning={tableLoading} size={"large"}>
                         <Table
@@ -891,12 +776,6 @@ function Zksync() {
                                     <span style={{color: 'white'}}>{t('ecosystem')}</span>
                                 </Badge>
                             </Button>
-                            {/*<Button type="primary" onClick={() => {*/}
-                            {/*    setIsWalletModalVisible(true)*/}
-                            {/*}} size={"large"} style={{width: "20%"}}*/}
-                            {/*        icon={<SettingOutlined/>}>*/}
-                            {/*    {t('config')}*/}
-                            {/*</Button>*/}
                             <Button type="primary" onClick={showModal} size={"large"} style={{width: "20%"}}
                                     icon={<PlusOutlined/>}>
                                 {t('add_address')}
