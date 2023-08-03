@@ -8,8 +8,7 @@ import {
     notification,
     Spin,
     Tag,
-    Popconfirm,
-    Row, Col, InputNumber, message, Badge
+    Popconfirm, message, Badge
 } from 'antd';
 import {exportToExcel} from "@utils"
 import {useEffect, useState} from "react";
@@ -772,9 +771,9 @@ function Zksync() {
                                     style={{width: "20%"}}
                                     icon={<AppstoreAddOutlined/>}
                             >
-                                <Badge count={"New"} offset={[30, 0]}>
-                                    <span style={{color: 'white'}}>{t('ecosystem')}</span>
-                                </Badge>
+                                {/*<Badge count={"New"} offset={[30, 0]}>*/}
+                                <span style={{color: 'white'}}>{t('ecosystem')}</span>
+                                {/*</Badge>*/}
                             </Button>
                             <Button type="primary" onClick={showModal} size={"large"} style={{width: "20%"}}
                                     icon={<PlusOutlined/>}>

@@ -13,8 +13,6 @@ const getEthPrice = async () => {
         console.log(e)
         return 0
     }
-
 }
-
 
 export default getEthPrice

@@ -3,22 +3,21 @@ import {Button, Input, Space, Table, Modal, Form, notification, Spin, Tag, Popco
 import {Layout, Card} from 'antd';
 import {exportToExcel,} from "@utils"
 import {
+    CheckOutlined,
     CopyOutlined,
     DeleteOutlined,
     DownloadOutlined,
-    EditOutlined,
-    PlusOutlined,
+    EditOutlined, ReloadOutlined,
     SyncOutlined,
     UploadOutlined
 } from "@ant-design/icons";
-import {getStarkData} from "@utils/getStarkData/main.js";
+import {getStark} from "@utils/stark/main.js";
 import './index.css'
 import copy from "copy-to-clipboard";
 
 const {TextArea} = Input;
 const {Content} = Layout;
 const Stark = () => {
-    const [isModalVisible, setIsModalVisible] = useState(false);
     const [isBatchModalVisible, setIsBatchModalVisible] = useState(false);
     const [batchLoading, setBatchLoading] = useState(false);
     const [data, setData] = useState([]);
@@ -26,7 +25,6 @@ const Stark = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [selectedKeys, setSelectedKeys] = useState([]);
     const [tableLoading, setTableLoading] = useState(false);
-    const [form] = Form.useForm();
     let idCounter = data.length;
     useEffect(() => {
         setTableLoading(true)
@@ -38,6 +36,9 @@ const Stark = () => {
             setData(JSON.parse(storedAddresses));
         }
     }, []);
+    useEffect(() => {
+        localStorage.setItem('stark_addresses', JSON.stringify(data));
+    }, [data]);
     const columns = [
         {
             title: "#",
@@ -85,8 +86,8 @@ const Stark = () => {
             className: 'address',
             render: (text, record) => {
                 const handleCopy = () => {
-                    copy(text); // 复制地址到剪贴板
-                    message.success('地址已复制'); // 显示成功提示
+                    copy(text);
+                    message.success('地址已复制');
                 };
 
                 return text ? (
@@ -105,62 +106,69 @@ const Stark = () => {
             },
         },
         {
-            title: "Type",
-            dataIndex: ["account", "classAlias"],
-            key: "classAlias",
+            title: "创建时间",
+            dataIndex: ["accountInfo", "deployedTime"],
+            key: " deployedTime",
             align: "center",
             render: (text, record) => text ? text : <Spin/>,
         },
         {
-            title: "StarkWare(轻点刷新!不然容易报错)",
+            title: "StarkId",
+            dataIndex: ["accountInfo", "starkId"],
+            key: "starkId",
+            align: "center",
+            render: (text, record) => text ? text : <Spin/>,
+        },
+        {
+            title: "StarkNet",
             className: "zksync2",
             children: [
                 {
                     title: "ETH",
-                    dataIndex: ["tokenBalance", "ETH"],
+                    dataIndex: ["balance", "ETH"],
                     key: "stark_eth_balance",
                     align: "center",
                     render: (text, record) => text || text === 0 ? text : <Spin/>, // 0 也是合法值
                 },
                 {
                     title: "USDC",
-                    dataIndex: ["tokenBalance", "USDC"],
+                    dataIndex: ["balance", "USDC"],
                     key: "stark_usdc_balance",
                     align: "center",
                     render: (text, record) => text || text === 0 ? text : <Spin/>,
                 },
                 {
                     title: "USDT",
-                    dataIndex: ["tokenBalance", "USDT"],
+                    dataIndex: ["balance", "USDT"],
                     key: "stark_usdt_balance",
                     align: "center",
                     render: (text, record) => text || text === 0 ? text : <Spin/>,
                 },
                 {
                     title: "DAI",
-                    dataIndex: ["tokenBalance", "DAI"],
+                    dataIndex: ["balance", "DAI"],
                     key: "stark_dai_balance",
                     align: "center",
                     render: (text, record) => text || text === 0 ? text : <Spin/>,
                 },
                 {
                     title: "WBTC",
-                    dataIndex: ["tokenBalance", "WBTC"],
+                    dataIndex: ["balance", "WBTC"],
                     key: "stark_wbtc_balance",
                     align: "center",
                     render: (text, record) => text || text === 0 ? text : <Spin/>,
                 },
                 {
                     title: "Tx",
-                    dataIndex: ["account", "nonce"],
+                    dataIndex: "tx",
                     key: "stark_tx_amount",
                     align: "center",
                     render: (text, record) => text || text === 0 ? text : <Spin/>,
-                    sorter: (a, b) => a.account.nonce - b.account.nonce,
+                    sorter: (a, b) => a.tx - b.tx,
                 },
                 {
                     title: "最后交易",
-                    dataIndex: ["activity", "lastTransactionTimeAgo"],
+                    dataIndex: "lastTime",
                     key: "stark_latest_tx",
                     align: "center",
                     render: (text, record) => text || text === 0 ?
@@ -173,13 +181,13 @@ const Stark = () => {
                     children: [
                         {
                             title: "L1->L2",
-                            dataIndex: ["bridge", "l1_l2"],
+                            dataIndex: ["bridge", "DepositTx"],
                             align: "center",
                             render: (text, record) => text || text === 0 ? text : <Spin/>,
                         },
                         {
                             title: "L2->L1",
-                            dataIndex: ["bridge", "l2_l1"],
+                            dataIndex: ["bridge", "WithdrawTx"],
                             align: "center",
                             render: (text, record) => text || text === 0 ? text : <Spin/>,
                         },
@@ -191,14 +199,14 @@ const Stark = () => {
                     children: [
                         {
                             title: "L1->L2",
-                            dataIndex: ["bridge", "l1_l2_amount"],
+                            dataIndex: ["bridge", "DepositVolume"],
                             align: "center",
                             render: (text, record) => text || text === 0 ? text : <Spin/>,
 
                         },
                         {
                             title: "L2->L1",
-                            dataIndex: ["bridge", "l2_l1_amount"],
+                            dataIndex: ["bridge", "WithdrawVolume"],
                             align: "center",
                             render: (text, record) => text || text === 0 ? text : <Spin/>,
                         }
@@ -211,35 +219,41 @@ const Stark = () => {
                     children: [
                         {
                             title: "天",
-                            dataIndex: ["activity", "days"],
+                            dataIndex: ["activity", "dayActivity"],
                             align: "center",
                             render: (text, record) => text || text === 0 ? text : <Spin/>,
                         },
                         {
                             title: "周",
-                            dataIndex: ["activity", "weeks"],
+                            dataIndex: ["activity", "weekActivity"],
                             align: "center",
                             render: (text, record) => text || text === 0 ? text : <Spin/>,
                         },
                         {
                             title: "月",
-                            dataIndex: ["activity", "months"],
+                            dataIndex: ["activity", "monthActivity"],
                             align: "center",
                             render: (text, record) => text || text === 0 ? text : <Spin/>,
                         },
                         {
-                            title: "金额(U)",
-                            dataIndex: ["volume", "volume"],
+                            title: "合约",
+                            dataIndex: ["activity", "contractActivity"],
                             align: "center",
                             render: (text, record) => text || text === 0 ? text : <Spin/>,
-                            sorter: (a, b) => a.volume.volume - b.volume.volume,
+                        },
+                        {
+                            title: "Vol(U)",
+                            dataIndex: "Vol",
+                            align: "center",
+                            render: (text, record) => text || text === 0 ? text : <Spin/>,
+                            sorter: (a, b) => a.Vol - b.Vol,
                         },
                         {
                             title: "fee(E)",
-                            dataIndex: ["activity", "fee"],
+                            dataIndex: "fee",
                             align: "center",
                             render: (text, record) => text || text === 0 ? text : <Spin/>,
-                            sorter: (a, b) => a.activity.fee - b.activity.fee,
+                            sorter: (a, b) => a.fee - b.fee,
                         }
                     ]
 
@@ -253,144 +267,105 @@ const Stark = () => {
                             <Popconfirm title={"确认删除？"} onConfirm={() => handleDelete(record.key)}>
                                 <Button icon={<DeleteOutlined/>}/>
                             </Popconfirm>
+                            {/*{record['result'] === "success" ? <Button icon={<CheckOutlined/>} type="primary"/> : null}*/}
                         </Space>
                     )
-
-                }
+                },
             ]
         },
     ];
-    const handleOk = async () => {
-        try {
-            const values = await form.validateFields();
-            if (values.address.length !== 66 && values.address.length !== 64) {
-                notification.error({
-                    message: "错误",
-                    description: "请输入正确的stark地址(64位)",
-                }, 1);
-                return;
-            }
-            if (!values.address.startsWith('0x')) {
-                values.address = '0x' + values.address;
-            }
-            setIsModalVisible(false);
-            const index = data.findIndex(item => item.address === values.address);
-            if (index !== -1) {
-                setData(data.map((item, i) => {
-                    if (i === index) {
-                        return {
-                            ...item,
-                            name: values.name,
-                        }
-                    }
-                    return item;
-                }));
-                getStarkData(values.address).then((response) => {
-                    setData(prevData => {
-                        const updatedData = [...prevData];
-                        updatedData[index] = {
-                            ...updatedData[index],
-                            ...response,
-                        }
-                        localStorage.setItem('stark_addresses', JSON.stringify(updatedData));
-                        return updatedData;
-                    });
-                })
-            } else {
-                const newEntry = {
-                    key: data.length.toString(),
-                    name: values.name,
-                    address: values.address,
-                };
-                setData(prevData => [...prevData, newEntry]);
-                getStarkData(values.address).then((response) => {
-                    setData(prevData => {
-                        const newData = [...prevData];
-                        newData[newData.length - 1] = {
-                            ...newData[newData.length - 1],
-                            ...response,
-                        }
-                        localStorage.setItem('stark_addresses', JSON.stringify(newData));
-                        return newData;
-                    });
-                })
-            }
-        } catch (error) {
-            notification.error({
-                message: "错误",
-                description: error.message,
-            }, 1);
-        } finally {
-            form.resetFields();
-        }
-    }
-
     const handleDelete = (key) => {
         setData(data.filter(item => item.key !== key));
         localStorage.setItem('stark_addresses', JSON.stringify(data.filter(item => item.key !== key)));
     }
     const handleBatchOk = async () => {
         try {
-            setBatchLoading(true)
+            setBatchLoading(true);
             setIsBatchModalVisible(false);
             const values = await batchForm.validateFields();
             const addresses = values.addresses.split("\n");
+
+            const limit = 5;
+            let activePromises = 0;
+            let promisesQueue = [];
+
+            const processQueue = () => {
+                while (promisesQueue.length > 0 && activePromises < limit) {
+                    const promise = promisesQueue.shift();
+                    activePromises += 1;
+
+                    promise().finally(() => {
+                        activePromises -= 1;
+                        processQueue();
+                    });
+                }
+            };
+
             for (let address of addresses) {
                 address = address.trim();
                 if (address.length !== 66 && address.length !== 64) {
                     notification.error({
                         message: "错误",
                         description: "请输入正确的stark地址(64位)",
+                        duration: 1,
                     });
                     continue;
                 }
                 if (!address.startsWith("0x")) {
                     address = "0x" + address;
                 }
-                const index = data.findIndex(item => item.address === address);
-                if (index !== -1) {
-                    setData(prevData => {
-                        const updatedData = [...prevData];
-                        for (let field in updatedData[index]) {
-                            if (field !== 'address' && field !== 'name' && field !== 'key') {
-                                updatedData[index][field] = null;
+
+                const promiseFunction = () => new Promise(async (resolve, reject) => {
+                    try {
+                        // add the address into data when it starts to process
+                        setData(prevData => {
+                            const updatedData = [...prevData];
+                            const index = updatedData.findIndex(item => item.address === address);
+                            if (index === -1) {
+                                const newEntry = {
+                                    key: idCounter.toString(),
+                                    address: address,
+                                };
+                                idCounter++;
+                                updatedData.push(newEntry);
                             }
-                        }
-                        return updatedData;
-                    });
-                    const response = await getStarkData(address);
-                    setData(prevData => {
-                        const updatedData = [...prevData];
-                        updatedData[index] = {
-                            ...updatedData[index],
-                            ...response,
-                        };
-                        localStorage.setItem('stark_addresses', JSON.stringify(updatedData));
-                        return updatedData;
-                    });
-                } else {
-                    const newEntry = {
-                        key: idCounter.toString(),
-                        address: address,
-                    };
-                    idCounter++;
-                    setData(prevData => [...prevData, newEntry]);
-                    const response = await getStarkData(address);
-                    setData(prevData => {
-                        const newData = [...prevData];
-                        newData[newData.length - 1] = {
-                            ...newData[newData.length - 1],
-                            ...response,
-                        };
-                        localStorage.setItem('stark_addresses', JSON.stringify(newData));
-                        return newData;
-                    });
-                }
+                            return updatedData;
+                        });
+                        const response = await getStark(address);
+                        // update the data of the address
+                        setData(prevData => {
+                            const updatedData = [...prevData];
+                            const index = updatedData.findIndex(item => item.address === address);
+                            if (index !== -1) {
+                                updatedData[index] = {
+                                    ...updatedData[index],
+                                    ...response,
+                                };
+                            }
+                            return updatedData;
+                        });
+                        resolve();
+                    } catch (error) {
+                        reject(error);
+                    }
+                });
+
+                promisesQueue.push(promiseFunction);
             }
+            processQueue();
+            while (activePromises > 0 || promisesQueue.length > 0) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+            notification.success({
+                message: "成功",
+                description: "批量添加成功",
+                duration: 1,
+            })
         } catch (error) {
             notification.error({
                 message: "错误",
                 description: error.message,
+                duration: 1,
             });
         } finally {
             batchForm.resetFields();
@@ -403,61 +378,86 @@ const Stark = () => {
             notification.error({
                 message: "错误",
                 description: "请先选择要刷新的地址",
-            }, 1);
+                duration: 1,
+            });
             return;
         }
-
         setIsLoading(true);
-
         try {
+            const limit = 5;
+            let activePromises = 0;
+            let promisesQueue = [];
+            const processQueue = () => {
+                while (promisesQueue.length > 0 && activePromises < limit) {
+                    const promise = promisesQueue.shift();
+                    activePromises += 1;
+                    promise().finally(() => {
+                        activePromises -= 1;
+                        processQueue();
+                    });
+                }
+            };
             for (let key of selectedKeys) {
                 const index = data.findIndex(item => item.key === key);
                 if (index !== -1) {
-                    setData(prevData => {
-                        const updatedData = [...prevData];
-                        for (let field in updatedData[index]) {
-                            if (field !== 'address' && field !== 'name' && field !== 'key') {
-                                updatedData[index][field] = null;
-                            }
+                    const promiseFunction = () => new Promise(async (resolve, reject) => {
+                        try {
+                            setData(prevData => {
+                                const updatedData = [...prevData];
+                                for (let field in updatedData[index]) {
+                                    if (field !== 'address' && field !== 'name' && field !== 'key') {
+                                        updatedData[index][field] = null;
+                                    }
+                                }
+                                return updatedData;
+                            });
+
+                            const response = await getStark(data[index].address);
+                            setData(prevData => {
+                                const updatedData = [...prevData];
+                                updatedData[index] = {
+                                    ...updatedData[index],
+                                    ...response,
+                                };
+                                localStorage.setItem('stark_addresses', JSON.stringify(updatedData));
+                                return updatedData;
+                            });
+                            resolve();
+                        } catch (error) {
+                            reject(error);
                         }
-                        return updatedData;
                     });
-
-                    const response = await getStarkData(data[index].address);
-
-                    setData(prevData => {
-                        const updatedData = [...prevData];
-                        updatedData[index] = {
-                            ...updatedData[index],
-                            ...response,
-                        };
-                        localStorage.setItem('stark_addresses', JSON.stringify(updatedData));
-                        return updatedData;
-                    });
+                    promisesQueue.push(promiseFunction);
                 }
+            }
+            processQueue();
+            while (activePromises > 0 || promisesQueue.length > 0) {
+                await new Promise(resolve => setTimeout(resolve, 100));
             }
             notification.success({
                 message: "完成",
                 description: "刷新地址数据完成",
-            }, 1);
+                duration: 1,
+            });
         } catch (error) {
             notification.error({
                 message: "错误",
                 description: error.message,
-            }, 1);
+                duration: 1,
+            });
         } finally {
             setIsLoading(false);
             setSelectedKeys([]);
         }
     };
 
-
     const handleDeleteSelected = () => {
         if (!selectedKeys.length) {
             notification.error({
                 message: "错误",
                 description: "请先选择要删除的地址",
-            }, 1);
+                duration: 1,
+            });
             return;
         }
         setData(data.filter(item => !selectedKeys.includes(item.key)));
@@ -487,25 +487,28 @@ const Stark = () => {
                        width={800}
                 >
                     <Form form={batchForm} layout="vertical">
-                        <Form.Item label="地址" name="addresses" rules={[{required: true}]}>
+                        <Form.Item label="地址" name="addresses" rules={[
+                            {
+                                required: true,
+                                validator: (_, value) => {
+                                    const addresses = value.split("\n");
+                                    let errorLines = [];
+                                    for (let i = 0; i < addresses.length; i++) {
+                                        let address = addresses[i].trim();
+                                        if (!address.startsWith("0x") || (address.length !== 66 && address.length !== 64)) {
+                                            errorLines.push(i + 1);
+                                        }
+                                    }
+                                    if (errorLines.length) {
+                                        return Promise.reject(`行 ${errorLines.join(", ")} 的地址格式错误，请输入正确的stark地址(64位)`);
+                                    }
+                                    return Promise.resolve();
+                                }
+                            }
+                        ]}>
                             <TextArea placeholder="请输入地址，每行一个"
                                       style={{width: "100%", height: "300px", resize: "none"}}
                             />
-                        </Form.Item>
-                    </Form>
-                </Modal>
-                <Modal title="添加地址" open={isModalVisible} onOk={handleOk}
-                       onCancel={() => setIsModalVisible(false)}
-                       okText={"添加地址"}
-                       cancelText={"取消"}
-                       width={800}
-                >
-                    <Form form={form} layout="vertical">
-                        <Form.Item label="地址" name="address" rules={[{required: true}]}>
-                            <Input placeholder="请输入地址" style={{width: "100%"}}/>
-                        </Form.Item>
-                        <Form.Item label="备注" name="name">
-                            <Input placeholder="请输入备注" style={{width: "100%"}}/>
                         </Form.Item>
                     </Form>
                 </Modal>
@@ -526,24 +529,19 @@ const Stark = () => {
                     <Card size={"small"} style={{width: "100%"}}>
                         <div style={{width: '100%', display: 'flex', justifyContent: 'space-between'}}>
                             <Button type="primary" onClick={() => {
-                                setIsModalVisible(true)
-                            }} size={"large"} style={{width: "20%"}} icon={<PlusOutlined/>}>
-                                添加地址
-                            </Button>
-                            <Button type="primary" onClick={() => {
                                 setIsBatchModalVisible(true)
-                            }} size={"large"} style={{width: "20%"}} icon={<UploadOutlined/>} loading={batchLoading}>
-                                {batchLoading ? "添加中..." : "批量添加地址"}
+                            }} size={"large"} style={{width: "25%"}} icon={<UploadOutlined/>} loading={batchLoading}>
+                                {batchLoading ? "添加中..." : "添加地址"}
                             </Button>
                             <Button type="primary" onClick={handleRefresh} loading={isLoading} size={"large"}
-                                    style={{width: "20%"}}
+                                    style={{width: "25%"}}
                                     icon={<SyncOutlined/>}>
                                 刷新选中地址
                             </Button>
                             <Popconfirm title={"确认删除" + selectedKeys.length + "个地址？"}
                                         onConfirm={handleDeleteSelected}>
                                 <Button type="primary" danger size={"large"}
-                                        style={{width: "20%"}}
+                                        style={{width: "25%"}}
                                         icon={<DeleteOutlined/>}>
                                     删除选中地址
                                 </Button>

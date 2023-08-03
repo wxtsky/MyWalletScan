@@ -18,7 +18,8 @@ const EcosystemModal = (props) => {
                     justifyContent: 'center'
                 }}>
                     <Image
-                        src={`/ecosystem/${text}`}
+                        // src={`/ecosystem/${text}`}
+                        src={text}
                         alt="logo"
                         style={{width: '100%', height: '100%', objectFit: 'contain'}}
                     />
@@ -70,7 +71,7 @@ const EcosystemModal = (props) => {
     const data = [
         {
             key: "1",
-            logo: 'izi.png',
+            logo: 'https://20178098.fs1.hubspotusercontent-na1.net/hubfs/20178098/ecosystem/izumi-1.png',
             name: "iziswap",
             category: "DEX",
             url: "https://zksync.izumi.finance/swap",
@@ -78,7 +79,7 @@ const EcosystemModal = (props) => {
         },
         {
             key: "2",
-            logo: 'portal.png',
+            logo: 'https://portal.zksync.io/_nuxt/icons/64x64.cb7cab0d.png',
             name: "zkSync Portal",
             category: "Portal",
             url: "https://portal.zksync.io/",
@@ -86,19 +87,59 @@ const EcosystemModal = (props) => {
         },
         {
             key: "3",
-            logo: 'portal.png',
+            logo: 'https://portal.zksync.io/_nuxt/icons/64x64.cb7cab0d.png',
             name: "zkSync Bridge",
             category: "Bridge",
-            url: "https://bridge.zksync.io/",
+            url: "https://portal.zksync.io/bridge/",
             description: "zkSync官方桥。",
         },
         {
             key: "4",
-            logo: 'meson.png',
+            logo: 'https://20178098.fs1.hubspotusercontent-na1.net/hubfs/20178098/ecosystem/meson.svg',
             name: "meson",
             category: "Bridge",
             url: "https://meson.fi/?from=bitboxtools",
             description: "Meson是一个领先的稳定币跨链协议，它允许稳定币在不同的区块链之间进行跨链交易。该协议支持 USDC、USDT 和 BUSD 等主流稳定币在 zkSync 和其他20条主流公链之间的跨链操作。",
+        },
+        {
+            key: "5",
+            logo: 'https://20178098.fs1.hubspotusercontent-na1.net/hubfs/20178098/ecosystem/hito-transparent.svg',
+            name: "Argent",
+            category: "Wallet",
+            url: "https://www.argent.xyz/",
+            description: "Argent是一款基于以太坊的移动钱包，支持zkSync。",
+        },
+        {
+            key: "6",
+            logo: 'https://20178098.fs1.hubspotusercontent-na1.net/hubfs/20178098/ecosystem/Group%20104439%20-%20Naomi%20LI.svg',
+            name: "Element Market",
+            category: "NFT",
+            url: "https://element.market/",
+            description: "Element Market是一个聚合NFT市场。",
+        },
+        {
+            key: "7",
+            logo: 'https://20178098.fs1.hubspotusercontent-na1.net/hubfs/20178098/ecosystem/orbiter-1.png',
+            name: "Orbiter",
+            category: "Bridge",
+            url: "https://orbiter.finance",
+            description: "Orbiter是一个跨链桥。",
+        },
+        {
+            key: "8",
+            logo: 'https://20178098.fs1.hubspotusercontent-na1.net/hubfs/20178098/ecosystem/okxwallet.png',
+            name: "OKX Wallet",
+            category: "Wallet",
+            url: "https://www.okx.com/cn/web3",
+            description: "OKX Wallet,Web3 的入口。",
+        },
+        {
+            key: "9",
+            logo: 'https://20178098.fs1.hubspotusercontent-na1.net/hubfs/20178098/ecosystem-logo-2/eco-logo-DeBank.png',
+            name: "DeBank",
+            category: "Defi",
+            url: "https://debank.com/",
+            description: "DeBank是一个去中心化的钱包聚合资产平台。",
         }
     ];
 
