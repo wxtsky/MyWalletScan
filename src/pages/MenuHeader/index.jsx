@@ -6,7 +6,6 @@ import './index.css'
 import React from "react";
 import {useTranslation} from "react-i18next";
 import {Select} from 'antd';
-import ZkInfo from "@pages/ZkInfo/index.jsx";
 
 const {Option} = Select;
 

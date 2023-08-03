@@ -30,7 +30,8 @@ export const getStark = async (address) => {
         }
     } catch (e) {
         return {
-            result: "error"
+            result: "error",
+            reason: e.message
         }
     }
 }

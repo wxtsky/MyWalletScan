@@ -1,9 +1,10 @@
 import {useEffect, useState} from "react";
-import {Button, Input, Space, Table, Modal, Form, notification, Spin, Tag, Popconfirm, message} from 'antd';
+import {Button, Input, Space, Table, Modal, Form, notification, Spin, Tag, Popconfirm, message, Tooltip} from 'antd';
 import {Layout, Card} from 'antd';
 import {exportToExcel,} from "@utils"
 import {
-    CheckOutlined,
+    CheckCircleOutlined,
+    CloseCircleOutlined,
     CopyOutlined,
     DeleteOutlined,
     DownloadOutlined,
@@ -105,19 +106,19 @@ const Stark = () => {
                 );
             },
         },
-        {
-            title: "创建时间",
-            dataIndex: ["accountInfo", "deployedTime"],
-            key: " deployedTime",
-            align: "center",
-            render: (text, record) => text ? text : <Spin/>,
-        },
+        // {
+        //     title: "创建时间",
+        //     dataIndex: ["accountInfo", "deployedTime"],
+        //     key: " deployedTime",
+        //     align: "center",
+        //     render: (text, record) => text ? text : <Spin/>,
+        // },
         {
             title: "StarkId",
             dataIndex: ["accountInfo", "starkId"],
             key: "starkId",
             align: "center",
-            render: (text, record) => text ? text : <Spin/>,
+            render: (text, record) => text,
         },
         {
             title: "StarkNet",
@@ -128,42 +129,42 @@ const Stark = () => {
                     dataIndex: ["balance", "ETH"],
                     key: "stark_eth_balance",
                     align: "center",
-                    render: (text, record) => text || text === 0 ? text : <Spin/>, // 0 也是合法值
+                    render: (text, record) => text,
                 },
                 {
                     title: "USDC",
                     dataIndex: ["balance", "USDC"],
                     key: "stark_usdc_balance",
                     align: "center",
-                    render: (text, record) => text || text === 0 ? text : <Spin/>,
+                    render: (text, record) => text,
                 },
                 {
                     title: "USDT",
                     dataIndex: ["balance", "USDT"],
                     key: "stark_usdt_balance",
                     align: "center",
-                    render: (text, record) => text || text === 0 ? text : <Spin/>,
+                    render: (text, record) => text,
                 },
                 {
                     title: "DAI",
                     dataIndex: ["balance", "DAI"],
                     key: "stark_dai_balance",
                     align: "center",
-                    render: (text, record) => text || text === 0 ? text : <Spin/>,
+                    render: (text, record) => text,
                 },
                 {
                     title: "WBTC",
                     dataIndex: ["balance", "WBTC"],
                     key: "stark_wbtc_balance",
                     align: "center",
-                    render: (text, record) => text || text === 0 ? text : <Spin/>,
+                    render: (text, record) => text,
                 },
                 {
                     title: "Tx",
                     dataIndex: "tx",
                     key: "stark_tx_amount",
                     align: "center",
-                    render: (text, record) => text || text === 0 ? text : <Spin/>,
+                    render: (text, record) => text,
                     sorter: (a, b) => a.tx - b.tx,
                 },
                 {
@@ -171,9 +172,8 @@ const Stark = () => {
                     dataIndex: "lastTime",
                     key: "stark_latest_tx",
                     align: "center",
-                    render: (text, record) => text || text === 0 ?
-                        <a href={`https://voyager.online/contract/${record.address}`} target="_blank">{text}</a> :
-                        <Spin/>,
+                    render: (text, record) => <a href={`https://voyager.online/contract/${record.address}`}
+                                                 target="_blank">{text}</a>,
                 },
                 {
                     title: "官方桥Tx",
@@ -183,13 +183,13 @@ const Stark = () => {
                             title: "L1->L2",
                             dataIndex: ["bridge", "DepositTx"],
                             align: "center",
-                            render: (text, record) => text || text === 0 ? text : <Spin/>,
+                            render: (text, record) => text,
                         },
                         {
                             title: "L2->L1",
                             dataIndex: ["bridge", "WithdrawTx"],
                             align: "center",
-                            render: (text, record) => text || text === 0 ? text : <Spin/>,
+                            render: (text, record) => text,
                         },
                     ]
                 },
@@ -201,14 +201,14 @@ const Stark = () => {
                             title: "L1->L2",
                             dataIndex: ["bridge", "DepositVolume"],
                             align: "center",
-                            render: (text, record) => text || text === 0 ? text : <Spin/>,
+                            render: (text, record) => text,
 
                         },
                         {
                             title: "L2->L1",
                             dataIndex: ["bridge", "WithdrawVolume"],
                             align: "center",
-                            render: (text, record) => text || text === 0 ? text : <Spin/>,
+                            render: (text, record) => text,
                         }
                     ]
 
@@ -221,56 +221,74 @@ const Stark = () => {
                             title: "天",
                             dataIndex: ["activity", "dayActivity"],
                             align: "center",
-                            render: (text, record) => text || text === 0 ? text : <Spin/>,
+                            render: (text, record) => text,
                         },
                         {
                             title: "周",
                             dataIndex: ["activity", "weekActivity"],
                             align: "center",
-                            render: (text, record) => text || text === 0 ? text : <Spin/>,
+                            render: (text, record) => text,
                         },
                         {
                             title: "月",
                             dataIndex: ["activity", "monthActivity"],
                             align: "center",
-                            render: (text, record) => text || text === 0 ? text : <Spin/>,
+                            render: (text, record) => text,
                         },
                         {
                             title: "合约",
                             dataIndex: ["activity", "contractActivity"],
                             align: "center",
-                            render: (text, record) => text || text === 0 ? text : <Spin/>,
+                            render: (text, record) => text,
                         },
                         {
                             title: "Vol(U)",
                             dataIndex: "Vol",
                             align: "center",
-                            render: (text, record) => text || text === 0 ? text : <Spin/>,
+                            render: (text, record) => text,
                             sorter: (a, b) => a.Vol - b.Vol,
                         },
                         {
                             title: "fee(E)",
                             dataIndex: "fee",
                             align: "center",
-                            render: (text, record) => text || text === 0 ? text : <Spin/>,
+                            render: (text, record) => text,
                             sorter: (a, b) => a.fee - b.fee,
                         }
                     ]
-
+                },
+                {
+                    title: "状态",
+                    key: "result",
+                    align: "center",
+                    render: (text, record) => (
+                        <Space>
+                            {record['result'] === "success" ?
+                                <Tag icon={<CheckCircleOutlined/>} color="success">成功</Tag> : null}
+                            {record['result'] === "error" ?
+                                <Tooltip title={record['reason']}>
+                                    <Tag icon={<CloseCircleOutlined/>} color="error">失败 </Tag>
+                                </Tooltip> : null}
+                            {record['result'] === "pending" ?
+                                <Tag icon={<SyncOutlined spin/>} color="processing">获取中 </Tag> : null}
+                        </Space>
+                    )
                 },
                 {
                     title: "操作",
                     key: "action",
                     align: "center",
                     render: (text, record) => (
-                        <Space size="small">
+                        <Space>
                             <Popconfirm title={"确认删除？"} onConfirm={() => handleDelete(record.key)}>
                                 <Button icon={<DeleteOutlined/>}/>
                             </Popconfirm>
-                            {/*{record['result'] === "success" ? <Button icon={<CheckOutlined/>} type="primary"/> : null}*/}
+                            <Button icon={<ReloadOutlined/>} onClick={() => {
+                                handleRefresh(record.key)
+                            }}/>
                         </Space>
                     )
-                },
+                }
             ]
         },
     ];
@@ -317,7 +335,6 @@ const Stark = () => {
 
                 const promiseFunction = () => new Promise(async (resolve, reject) => {
                     try {
-                        // add the address into data when it starts to process
                         setData(prevData => {
                             const updatedData = [...prevData];
                             const index = updatedData.findIndex(item => item.address === address);
@@ -325,6 +342,7 @@ const Stark = () => {
                                 const newEntry = {
                                     key: idCounter.toString(),
                                     address: address,
+                                    result: "pending",
                                 };
                                 idCounter++;
                                 updatedData.push(newEntry);
@@ -332,7 +350,6 @@ const Stark = () => {
                             return updatedData;
                         });
                         const response = await getStark(address);
-                        // update the data of the address
                         setData(prevData => {
                             const updatedData = [...prevData];
                             const index = updatedData.findIndex(item => item.address === address);
@@ -358,7 +375,7 @@ const Stark = () => {
             }
             notification.success({
                 message: "成功",
-                description: "批量添加成功",
+                description: "批量添加完成",
                 duration: 1,
             })
         } catch (error) {
@@ -373,8 +390,11 @@ const Stark = () => {
             setBatchLoading(false)
         }
     };
-    const handleRefresh = async () => {
-        if (!selectedKeys.length) {
+    const handleRefresh = async (singleKey) => {
+        console.log(singleKey)
+        const keys = singleKey ? [singleKey] : selectedKeys;
+        console.log(keys)
+        if (!keys.length) {
             notification.error({
                 message: "错误",
                 description: "请先选择要刷新的地址",
@@ -397,7 +417,7 @@ const Stark = () => {
                     });
                 }
             };
-            for (let key of selectedKeys) {
+            for (let key of keys) {
                 const index = data.findIndex(item => item.key === key);
                 if (index !== -1) {
                     const promiseFunction = () => new Promise(async (resolve, reject) => {
@@ -406,7 +426,11 @@ const Stark = () => {
                                 const updatedData = [...prevData];
                                 for (let field in updatedData[index]) {
                                     if (field !== 'address' && field !== 'name' && field !== 'key') {
-                                        updatedData[index][field] = null;
+                                        if (field === "result") {
+                                            updatedData[index][field] = "pending";
+                                        } else {
+                                            updatedData[index][field] = null;
+                                        }
                                     }
                                 }
                                 return updatedData;
@@ -447,7 +471,9 @@ const Stark = () => {
             });
         } finally {
             setIsLoading(false);
-            setSelectedKeys([]);
+            if (!singleKey) {
+                setSelectedKeys([]);
+            }
         }
     };
 
@@ -533,7 +559,7 @@ const Stark = () => {
                             }} size={"large"} style={{width: "25%"}} icon={<UploadOutlined/>} loading={batchLoading}>
                                 {batchLoading ? "添加中..." : "添加地址"}
                             </Button>
-                            <Button type="primary" onClick={handleRefresh} loading={isLoading} size={"large"}
+                            <Button type="primary" onClick={() => handleRefresh()} loading={isLoading} size={"large"}
                                     style={{width: "25%"}}
                                     icon={<SyncOutlined/>}>
                                 刷新选中地址

@@ -44,7 +44,6 @@ const TotalDataChart = ({data, change_7d, change_1d, onRefresh, isLoading}) => {
 }
 
 const StarkVol = () => {
-    const [data, setData] = useState([]);
     const [totalDataChart, setTotalDataChart] = useState([]);
     const [change_1d, setChange_1d] = useState(0);
     const [change_7d, setChange_7d] = useState(0);
