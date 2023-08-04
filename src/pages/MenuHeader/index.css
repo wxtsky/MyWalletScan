@@ -1,16 +1,15 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap');
 
 .custom-menu {
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Roboto Mono', monospace;
 }
 
-/* 初始化菜单项样式 */
 .custom-menu .ant-menu-item {
+    border-bottom: none !important;
     color: #333;
     position: relative;
 }
 
-/* 创建下划线并隐藏 */
 .custom-menu .ant-menu-item::before {
     content: "";
     position: absolute;
@@ -22,25 +21,27 @@
     transition: all 0.3s;
 }
 
-/* 悬停或选中时显示并展开下划线 */
 .custom-menu .ant-menu-item:hover::before,
 .custom-menu .ant-menu-item-selected::before {
     width: 100%;
     left: 0;
 }
 
-/* 初始化链接样式 */
 .custom-menu .ant-menu-item a {
     color: #333;
 }
 
-/* 悬停或选中时改变链接颜色 */
 .custom-menu .ant-menu-item a:hover,
 .custom-menu .ant-menu-item-selected a {
     color: #1890ff;
 }
 
+.custom-menu .ant-menu-item::after,
+.custom-menu .ant-menu-item-selected::after,
+.custom-menu .ant-menu-item:hover::after {
+    content: none !important;
+}
+
 .custom-menu .ant-menu-item::before {
     height: 1px;
-    /* 其他样式 */
 }

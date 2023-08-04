@@ -13,6 +13,7 @@ import {Velocore} from "@utils/getZksyncData/procotols/velocore.js";
 import {ZkSyncEraPortal} from "@utils/getZksyncData/procotols/zksynceraportal.js";
 import {ZkSyncId} from "@utils/getZksyncData/procotols/zksyncid.js";
 import {ZkSyncNameService} from "@utils/getZksyncData/procotols/zksyncnameservices.js";
+import {dbConfig, initDB, update} from "@utils/indexedDB/main.js";
 
 export const getPrtocol = async (transactions, address) => {
     const syncSwap = SyncSwap.getProtocolsState(transactions, address);
@@ -30,9 +31,7 @@ export const getPrtocol = async (transactions, address) => {
     const zksyncportal = ZkSyncEraPortal.getProtocolsState(transactions, address);
     const zksyncid = ZkSyncId.getProtocolsState(transactions, address);
     const zksyncnameservices = ZkSyncNameService.getProtocolsState(transactions, address);
-
-    // 使用 Promise.all 并行执行所有的异步操作
-    return await Promise.all([
+    const result = await Promise.all([
         syncSwap,
         goal3,
         holdstation,
@@ -49,5 +48,10 @@ export const getPrtocol = async (transactions, address) => {
         zksyncid,
         zksyncnameservices
     ]);
+    await initDB(dbConfig)
+    await update("zkProtocol", {
+        address: address,
+        data: JSON.stringify(result)
+    })
 }
 

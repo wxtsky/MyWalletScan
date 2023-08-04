@@ -1,5 +1,6 @@
 import axios from 'axios';
 import {getEthPrice} from "@utils";
+import {dbConfig, initDB, update} from "@utils/indexedDB/main.js";
 
 
 const getAllTransfers = async (address) => {
@@ -100,25 +101,13 @@ export const getTransactionsList = async (address) => {
     });
 
     await assignTransferValues(transactions);
-    const localTransactions = JSON.parse(localStorage.getItem('zkSync_transactions'));
-    if (localTransactions === null) {
-        localStorage.setItem('zkSync_transactions', JSON.stringify([{
-            address: address,
-            transactions: transactions
-        }]))
-        return transactions;
-    } else {
-        const index = localTransactions.findIndex((item) => item.address === address);
-        if (index === -1) {
-            localTransactions.push({
-                address: address,
-                transactions: transactions
-            })
-        } else {
-            localTransactions[index].transactions = transactions;
-        }
-        localStorage.setItem('zkSync_transactions', JSON.stringify(localTransactions));
-    }
+
+    await initDB(dbConfig)
+    await update("zkTransactions", {
+        address: address,
+        data: JSON.stringify(transactions)
+    })
+
     return transactions;
 };
 

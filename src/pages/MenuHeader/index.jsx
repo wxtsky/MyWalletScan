@@ -6,6 +6,7 @@ import './index.css'
 import React from "react";
 import {useTranslation} from "react-i18next";
 import {Select} from 'antd';
+import initPage from "@utils/initPage.js";
 
 const {Option} = Select;
 
@@ -73,7 +74,6 @@ const MenuHeader = () => {
             key: 'languageSwitch',
         },
     ];
-
     const navigate = useNavigate();
     const location = useLocation();
     const [current, setCurrent] = useState(location.pathname.replace('/', '') || 'zksync');
@@ -85,7 +85,9 @@ const MenuHeader = () => {
 
         setCurrent(e.key);
     };
-
+    useEffect(() => {
+        initPage();
+    }, []);
     useEffect(() => {
         if (location.pathname.replace('/', '') === 'twitter' || location.pathname.replace('/', '') === 'github') {
             return;

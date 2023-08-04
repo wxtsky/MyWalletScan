@@ -25,8 +25,8 @@ export default {
         operation: "操作",
         config: "配置",
         add_address: "添加地址",
-        batch_add_address: "批量添加地址",
-        adding: "添加中 进度",
+        batch_add_address: "添加地址",
+        adding: "添加中",
         refresh_selected_address: "刷新选中地址",
         refreshing: "正在刷新",
         confirm_delete: "确认删除",
@@ -40,12 +40,9 @@ export default {
         tip2: "在您使用生态应用时，请仔细核对链接，一切造成的损失由您自行承担",
         close: "关闭",
         ecosystem: "生态应用",
-        //请输入地址，每行一个
         zk_msg: "请输入地址，每行一个",
-        //请输入地址
         zk_msg2: "请输入地址",
         cancel: "取消",
-        //设置钱包预期标准，若钱包达到设置标准，钱包地址背景会为蓝色，更清晰
         zk_msg3: "设置钱包预期标准，若钱包达到设置标准，钱包地址背景会为蓝色，更清晰",
         secondsAgo: "{{count}} 秒前",
         minutesAgo: "{{count}} 分前",

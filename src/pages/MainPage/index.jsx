@@ -8,8 +8,10 @@ import Coffee from "@pages/Coffee/index.jsx";
 import ZkInfo from "@pages/ZkInfo/index.jsx";
 import StarkInfo from "@pages/StarkInfo/index.jsx";
 
+
 function MainPage() {
     const location = useLocation()
+
     return (
         <div
             style={{
@@ -32,6 +34,7 @@ function MainPage() {
                             backgroundColor: "#fff",
                             borderBottom: "1px solid #e8e8e8",
                             boxShadow: "0 2px 8px rgba(0, 0, 0, 0.06)",
+                            zIndex: 3,
                         }}
                     />
                 </div>

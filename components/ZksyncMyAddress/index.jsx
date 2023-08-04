@@ -1,12 +1,10 @@
 import {useState, useEffect, useRef} from "react";
 import {Card, Col, Row, Select} from "antd";
 import moment from "moment";
-import {Area, Column, Line} from '@antv/g2plot';
+import {Area, Column} from '@antv/g2plot';
 import {getEthPrice} from "@utils";
+import {dbConfig, get, getAllKeys, initDB} from "@utils/indexedDB/main.js";
 
-const getLocalStorage = (key) => {
-    return JSON.parse(localStorage.getItem(key));
-}
 
 const createDateRange = (start, end) => {
     let currentDate = moment(start).startOf('day');
@@ -227,10 +225,8 @@ const CumulativeVolume = ({transactions}) => {
                     },
                 }
             });
-
             chart.render();
         }
-
         return () => {
             if (containerRef.current) {
                 containerRef.current.innerHTML = '';
@@ -245,24 +241,32 @@ const CumulativeVolume = ({transactions}) => {
     );
 };
 
-
+const getZkSyncAllAddress = async () => {
+    await initDB(dbConfig)
+    const addresses = await getAllKeys("zkTransactions")
+    return addresses || []
+}
+const getAddressTranscation = async (address) => {
+    await initDB(dbConfig)
+    const transactions = await get("zkTransactions", address)
+    const transactionsData = transactions.data ? JSON.parse(transactions.data) : []
+    return transactionsData || []
+}
 const ZksyncMyAddress = () => {
-    const [address, setAddress] = useState({})
+    const [address, setAddress] = useState([])
     const [selectAddress, setSelectAddress] = useState('')
+    const [transactions, setTransactions] = useState([])
     const [ethPrice, setEthPrice] = useState(0)
     useEffect(() => {
         getEthPrice().then((res) => {
             setEthPrice(Number(res))
         })
-        const addressesInfo = getLocalStorage('zkSync_transactions') || [];
-        addressesInfo.forEach((item) => {
-            setAddress((prev) => {
-                    return {...prev, [item.address]: item.transactions}
-                }
-            )
-        })
     }, [])
-
+    useEffect(() => {
+        getZkSyncAllAddress().then((res) => {
+            setAddress(res)
+        })
+    }, []);
     return (
         <div>
             <Select
@@ -273,23 +277,32 @@ const ZksyncMyAddress = () => {
                 }}
                 onChange={(value) => {
                     setSelectAddress(value)
+                    getAddressTranscation(value).then((res) => {
+                        setTransactions(res)
+                    })
                 }}
-                options={Object.keys(address).map((item) => {
-                    return {label: item, value: item}
-                })}
+                notFoundContent={"暂无数据,请先刷新您的zkSync获取数据"}
+                options={
+                    address.map((item) => {
+                        return {
+                            value: item,
+                            label: item
+                        }
+                    })
+                }
             />
             <Row gutter={16} style={{marginTop: 20}}>
                 <Col xs={24} md={12}>
-                    {selectAddress && <DailyTransaction transactions={address[selectAddress]} ethPrice={ethPrice}/>}
+                    {selectAddress && <DailyTransaction transactions={transactions} ethPrice={ethPrice}/>}
                 </Col>
                 <Col xs={24} md={12}>
-                    {selectAddress && <CumulativeGasFee transactions={address[selectAddress]} ethPrice={ethPrice}/>}
+                    {selectAddress && <CumulativeGasFee transactions={transactions} ethPrice={ethPrice}/>}
                 </Col>
                 <Col xs={24} md={12}>
-                    {selectAddress && <DailyTransactions transactions={address[selectAddress]}/>}
+                    {selectAddress && <DailyTransactions transactions={transactions}/>}
                 </Col>
                 <Col xs={24} md={12}>
-                    {selectAddress && <CumulativeVolume transactions={address[selectAddress]}/>}
+                    {selectAddress && <CumulativeVolume transactions={transactions}/>}
                 </Col>
             </Row>
         </div>

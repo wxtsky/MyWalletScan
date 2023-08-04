@@ -28,13 +28,13 @@ const ZkInfo = () => {
         }
     ]
     return (
-        <>
+        <div style={{padding: '0 20px'}}>
             <Tabs
                 defaultActiveKey="ZksyncTvl"
                 centered
                 items={Items}
             />
-        </>
+        </div>
     )
 }
 export default ZkInfo;

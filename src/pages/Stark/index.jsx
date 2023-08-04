@@ -15,6 +15,7 @@ import {
 import {getStark} from "@utils/stark/main.js";
 import './index.css'
 import copy from "copy-to-clipboard";
+import deleteData from "@utils/indexedDB/deleteData.js";
 
 const {TextArea} = Input;
 const {Content} = Layout;
@@ -26,7 +27,7 @@ const Stark = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [selectedKeys, setSelectedKeys] = useState([]);
     const [tableLoading, setTableLoading] = useState(false);
-    let idCounter = data.length;
+    let idCounter = data.length + 1;
     useEffect(() => {
         setTableLoading(true)
         const storedAddresses = localStorage.getItem('stark_addresses');
@@ -40,6 +41,12 @@ const Stark = () => {
     useEffect(() => {
         localStorage.setItem('stark_addresses', JSON.stringify(data));
     }, [data]);
+    useEffect(() => {
+        const items = localStorage.getItem('stark_transactions');
+        if (items) {
+            localStorage.removeItem('stark_transactions');
+        }
+    }, []);
     const columns = [
         {
             title: "#",
@@ -106,13 +113,6 @@ const Stark = () => {
                 );
             },
         },
-        // {
-        //     title: "创建时间",
-        //     dataIndex: ["accountInfo", "deployedTime"],
-        //     key: " deployedTime",
-        //     align: "center",
-        //     render: (text, record) => text ? text : <Spin/>,
-        // },
         {
             title: "StarkId",
             dataIndex: ["accountInfo", "starkId"],
@@ -280,7 +280,9 @@ const Stark = () => {
                     align: "center",
                     render: (text, record) => (
                         <Space>
-                            <Popconfirm title={"确认删除？"} onConfirm={() => handleDelete(record.key)}>
+                            <Popconfirm title={"确认删除？"} onConfirm={async () => {
+                                await handleDelete(record.address)
+                            }}>
                                 <Button icon={<DeleteOutlined/>}/>
                             </Popconfirm>
                             <Button icon={<ReloadOutlined/>} onClick={() => {
@@ -292,9 +294,10 @@ const Stark = () => {
             ]
         },
     ];
-    const handleDelete = (key) => {
-        setData(data.filter(item => item.key !== key));
-        localStorage.setItem('stark_addresses', JSON.stringify(data.filter(item => item.key !== key)));
+    const handleDelete = async (address) => {
+        setData(data.filter(item => item.address !== address));
+        localStorage.setItem('stark_addresses', JSON.stringify(data.filter(item => item.address !== address)));
+        await deleteData("starkTransactions", [address]);
     }
     const handleBatchOk = async () => {
         try {
@@ -391,9 +394,7 @@ const Stark = () => {
         }
     };
     const handleRefresh = async (singleKey) => {
-        console.log(singleKey)
         const keys = singleKey ? [singleKey] : selectedKeys;
-        console.log(keys)
         if (!keys.length) {
             notification.error({
                 message: "错误",
@@ -477,7 +478,7 @@ const Stark = () => {
         }
     };
 
-    const handleDeleteSelected = () => {
+    const handleDeleteSelected = async () => {
         if (!selectedKeys.length) {
             notification.error({
                 message: "错误",
@@ -486,6 +487,8 @@ const Stark = () => {
             });
             return;
         }
+        const addresses = data.filter(item => selectedKeys.includes(item.key)).map(item => item.address);
+        await deleteData("starkTransactions", addresses);
         setData(data.filter(item => !selectedKeys.includes(item.key)));
         localStorage.setItem('stark_addresses', JSON.stringify(data.filter(item => !selectedKeys.includes(item.key))));
         setSelectedKeys([]);
@@ -565,7 +568,9 @@ const Stark = () => {
                                 刷新选中地址
                             </Button>
                             <Popconfirm title={"确认删除" + selectedKeys.length + "个地址？"}
-                                        onConfirm={handleDeleteSelected}>
+                                        onConfirm={async () => {
+                                            await handleDeleteSelected()
+                                        }}>
                                 <Button type="primary" danger size={"large"}
                                         style={{width: "25%"}}
                                         icon={<DeleteOutlined/>}>
