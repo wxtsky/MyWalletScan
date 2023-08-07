@@ -46,6 +46,10 @@ const MenuHeader = () => {
             key: 'stark_info',
         },
         {
+            label: "Linea",
+            key: 'linea',
+        },
+        {
             label: 'LayerZero',
             key: 'layer',
         },

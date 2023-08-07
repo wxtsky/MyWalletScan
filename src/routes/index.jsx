@@ -3,6 +3,7 @@ import React, {Suspense} from "react";
 
 import {Navigate, useRoutes} from "react-router-dom";
 import StarkInfo from "@pages/StarkInfo/index.jsx";
+import Linea from "@pages/Linea/index.jsx";
 
 const Zksync = React.lazy(() => import("@pages/Zksync"));
 const MainPage = React.lazy(() => import("@pages/MainPage"));
@@ -29,6 +30,10 @@ const router = [
             {
                 path: '/stark_info',
                 element: <StarkInfo/>
+            },
+            {
+                path: '/linea',
+                element: <Linea/>
             },
             {
                 path: '/Layer',

@@ -1,0 +1,31 @@
+.ant-table-small .ant-table-cell,
+.ant-table-small .ant-table-thead > tr > th {
+    padding: 4px 8px;
+    font-size: 14px;
+}
+
+.ant-table-small .ant-table-row {
+    line-height: 1.2;
+}
+
+.ant-table-thead > tr > th.stark_cross_tx {
+    background-color: #5bc0de;
+    color: white;
+}
+
+.ant-table-thead > tr > th.stark_cross_amount {
+    background-color: #4e9ed4;
+    color: white;
+}
+
+.ant-table-thead > tr > th.stark_activity {
+    background-color: #03b3ff;
+    color: white;
+}
+
+.stark_footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    z-index: 2;
+}

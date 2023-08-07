@@ -7,6 +7,7 @@ import Layer from "@pages/Layer/index.jsx";
 import Coffee from "@pages/Coffee/index.jsx";
 import ZkInfo from "@pages/ZkInfo/index.jsx";
 import StarkInfo from "@pages/StarkInfo/index.jsx";
+import Linea from "@pages/Linea/index.jsx";
 
 
 function MainPage() {
@@ -51,6 +52,7 @@ function MainPage() {
                         {location.pathname === '/zk_info' && <ZkInfo/>}
                         {location.pathname === "/stark" && <Stark/>}
                         {location.pathname === "/stark_info" && <StarkInfo/>}
+                        {location.pathname === "/linea" && <Linea/>}
                         {location.pathname === "/layer" && <Layer/>}
                         {location.pathname === "/coffee" && <Coffee/>}
                     </div>
