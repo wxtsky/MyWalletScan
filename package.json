@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@ant-design/icons": "^5.0.1",
+    "@ant-design/pro-components": "^2.6.11",
     "@antv/g2": "^4.2.10",
     "@antv/g2plot": "^2.4.31",
     "antd": "^5.4.6",

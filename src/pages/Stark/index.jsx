@@ -28,25 +28,29 @@ const Stark = () => {
     const [selectedKeys, setSelectedKeys] = useState([]);
     const [tableLoading, setTableLoading] = useState(false);
     let idCounter = data.length + 1;
+    const [initialized, setInitialized] = useState(false);
+
     useEffect(() => {
-        setTableLoading(true)
+        setTableLoading(true);
+
         const storedAddresses = localStorage.getItem('stark_addresses');
         setTimeout(() => {
             setTableLoading(false);
         }, 500);
+
         if (storedAddresses) {
             setData(JSON.parse(storedAddresses));
         }
+
+        setInitialized(true);
     }, []);
+
     useEffect(() => {
+        if (!initialized) return;
+
         localStorage.setItem('stark_addresses', JSON.stringify(data));
-    }, [data]);
-    useEffect(() => {
-        const items = localStorage.getItem('stark_transactions');
-        if (items) {
-            localStorage.removeItem('stark_transactions');
-        }
-    }, []);
+    }, [data, initialized]);
+
     const columns = [
         {
             title: "#",
@@ -369,7 +373,6 @@ const Stark = () => {
                         reject(error);
                     }
                 });
-
                 promisesQueue.push(promiseFunction);
             }
             processQueue();

@@ -47,7 +47,28 @@ function Zksync() {
     const [tableLoading, setTableLoading] = useState(false);
     const [showAddressDetailModal, setShowAddressDetailModal] = useState(null);
     const [addressDetail, setAddressDetail] = useState(null);
+    const [initialized, setInitialized] = useState(false);
     let idCounter = data.length + 1;
+    useEffect(() => {
+        setTableLoading(true);
+
+        const storedAddresses = localStorage.getItem('addresses');
+        setTimeout(() => {
+            setTableLoading(false);
+        }, 500);
+
+        if (storedAddresses) {
+            setData(JSON.parse(storedAddresses));
+        }
+
+        setInitialized(true);
+    }, []);
+
+    useEffect(() => {
+        if (!initialized) return;
+
+        localStorage.setItem('addresses', JSON.stringify(data));
+    }, [data, initialized]);
     const handleRefresh = async (singleKey) => {
         const keys = singleKey ? [singleKey] : selectedKeys;
         if (!keys.length) {
@@ -132,19 +153,7 @@ function Zksync() {
             }
         }
     };
-    useEffect(() => {
-        setTableLoading(true);
-        const storedAddresses = localStorage.getItem('addresses');
-        setTimeout(() => {
-            setTableLoading(false);
-        }, 500);
-        if (storedAddresses) {
-            setData(JSON.parse(storedAddresses));
-        }
-    }, []);
-    useEffect(() => {
-        localStorage.setItem('addresses', JSON.stringify(data));
-    }, [data]);
+
     const handleBatchOk = async () => {
         try {
             setBatchLoading(true);

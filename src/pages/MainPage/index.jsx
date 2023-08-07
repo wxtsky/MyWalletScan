@@ -11,7 +11,6 @@ import StarkInfo from "@pages/StarkInfo/index.jsx";
 
 function MainPage() {
     const location = useLocation()
-
     return (
         <div
             style={{
