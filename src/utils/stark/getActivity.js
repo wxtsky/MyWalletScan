@@ -7,14 +7,28 @@ const getWeekNumber = (date) => {
 
     return `${year}-${weekIndex}`;
 };
-const countAllTransactionPeriods = (address, transfers) => {
+
+
+const formatCallData = (callData) => {
+    let result = "";
+    if (!callData) return result;
+    for (let i = 0; i < callData.length; i++) {
+        console.log(callData[i].length)
+        if (!callData[i]) continue;
+        if (callData[i].length === 66 || callData[i].length === 64 || callData[i].length === 65) {
+            result = callData[i];
+            break;
+        }
+    }
+    return result;
+}
+const countAllTransactionPeriods = (address, transcations) => {
     const uniqueDays = new Set();
     const uniqueWeeks = new Set();
     const uniqueMonths = new Set();
     const uniqueContracts = new Set();
-    transfers.forEach((transfer) => {
-        if (transfer.transfer_from_address.toLowerCase() !== address.toLowerCase()) return;
-        const timestamp = new Date(transfer.timestamp * 1000);
+    transcations.forEach((transcation) => {
+        const timestamp = new Date(transcation.timestamp * 1000);
         const year = timestamp.getFullYear();
         const month = timestamp.getMonth();
         const day = timestamp.getDate();
@@ -23,7 +37,10 @@ const countAllTransactionPeriods = (address, transfers) => {
         uniqueDays.add(`${year}-${month}-${day}`);
         uniqueWeeks.add(`${year}-${week}`);
         uniqueMonths.add(`${year}-${month}`);
-        uniqueContracts.add(transfer.transfer_to_address);
+        const contract = formatCallData(transcation.calldata)
+        if (contract) {
+            uniqueContracts.add(contract);
+        }
     });
     return {
         dayActivity: uniqueDays.size,
@@ -33,8 +50,8 @@ const countAllTransactionPeriods = (address, transfers) => {
     };
 };
 
-export default function getActivity(address, transfers) {
-    if (transfers.length === 0) return {
+export default function getActivity(address, transcations) {
+    if (transcations.length === 0) return {
         dayActivity: 0,
         weekActivity: 0,
         monthActivity: 0,
@@ -45,7 +62,7 @@ export default function getActivity(address, transfers) {
         weekActivity,
         monthActivity,
         contractActivity
-    } = countAllTransactionPeriods(address, transfers);
+    } = countAllTransactionPeriods(address, transcations);
     return {
         dayActivity,
         weekActivity,

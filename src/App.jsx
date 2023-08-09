@@ -36,7 +36,7 @@ function App() {
     return (
         <ConfigProvider locale={locale}>
             <div className="App">
-                <WrapperRouter/>
+                    <WrapperRouter/>
             </div>
         </ConfigProvider>
     )

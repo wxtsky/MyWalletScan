@@ -14,7 +14,7 @@ export const getStark = async (address) => {
         const result = await getTransactions(address);
         const transactions = result['transactions'];
         const transfers = result['transfers'];
-        const activity = getActivity(address, transfers)
+        const activity = getActivity(address, transactions)
         const {tx, lastTime, fee} = await getTxAndFee(transactions);
         const balance = await getBalance(address);
         const bridge = getBridge(transfers)

@@ -1,17 +1,8 @@
 import MenuHeader from "@pages/MenuHeader/index.jsx";
-import Zksync from "@pages/Zksync/index.jsx";
-import {useLocation} from "react-router-dom";
-import Stark from "@pages/Stark/index.jsx";
+import {Outlet} from "react-router-dom";
 import {Layout} from "antd";
-import Layer from "@pages/Layer/index.jsx";
-import Coffee from "@pages/Coffee/index.jsx";
-import ZkInfo from "@pages/ZkInfo/index.jsx";
-import StarkInfo from "@pages/StarkInfo/index.jsx";
-import Linea from "@pages/Linea/index.jsx";
-
 
 function MainPage() {
-    const location = useLocation()
     return (
         <div
             style={{
@@ -19,7 +10,6 @@ function MainPage() {
                 minHeight: "100vh",
             }}
         >
-            {/*<Notice message={"Stark功能已更新。"}/>*/}
             <Layout>
                 <div
                     style={{
@@ -47,14 +37,7 @@ function MainPage() {
                     }}
                 >
                     <div>
-                        {location.pathname === "/" && <Zksync/>}
-                        {location.pathname === "/zksync" && <Zksync/>}
-                        {location.pathname === '/zk_info' && <ZkInfo/>}
-                        {location.pathname === "/stark" && <Stark/>}
-                        {location.pathname === "/stark_info" && <StarkInfo/>}
-                        {location.pathname === "/linea" && <Linea/>}
-                        {location.pathname === "/layer" && <Layer/>}
-                        {location.pathname === "/coffee" && <Coffee/>}
+                        <Outlet/>
                     </div>
                 </div>
             </Layout>

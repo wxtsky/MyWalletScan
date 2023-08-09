@@ -13,6 +13,7 @@
     "@ant-design/pro-components": "^2.6.11",
     "@antv/g2": "^4.2.10",
     "@antv/g2plot": "^2.4.31",
+    "@emotion/css": "^11.11.2",
     "antd": "^5.4.6",
     "axios": "^1.4.0",
     "copy-to-clipboard": "^3.3.3",

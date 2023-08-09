@@ -10,6 +10,8 @@ async function fetchTransactions(url, Json_data, headers) {
             initiator_address,
             initiator_identifier,
             nonce,
+            calldata,
+            main_calls,
             timestamp,
             transaction_hash,
         } = item['node'];
@@ -18,6 +20,8 @@ async function fetchTransactions(url, Json_data, headers) {
             initiator_address,
             initiator_identifier,
             nonce,
+            calldata,
+            main_calls,
             timestamp,
             transaction_hash,
             transfers: []
