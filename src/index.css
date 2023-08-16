@@ -1,0 +1,12 @@
+.ant-table-small .ant-table-cell,
+.ant-table-small .ant-table-thead > tr > th {
+    font-size: 14px;
+}
+
+.ant-table-small .ant-table-row {
+    line-height: 1.2;
+}
+
+.ant-table {
+    font-weight: 600;
+}

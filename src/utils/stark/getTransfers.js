@@ -55,11 +55,10 @@ export async function getTransfers(address) {
             'after': null,
             'input': {
                 'transfer_from_or_to_address': address,
-                'call_invocation_type': 'FUNCTION',
                 'sort_by': 'timestamp',
-                'order_by': 'desc'
-            }
-        }
+                'order_by': 'desc',
+            },
+        },
     }
     let allTransfers = [];
     let results = await fetchTransfers(url, Json_data, headers);

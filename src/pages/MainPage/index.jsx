@@ -2,6 +2,7 @@ import MenuHeader from "@pages/MenuHeader/index.jsx";
 import {Outlet} from "react-router-dom";
 import {Layout} from "antd";
 
+
 function MainPage() {
     return (
         <div

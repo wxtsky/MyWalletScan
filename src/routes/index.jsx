@@ -11,6 +11,7 @@ const Stark = React.lazy(() => import("@pages/Stark"));
 const Layer = React.lazy(() => import("@pages/Layer"));
 const Coffee = React.lazy(() => import("@pages/Coffee"));
 const ZkInfo = React.lazy(() => import("@pages/ZkInfo"));
+const Setting = React.lazy(() => import("@pages/Setting"));
 const router = [
     {
         path: '/', element: <MainPage/>,
@@ -43,6 +44,10 @@ const router = [
                 path: '/coffee',
                 element: <Coffee/>,
             },
+            {
+                path: '/setting',
+                element: <Setting/>
+            }
         ]
     },
     {path: "*", element: <Navigate to="/"/>},

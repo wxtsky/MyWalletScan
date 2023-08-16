@@ -8,7 +8,7 @@ import {
     notification,
     Spin,
     Tag,
-    Popconfirm, Tooltip
+    Popconfirm, Tooltip, Checkbox
 } from 'antd';
 import {exportToExcel} from "@utils"
 import {useEffect, useState} from "react";
@@ -48,7 +48,14 @@ function Zksync() {
     const [showAddressDetailModal, setShowAddressDetailModal] = useState(null);
     const [addressDetail, setAddressDetail] = useState(null);
     const [initialized, setInitialized] = useState(false);
+    const [isGetTustalabsData, setIsGetTustalabsData] = useState(true);
     let idCounter = data.length + 1;
+    useEffect(() => {
+        const storedIsGetTustalabsData = localStorage.getItem('isGetTustalabsData');
+        if (storedIsGetTustalabsData) {
+            setIsGetTustalabsData(storedIsGetTustalabsData === 'true');
+        }
+    }, []);
     useEffect(() => {
         setTableLoading(true);
 
@@ -113,7 +120,7 @@ function Zksync() {
                                 return updatedData;
                             });
 
-                            const response = await getAllZksSyncData(data[index].address);
+                            const response = await getAllZksSyncData(data[index].address, isGetTustalabsData);
                             setData(prevData => {
                                 const updatedData = [...prevData];
                                 updatedData[index] = {
@@ -141,6 +148,7 @@ function Zksync() {
                 duration: 1,
             });
         } catch (error) {
+            s
             notification.error({
                 message: t('zk_error'),
                 description: error.message,
@@ -203,7 +211,7 @@ function Zksync() {
                             }
                             return updatedData;
                         });
-                        const response = await getAllZksSyncData(address);
+                        const response = await getAllZksSyncData(address, isGetTustalabsData);
                         setData(prevData => {
                             const updatedData = [...prevData];
                             const index = updatedData.findIndex(item => item.address === address);
@@ -290,10 +298,10 @@ function Zksync() {
     const handleBatchCancel = () => {
         setIsBatchModalVisible(false);
     };
-    const [editingKey, setEditingKey] = useState(null);
     const getProtocol = async (address) => {
         await initDB(dbConfig)
         const protocol = await get("zkProtocol", address);
+        console.log(protocol)
         const protocolData = protocol.data ? JSON.parse(protocol.data) : [];
         return {address: address, protocols: protocolData} || {address: address, protocols: []};
     }
@@ -310,28 +318,36 @@ function Zksync() {
             key: "name",
             align: "center",
             render: (text, record) => {
-                const isEditing = record.key === editingKey;
-                return isEditing ? (
-                    <Input
-                        placeholder={t("notes_placeholder")}
-                        defaultValue={text}
-                        onPressEnter={(e) => {
-                            record.name = e.target.value;
+                const displayText = text || <EditOutlined/>;
+                return (
+                    <Popconfirm
+                        title={
+                            <div>
+                                <Input
+                                    placeholder={"请输入备注"}
+                                    defaultValue={text}
+                                    onChange={(e) => {
+                                        record.name = e.target.value
+                                    }}
+                                    allowClear
+                                    bordered
+                                />
+                            </div>
+                        }
+                        icon={<EditOutlined/>}
+                        onConfirm={() => {
                             setData([...data]);
                             localStorage.setItem('addresses', JSON.stringify(data));
-                            setEditingKey(null);
                         }}
-                    />
-                ) : (
-                    <>
-                        <Tag color="blue">{text}</Tag>
-                        <Button
-                            shape="circle"
-                            icon={<EditOutlined/>}
-                            size={"small"}
-                            onClick={() => setEditingKey(record.key)}
-                        />
-                    </>
+                        onCancel={() => {
+                        }}
+                        okText={"确定"}
+                        cancelText={"取消"}
+                    >
+                        <Tag color="blue" style={{cursor: "pointer"}}>
+                            {displayText}
+                        </Tag>
+                    </Popconfirm>
                 );
             },
         },
@@ -393,7 +409,7 @@ function Zksync() {
                     key: "zks1_tx_amount",
                     align: "center",
                     render: (text, record) => (text),
-                    sorter: (a, b) => a.zks1_tx_amount - b.zks1_tx_amount,
+                    sorter: (a, b) => a.zksLiteBalance.zks1_tx_amount - b.zksLiteBalance.zks1_tx_amount,
                 },
                 {
                     title: t('last_tx'),
@@ -430,7 +446,7 @@ function Zksync() {
                     key: "zks2_tx_amount",
                     align: "center",
                     render: (text, record) => (text),
-                    sorter: (a, b) => a.zks2_tx_amount - b.zks2_tx_amount,
+                    sorter: (a, b) => a.zksEraBalance.zks2_tx_amount - b.zksEraBalance.zks2_tx_amount,
                 },
                 {
                     title: t("last_tx"),
@@ -533,7 +549,48 @@ function Zksync() {
             ],
         },
         {
-            title: "状态",
+            title: (
+                <span>
+                    <Space>
+                    <span>Trustalabs</span>
+                    <Checkbox
+                        checked={isGetTustalabsData}
+                        onChange={(e) => {
+                            setIsGetTustalabsData(e.target.checked);
+                            localStorage.setItem('isGetTustalabsData', e.target.checked);
+                        }}/>
+                        </Space>
+                </span>
+            ),
+            key: 'trustData',
+            className: "trustData",
+            children: [
+                {
+                    title: t('score'),
+                    key: 'score',
+                    dataIndex: ['trustData', 'score'],
+                    align: 'center',
+                    sorter: (a, b) => a.trustData.score - b.trustData.score,
+                },
+                {
+                    title: t('rank'),
+                    key: 'rank',
+                    dataIndex: ['trustData', 'rank'],
+                    align: 'center',
+                    sorter: (a, b) => a.trustData.rank - b.trustData.rank,
+                },
+                {
+                    title: 'Top',
+                    key: 'top',
+                    dataIndex: ['trustData', 'top'],
+                    align: 'center',
+                    render: (text, record) => (text !== "-" && text ? text.toString() + "%" : text),
+                    sorter: (a, b) => a.trustData.top - b.trustData.top,
+                }
+            ]
+        },
+        {
+            title: t("state"),
             key: "result",
             align: "center",
             render: (text, record) => (
@@ -600,7 +657,7 @@ function Zksync() {
             title: 'tx',
             dataIndex: 'interactions',
             key: 'interactions',
-            sorter: (a, b) => a.volume - b.volume,
+            sorter: (a, b) => a.interactions - b.interactions,
             align: 'center',
         },
         {
@@ -658,7 +715,7 @@ function Zksync() {
                     </Form>
                 </Modal>
                 <div style={{marginBottom: "50px"}}>
-                    <Spin spinning={tableLoading} size={"large"}>
+                    <Spin spinning={tableLoading} size={"small"}>
                         <Table
                             rowKey={record => record.key}
                             rowSelection={rowSelection}
@@ -713,20 +770,6 @@ function Zksync() {
                             <Button type="primary" icon={<DownloadOutlined/>} size={"large"}
                                     style={{width: "8%"}}
                                     onClick={exportToExcelFile}/>
-                            {/*<Popconfirm*/}
-                            {/*    title="您即将备份数据到本地，包括zkSync，stark，l0,将会下载一个json文件，里面包括您的地址和地址备注信息。"*/}
-                            {/*    onConfirm={() => {*/}
-                            {/*        backupData()*/}
-                            {/*    }}>*/}
-                            {/*    <Button type="primary" icon={<DownloadOutlined/>} size={"large"} style={{width: "8%"}}>*/}
-                            {/*        备份数据*/}
-                            {/*    </Button>*/}
-                            {/*</Popconfirm>*/}
-                            {/*<Button type="primary" icon={<UploadOutlined/>} size={"large"}*/}
-                            {/*        style={{width: "8%"}}*/}
-                            {/*>*/}
-                            {/*    恢复数据*/}
-                            {/*</Button>*/}
                         </div>
                     </Card>
                 </div>

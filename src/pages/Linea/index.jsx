@@ -71,30 +71,38 @@ const Linea = () => {
             align: "center",
             className: "name",
             render: (text, record) => {
-                const isEditing = record.key === editingKey;
-                return isEditing ? (
-                    <Input
-                        placeholder="请输入备注"
-                        defaultValue={text}
-                        onPressEnter={(e) => {
-                            record.name = e.target.value;
+                const displayText = text || <EditOutlined/>;
+                return (
+                    <Popconfirm
+                        title={
+                            <div>
+                                <Input
+                                    placeholder={"请输入备注"}
+                                    defaultValue={text}
+                                    onChange={(e) => {
+                                        record.name = e.target.value
+                                    }}
+                                    allowClear
+                                    bordered
+                                />
+                            </div>
+                        }
+                        icon={<EditOutlined/>}
+                        onConfirm={() => {
                             setData([...data]);
                             localStorage.setItem('linea_addresses', JSON.stringify(data));
-                            setEditingKey(null);
                         }}
-                    />
-                ) : (
-                    <>
-                        <Tag color="blue">{text}</Tag>
-                        <Button
-                            shape="circle"
-                            icon={<EditOutlined/>}
-                            size={"small"}
-                            onClick={() => setEditingKey(record.key)}
-                        />
-                    </>
+                        onCancel={() => {
+                        }}
+                        okText={"确定"}
+                        cancelText={"取消"}
+                    >
+                        <Tag color="blue" style={{cursor: "pointer"}}>
+                            {displayText}
+                        </Tag>
+                    </Popconfirm>
                 );
-            },
+            }
         },
         {
             title: <span>
@@ -116,7 +124,6 @@ const Linea = () => {
         },
         {
             title: "Linea",
-            className: "zksync2",
             children: [
                 {
                     title: "ETH",
@@ -131,7 +138,7 @@ const Linea = () => {
                     key: "linea_tx_amount",
                     align: "center",
                     render: (text, record) => text,
-                    sorter: (a, b) => a.tx - b.tx,
+                    sorter: (a, b) => a.activity.tx - b.activity.tx,
                 },
                 {
                     title: "最后交易",
@@ -143,7 +150,6 @@ const Linea = () => {
                 },
                 {
                     title: "官方桥Tx",
-                    className: "linea_cross_tx",
                     children: [
                         {
                             title: "L1->L2",
@@ -161,7 +167,6 @@ const Linea = () => {
                 },
                 {
                     title: "官方桥金额(ETH)",
-                    className: "linea_cross_amount",
                     children: [
                         {
                             title: "L1->L2",
@@ -181,7 +186,6 @@ const Linea = () => {
                 },
                 {
                     title: "活跃统计",
-                    className: "linea_activity",
                     children: [
                         {
                             title: "天",
@@ -212,7 +216,7 @@ const Linea = () => {
                             dataIndex: ["activity", "fee"],
                             align: "center",
                             render: (text, record) => text,
-                            sorter: (a, b) => a.fee - b.fee,
+                            sorter: (a, b) => a.activity.fee - b.activity.fee,
                         }
                     ]
                 },
@@ -489,7 +493,7 @@ const Linea = () => {
                     </Form>
                 </Modal>
                 <div style={{marginBottom: "50px"}}>
-                    <Spin spinning={tableLoading} size={"large"}>
+                    <Spin spinning={tableLoading} size={"small"}>
                         <Table
                             rowSelection={rowSelection}
                             dataSource={data}
@@ -501,7 +505,7 @@ const Linea = () => {
                         />
                     </Spin>
                 </div>
-                <div className="stark_footer">
+                <div className="linea_footer">
                     <Card size={"small"} style={{width: "100%"}}>
                         <div style={{width: '100%', display: 'flex', justifyContent: 'space-between'}}>
                             <Button type="primary" onClick={() => {

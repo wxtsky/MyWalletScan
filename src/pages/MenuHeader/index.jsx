@@ -26,7 +26,6 @@ function LanguageSwitcher() {
     );
 }
 
-
 const MenuHeader = () => {
     const items = [
         {
@@ -77,6 +76,10 @@ const MenuHeader = () => {
             label: <LanguageSwitcher/>,
             key: 'languageSwitch',
         },
+        // {
+        //     label:'Setting',
+        //     key:'setting'
+        // }
     ];
     const navigate = useNavigate();
     const location = useLocation();

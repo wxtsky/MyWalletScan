@@ -13,23 +13,8 @@
     color: white;
 }
 
-.ant-table-cell {
-    text-align: center;
-    font-size: 20px;
-}
-
-.ant-table-small .ant-table-cell,
-.ant-table-small .ant-table-thead > tr > th {
-    padding: 4px 8px;
-    font-size: 16px;
-}
-
-.ant-table-small .ant-table-row {
-    line-height: 1.2;
-}
-
-.ant-table {
-    font-weight: 600;
+.ant-table-thead > tr > th.trustData {
+    background-color: #d5ffd5;
 }
 
 .zks_footer {

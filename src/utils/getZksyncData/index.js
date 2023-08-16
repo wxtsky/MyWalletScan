@@ -7,8 +7,10 @@ import {getZksLite} from "@utils/getZksyncData/getZksLite.js";
 import {getEthBalance} from "@utils/getZksyncData/getEthBalance.js";
 import {getTxCount} from "@utils/getZksyncData/getTxCount.js";
 import {getBridge} from "@utils/getZksyncData/getBridge.js";
+import getTrustalabsData from "@utils/getZksyncData/getTrustalabsData.js";
+import {getPrtocol} from "@utils/getZksyncData/getProtocol.js";
 
-export const getAllZksSyncData = async (address) => {
+export const getAllZksSyncData = async (address, isGetTrustalabsData) => {
     try {
         const transactions = await getTransactionsList(address);
         const fee = await getFee(transactions);
@@ -19,6 +21,8 @@ export const getAllZksSyncData = async (address) => {
         const ethBalance = await getEthBalance(address, "ethereum");
         const tx = await getTxCount(address, "ethereum");
         const bridge = getBridge(transactions, address);
+        const trustData = await getTrustalabsData(address, isGetTrustalabsData)
+        await getPrtocol(transactions, address)
         return {
             totalFee: fee,
             totalExchangeAmount: volume,
@@ -28,6 +32,7 @@ export const getAllZksSyncData = async (address) => {
             eth_balance: ethBalance,
             eth_tx_amount: tx,
             bridge,
+            trustData,
             result: "success"
         };
     } catch (e) {

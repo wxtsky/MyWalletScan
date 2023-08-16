@@ -65,30 +65,38 @@ const Stark = () => {
             align: "center",
             className: "name",
             render: (text, record) => {
-                const isEditing = record.key === editingKey;
-                return isEditing ? (
-                    <Input
-                        placeholder="请输入备注"
-                        defaultValue={text}
-                        onPressEnter={(e) => {
-                            record.name = e.target.value;
+                const displayText = text || <EditOutlined/>;
+                return (
+                    <Popconfirm
+                        title={
+                            <div>
+                                <Input
+                                    placeholder={"请输入备注"}
+                                    defaultValue={text}
+                                    onChange={(e) => {
+                                        record.name = e.target.value
+                                    }}
+                                    allowClear
+                                    bordered
+                                />
+                            </div>
+                        }
+                        icon={<EditOutlined/>}
+                        onConfirm={() => {
                             setData([...data]);
                             localStorage.setItem('stark_addresses', JSON.stringify(data));
-                            setEditingKey(null);
                         }}
-                    />
-                ) : (
-                    <>
-                        <Tag color="blue">{text}</Tag>
-                        <Button
-                            shape="circle"
-                            icon={<EditOutlined/>}
-                            size={"small"}
-                            onClick={() => setEditingKey(record.key)}
-                        />
-                    </>
+                        onCancel={() => {
+                        }}
+                        okText={"确定"}
+                        cancelText={"取消"}
+                    >
+                        <Tag color="blue" style={{cursor: "pointer"}}>
+                            {displayText}
+                        </Tag>
+                    </Popconfirm>
                 );
-            },
+            }
         },
         {
             title: '钱包地址',
@@ -545,7 +553,7 @@ const Stark = () => {
                     </Form>
                 </Modal>
                 <div style={{marginBottom: "50px"}}>
-                    <Spin spinning={tableLoading} size={"large"}>
+                    <Spin spinning={tableLoading} size={"small"}>
                         <Table
                             rowSelection={rowSelection}
                             dataSource={data}
