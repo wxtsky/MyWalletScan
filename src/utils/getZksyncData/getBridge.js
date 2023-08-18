@@ -23,8 +23,8 @@ export const getBridge = (transaction, address) => {
     })
     return {
         l1Tol2Times,
-        l1Tol2Amount: l1Tol2Amount.toFixed(3),
+        l1Tol2Amount: l1Tol2Amount === 0 ? 0 : l1Tol2Amount.toFixed(3),
         l2Tol1Times,
-        l2Tol1Amount: l2Tol1Amount.toFixed(3),
+        l2Tol1Amount: l2Tol1Amount === 0 ? 0 : l2Tol1Amount.toFixed(3),
     }
 }

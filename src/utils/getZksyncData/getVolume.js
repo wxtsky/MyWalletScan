@@ -10,6 +10,6 @@ export const getVolume = (transactions) => {
         const tmpVolume = parseInt(transfers[0].amount) * 10 ** -transfers[0].token.decimals * transfers[0].token.price;
         volume += tmpVolume;
     });
-    return volume.toFixed(2);
+    return volume === 0 ? 0 : volume.toFixed(2);
 }
 

@@ -1,5 +1,19 @@
 import {useEffect, useState} from "react";
-import {Button, Input, Space, Table, Modal, Form, notification, Spin, Tag, Popconfirm, message, Tooltip} from 'antd';
+import {
+    Button,
+    Input,
+    Space,
+    Table,
+    Modal,
+    Form,
+    notification,
+    Spin,
+    Tag,
+    Popconfirm,
+    message,
+    Tooltip,
+    Typography
+} from 'antd';
 import {Layout, Card} from 'antd';
 import {exportToExcel,} from "@utils"
 import {
@@ -17,6 +31,7 @@ import './index.css'
 import copy from "copy-to-clipboard";
 import deleteData from "@utils/indexedDB/deleteData.js";
 
+const {Text} = Typography;
 const {TextArea} = Input;
 const {Content} = Layout;
 const Stark = () => {
@@ -104,7 +119,7 @@ const Stark = () => {
             key: 'address',
             align: 'center',
             className: 'address',
-            render: (text, record) => {
+            render: (text) => {
                 const handleCopy = () => {
                     copy(text);
                     message.success('地址已复制');
@@ -130,53 +145,46 @@ const Stark = () => {
             dataIndex: ["accountInfo", "starkId"],
             key: "starkId",
             align: "center",
-            render: (text, record) => text,
+            render: (text) => text,
         },
         {
             title: "StarkNet",
-            className: "zksync2",
             children: [
                 {
                     title: "ETH",
                     dataIndex: ["balance", "ETH"],
                     key: "stark_eth_balance",
                     align: "center",
-                    render: (text, record) => text,
                 },
                 {
                     title: "USDC",
                     dataIndex: ["balance", "USDC"],
                     key: "stark_usdc_balance",
                     align: "center",
-                    render: (text, record) => text,
                 },
                 {
                     title: "USDT",
                     dataIndex: ["balance", "USDT"],
                     key: "stark_usdt_balance",
                     align: "center",
-                    render: (text, record) => text,
                 },
                 {
                     title: "DAI",
                     dataIndex: ["balance", "DAI"],
                     key: "stark_dai_balance",
                     align: "center",
-                    render: (text, record) => text,
                 },
                 {
                     title: "WBTC",
                     dataIndex: ["balance", "WBTC"],
                     key: "stark_wbtc_balance",
                     align: "center",
-                    render: (text, record) => text,
                 },
                 {
                     title: "Tx",
                     dataIndex: "tx",
                     key: "stark_tx_amount",
                     align: "center",
-                    render: (text, record) => text,
                     sorter: (a, b) => a.tx - b.tx,
                 },
                 {
@@ -195,13 +203,11 @@ const Stark = () => {
                             title: "L1->L2",
                             dataIndex: ["bridge", "DepositTx"],
                             align: "center",
-                            render: (text, record) => text,
                         },
                         {
                             title: "L2->L1",
                             dataIndex: ["bridge", "WithdrawTx"],
                             align: "center",
-                            render: (text, record) => text,
                         },
                     ]
                 },
@@ -213,14 +219,12 @@ const Stark = () => {
                             title: "L1->L2",
                             dataIndex: ["bridge", "DepositVolume"],
                             align: "center",
-                            render: (text, record) => text,
 
                         },
                         {
                             title: "L2->L1",
                             dataIndex: ["bridge", "WithdrawVolume"],
                             align: "center",
-                            render: (text, record) => text,
                         }
                     ]
 
@@ -233,38 +237,32 @@ const Stark = () => {
                             title: "天",
                             dataIndex: ["activity", "dayActivity"],
                             align: "center",
-                            render: (text, record) => text,
                         },
                         {
                             title: "周",
                             dataIndex: ["activity", "weekActivity"],
                             align: "center",
-                            render: (text, record) => text,
                         },
                         {
                             title: "月",
                             dataIndex: ["activity", "monthActivity"],
                             align: "center",
-                            render: (text, record) => text,
                         },
                         {
                             title: "合约",
                             dataIndex: ["activity", "contractActivity"],
                             align: "center",
-                            render: (text, record) => text,
                         },
                         {
                             title: "Vol(U)",
                             dataIndex: "Vol",
                             align: "center",
-                            render: (text, record) => text,
                             sorter: (a, b) => a.Vol - b.Vol,
                         },
                         {
                             title: "fee(E)",
                             dataIndex: "fee",
                             align: "center",
-                            render: (text, record) => text,
                             sorter: (a, b) => a.fee - b.fee,
                         }
                     ]
@@ -507,12 +505,94 @@ const Stark = () => {
     const exportToExcelFile = () => {
         exportToExcel(data, 'starkInfo');
     }
-    const [editingKey, setEditingKey] = useState(null);
     const rowSelection = {
         selectedRowKeys: selectedKeys,
         onChange: (selectedRowKeys) => {
             setSelectedKeys(selectedRowKeys);
         },
+    };
+
+    function formatNumber(number, decimals = 3) {
+        return number === 0 ? '0' : number.toFixed(decimals);
+    }
+
+    const tableSummary = (pageData) => {
+        let totalEthBalance = 0;
+        let totalUsdcBalance = 0;
+        let totalUsdtBalance = 0;
+        let totalDaiBalance = 0;
+        let totalWBTCBalance = 0;
+        let totalL1Tol2Amount = 0;
+        let totalL2Tol1Amount = 0;
+        let totalAmount = 0;
+        let totalFee = 0;
+
+        pageData.forEach((row) => {
+            totalEthBalance += parseFloat(row.balance?.ETH || 0);
+            totalUsdcBalance += parseFloat(row.balance?.USDC || 0);
+            totalUsdtBalance += parseFloat(row.balance?.USDT || 0);
+            totalDaiBalance += parseFloat(row.balance?.DAI || 0);
+            totalWBTCBalance += parseFloat(row.balance?.WBTC || 0);
+            totalL1Tol2Amount += parseFloat(row.bridge?.DepositVolume || 0);
+            totalL2Tol1Amount += parseFloat(row.bridge?.WithdrawVolume || 0);
+            totalAmount += parseFloat(row.Vol || 0);
+            totalFee += parseFloat(row.fee || 0);
+        });
+
+        return (
+            <Table.Summary>
+                <Table.Summary.Row>
+                    <Table.Summary.Cell index={0}>
+                        <Text type={"danger"}>总计</Text>
+                    </Table.Summary.Cell>
+                    <Table.Summary.Cell index={1}/>
+                    <Table.Summary.Cell index={2}/>
+                    <Table.Summary.Cell index={3}/>
+                    <Table.Summary.Cell index={4}/>
+                    <Table.Summary.Cell index={5}>
+                        <Text type="danger">{formatNumber(totalEthBalance)}</Text>
+                    </Table.Summary.Cell>
+                    <Table.Summary.Cell index={6}>
+                        <Text type="danger">{formatNumber(totalUsdcBalance)}</Text>
+                    </Table.Summary.Cell>
+                    <Table.Summary.Cell index={7}>
+                        <Text type="danger">{formatNumber(totalUsdtBalance)}</Text>
+                    </Table.Summary.Cell>
+                    <Table.Summary.Cell index={8}>
+                        <Text type="danger">{formatNumber(totalDaiBalance)}</Text>
+                    </Table.Summary.Cell>
+                    <Table.Summary.Cell index={9}>
+                        <Text type="danger">{formatNumber(totalWBTCBalance)}</Text>
+                    </Table.Summary.Cell>
+                    <Table.Summary.Cell index={10}/>
+                    <Table.Summary.Cell index={11}/>
+                    <Table.Summary.Cell index={12}/>
+                    <Table.Summary.Cell index={13}/>
+                    <Table.Summary.Cell index={14}>
+                        <Text type="danger">{formatNumber(totalL1Tol2Amount, 2)}</Text>
+                    </Table.Summary.Cell>
+                    <Table.Summary.Cell index={15}>
+                        <Text type="danger">{formatNumber(totalL2Tol1Amount, 2)}</Text>
+                    </Table.Summary.Cell>
+                    <Table.Summary.Cell index={16}/>
+                    <Table.Summary.Cell index={17}/>
+                    <Table.Summary.Cell index={18}/>
+                    <Table.Summary.Cell index={19}/>
+                    <Table.Summary.Cell index={20}>
+                        <Text type="danger">
+                            {formatNumber(totalAmount, 2)}
+                        </Text>
+                    </Table.Summary.Cell>
+                    <Table.Summary.Cell index={21}>
+                        <Text type="danger">
+                            {formatNumber(totalFee, 2)}
+                        </Text>
+                    </Table.Summary.Cell>
+                    <Table.Summary.Cell index={22}/>
+                    <Table.Summary.Cell index={23}/>
+                </Table.Summary.Row>
+            </Table.Summary>
+        );
     };
     return (
         <div>
@@ -562,6 +642,7 @@ const Stark = () => {
                             style={{marginBottom: "20px"}}
                             size={"small"}
                             columns={columns}
+                            summary={tableSummary}
                         />
                     </Spin>
                 </div>

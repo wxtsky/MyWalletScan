@@ -36,6 +36,7 @@ const getActivity = (address, transactions) => {
     const uniqueWeeks = new Set();
     const uniqueMonths = new Set();
     const uniqueContracts = new Set();
+    transactions.reverse();
     if (transactions.length === 0) return ({
         tx,
         lastTx: "无",

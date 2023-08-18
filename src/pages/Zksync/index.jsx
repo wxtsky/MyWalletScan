@@ -31,7 +31,9 @@ import EcosystemModal from "@components/EcosystemModal/index.jsx";
 import {useTranslation} from "react-i18next";
 import {dbConfig, get, initDB} from "@utils/indexedDB/main.js";
 import deleteData from "@utils/indexedDB/deleteData.js";
+import {Typography} from 'antd';
 
+const {Text, Paragraph} = Typography;
 const {TextArea} = Input;
 
 function Zksync() {
@@ -354,20 +356,22 @@ function Zksync() {
         {
             title: (
                 <span>
-                {t("address")}
+            {t("address")}
                     <span onClick={toggleHideColumn} style={{marginLeft: 8, cursor: 'pointer'}}>
-                        {getEyeIcon()}
-                    </span>
-                </span>
+                {getEyeIcon()}
+            </span>
+        </span>
             ),
             dataIndex: "address",
             key: "address",
             align: "center",
-            render: (text, record) => {
-                if (hideColumn) {
-                    return text.slice(0, 4) + '***' + text.slice(-4);
-                }
-                return text;
+            render: (text) => {
+                const displayText = hideColumn ? text.slice(0, 4) + '***' + text.slice(-4) : text;
+                return (
+                    <Paragraph copyable={{text}} style={{whiteSpace: "nowrap", margin: 0}}>
+                        {displayText}
+                    </Paragraph>
+                );
             },
         },
         {
@@ -380,14 +384,12 @@ function Zksync() {
                     dataIndex: "eth_balance",
                     key: "eth_balance",
                     align: "center",
-                    render: (text, record) => (text),
                 },
                 {
                     title: "Tx",
                     dataIndex: "eth_tx_amount",
                     key: "eth_tx_amount",
                     align: "center",
-                    render: (text, record) => (text),
                 },
             ],
         },
@@ -401,14 +403,12 @@ function Zksync() {
                     dataIndex: ['zksLiteBalance', "zks1_balance"],
                     key: "zks1_balance",
                     align: "center",
-                    render: (text, record) => (text),
                 },
                 {
                     title: "Tx",
                     dataIndex: ['zksLiteBalance', "zks1_tx_amount"],
                     key: "zks1_tx_amount",
                     align: "center",
-                    render: (text, record) => (text),
                     sorter: (a, b) => a.zksLiteBalance.zks1_tx_amount - b.zksLiteBalance.zks1_tx_amount,
                 },
                 {
@@ -416,7 +416,6 @@ function Zksync() {
                     dataIndex: ['zksLiteBalance', "zks1_latest_tx"],
                     key: "zks1_latest_tx",
                     align: "center",
-                    render: (text, record) => (text),
                 }
             ],
 
@@ -431,21 +430,18 @@ function Zksync() {
                     dataIndex: ['zksEraBalance', "zks2_balance"],
                     key: "zks2_balance",
                     align: "center",
-                    render: (text, record) => (text),
                 },
                 {
                     title: "USDC",
                     dataIndex: ['zksEraBalance', "zks2_usdcBalance"],
                     key: "zks2_usdcBalance",
                     align: "center",
-                    render: (text, record) => (text),
                 },
                 {
                     title: "Tx",
                     dataIndex: ['zksEraBalance', "zks2_tx_amount"],
                     key: "zks2_tx_amount",
                     align: "center",
-                    render: (text, record) => (text),
                     sorter: (a, b) => a.zksEraBalance.zks2_tx_amount - b.zksEraBalance.zks2_tx_amount,
                 },
                 {
@@ -466,14 +462,12 @@ function Zksync() {
                             dataIndex: ['bridge', "l1Tol2Times"],
                             key: "l1Tol2Times",
                             align: "center",
-                            render: (text, record) => (text),
                         },
                         {
                             title: "L2->L1",
                             dataIndex: ['bridge', "l2Tol1Times"],
                             key: "l2Tol1Times",
                             align: "center",
-                            render: (text, record) => (text),
                         },
                     ],
                 },
@@ -486,14 +480,12 @@ function Zksync() {
                             dataIndex: ['bridge', "l1Tol2Amount"],
                             key: "l1Tol2Amount",
                             align: "center",
-                            render: (text, record) => (text),
                         },
                         {
                             title: "L2->L1",
                             dataIndex: ['bridge', "l2Tol1Amount"],
                             key: "l2Tol1Amount",
                             align: "center",
-                            render: (text, record) => (text),
                         },
                     ],
                 },
@@ -506,35 +498,30 @@ function Zksync() {
                             dataIndex: ['activity', "dayActivity"],
                             key: "dayActivity",
                             align: "center",
-                            render: (text, record) => (text),
                         },
                         {
                             title: t('week'),
                             dataIndex: ['activity', "weekActivity"],
                             key: "weekActivity",
                             align: "center",
-                            render: (text, record) => (text),
                         },
                         {
                             title: t('month'),
                             dataIndex: ['activity', "monthActivity"],
                             key: "monthActivity",
                             align: "center",
-                            render: (text, record) => (text),
                         },
                         {
                             title: t('contract'),
                             dataIndex: ['activity', "contractActivity"],
                             key: "contractActivity",
                             align: "center",
-                            render: (text, record) => (text),
                         },
                         {
                             title: t('amount'),
                             dataIndex: "totalExchangeAmount",
                             key: "totalExchangeAmount",
                             align: "center",
-                            render: (text, record) => (text),
                             sorter: (a, b) => a.totalExchangeAmount - b.totalExchangeAmount,
                         },
                         {
@@ -542,7 +529,6 @@ function Zksync() {
                             dataIndex: "totalFee",
                             key: "totalFee",
                             align: "center",
-                            render: (text, record) => (text),
                         }
                     ],
                 },
@@ -584,10 +570,23 @@ function Zksync() {
                     key: 'top',
                     dataIndex: ['trustData', 'top'],
                     align: 'center',
-                    render: (text, record) => (text !== "-" && text ? text.toString() + "%" : text),
+                    render: (text) => (text !== "-" && text ? text.toString() + "%" : text),
                     sorter: (a, b) => a.trustData.top - b.trustData.top,
                 }
             ]
+        },
+        {
+            title: "NFT是否可领",
+            key: "nft",
+            align: "center",
+            dataIndex: "isCanClaim",
+            render: (text) => (
+                <Space>
+                    {text && text === "yes" ? <Tag color="success">是</Tag> : null}
+                    {text && text === "no" ? <Tag color="error">否</Tag> : null}
+                    {text && text === "error" ? <Tag color="error">获取失败</Tag> : null}
+                </Space>
+            )
         },
         {
             title: t("state"),
@@ -665,7 +664,7 @@ function Zksync() {
             dataIndex: 'lastActivity',
             key: 'lastActivity',
             align: 'center',
-            render: (text, record) => (text === '' ? '无' : new Date(text).toLocaleString('zh-CN', {timeZone: 'Asia/Shanghai'})),
+            render: (text) => (text === '' ? '无' : new Date(text).toLocaleString('zh-CN', {timeZone: 'Asia/Shanghai'})),
         },
         {
             title: t('amount'),
@@ -674,9 +673,102 @@ function Zksync() {
             align: 'center',
             sorter: (a, b) => a.volume - b.volume,
             defaultSortOrder: 'descend',
-            render: (text, record) => (Number(text).toFixed(2)),
+            render: (text) => (Number(text).toFixed(2)),
         }
     ]
+
+    function formatNumber(number, decimals = 3) {
+        return number === 0 ? '0' : number.toFixed(decimals);
+    }
+
+    const tableSummary = (pageData) => {
+        let totalEthBalance = 0;
+        let totalZkLiteEthBalance = 0;
+        let totalZkEraEthBalance = 0;
+        let totalZkEraUsdcBalance = 0;
+        let totalL1Tol2Amount = 0;
+        let totalL2Tol1Amount = 0;
+        let totalAmount = 0;
+        let totalFee = 0;
+
+        pageData.forEach((row) => {
+            totalEthBalance += parseFloat(row.eth_balance || 0);
+            totalZkLiteEthBalance += parseFloat(row.zksLiteBalance?.zks1_balance || 0);
+            totalZkEraEthBalance += parseFloat(row.zksEraBalance?.zks2_balance || 0);
+            totalZkEraUsdcBalance += parseFloat(row.zksEraBalance?.zks2_usdcBalance || 0);
+            totalL1Tol2Amount += parseFloat(row.bridge?.l1Tol2Amount || 0);
+            totalL2Tol1Amount += parseFloat(row.bridge?.l2Tol1Amount || 0);
+            totalAmount += parseFloat(row.totalExchangeAmount || 0);
+            totalFee += parseFloat(row.totalFee || 0);
+        });
+
+        return (
+            <Table.Summary>
+                <Table.Summary.Row>
+                    <Table.Summary.Cell index={0}>
+                        <Text type={"danger"}>总计</Text>
+                    </Table.Summary.Cell>
+                    <Table.Summary.Cell index={1}/>
+                    <Table.Summary.Cell index={2}/>
+                    <Table.Summary.Cell index={3}/>
+                    <Table.Summary.Cell index={4}>
+                        <Text type="danger">{formatNumber(totalEthBalance)}</Text></Table.Summary.Cell>
+                    <Table.Summary.Cell index={5}/>
+                    <Table.Summary.Cell index={6}>
+                        <Text type="danger">
+                            {formatNumber(totalZkLiteEthBalance)}
+                        </Text>
+                    </Table.Summary.Cell>
+                    <Table.Summary.Cell index={7}/>
+                    <Table.Summary.Cell index={8}/>
+                    <Table.Summary.Cell index={9}>
+                        <Text type="danger">
+                            {formatNumber(totalZkEraEthBalance)}
+                        </Text>
+                    </Table.Summary.Cell>
+                    <Table.Summary.Cell index={10}>
+                        <Text type="danger">
+                            {formatNumber(totalZkEraUsdcBalance, 2)}
+                        </Text>
+                    </Table.Summary.Cell>
+                    <Table.Summary.Cell index={11}/>
+                    <Table.Summary.Cell index={12}/>
+                    <Table.Summary.Cell index={13}/>
+                    <Table.Summary.Cell index={14}/>
+                    <Table.Summary.Cell index={15}>
+                        <Text type="danger">
+                            {formatNumber(totalL1Tol2Amount)}
+                        </Text>
+
+                    </Table.Summary.Cell>
+                    <Table.Summary.Cell index={16}>
+                        <Text type="danger">
+                            {formatNumber(totalL2Tol1Amount)}
+                        </Text>
+                    </Table.Summary.Cell>
+                    <Table.Summary.Cell index={17}/>
+                    <Table.Summary.Cell index={18}/>
+                    <Table.Summary.Cell index={19}/>
+                    <Table.Summary.Cell index={20}/>
+                    <Table.Summary.Cell index={21}>
+                        <Text type="danger">
+                            {formatNumber(totalAmount, 2)}
+                        </Text>
+                    </Table.Summary.Cell>
+                    <Table.Summary.Cell index={22}><Text type="danger">
+                        {formatNumber(totalFee, 2)}</Text><
+                        /Table.Summary.Cell>
+                    <Table.Summary.Cell index={23}/>
+                    <Table.Summary.Cell index={24}/>
+                    <Table.Summary.Cell index={25}/>
+                    <Table.Summary.Cell index={26}/>
+                    <Table.Summary.Cell index={27}/>
+                    <Table.Summary.Cell index={28}/>
+                </Table.Summary.Row>
+            </Table.Summary>
+        );
+    };
+
     return (
         <div>
             <Content>
@@ -725,6 +817,7 @@ function Zksync() {
                             style={{marginBottom: "20px", zIndex: 2}}
                             size={"small"}
                             columns={columns}
+                            summary={tableSummary}
                         />
                     </Spin>
                 </div>

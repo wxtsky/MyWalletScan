@@ -4,6 +4,6 @@ export const getFee = async (transactions) => {
         const tmpFees = parseInt(transaction.fee, 16) * 10 ** -18 * transaction.ethValue;
         fee += tmpFees;
     });
-    return fee.toFixed(2);
+    return fee === 0 ? 0 : fee.toFixed(2);
 }
 
