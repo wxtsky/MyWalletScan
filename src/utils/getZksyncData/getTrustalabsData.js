@@ -36,7 +36,6 @@ const getTrustalabsData = async (address, isGetTrustalabsData) => {
             rank: '-',
             top: '-'
         }
-        console.log(e.message)
     }
     return result;
 }

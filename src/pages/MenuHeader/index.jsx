@@ -1,7 +1,7 @@
 import {Menu} from 'antd';
 import {useEffect, useState} from 'react';
 import {useLocation, useNavigate} from "react-router-dom";
-import {GithubOutlined, TwitterOutlined} from "@ant-design/icons";
+import {GithubOutlined, SettingOutlined, TwitterOutlined} from "@ant-design/icons";
 import './index.css'
 import React from "react";
 import {useTranslation} from "react-i18next";
@@ -73,13 +73,13 @@ const MenuHeader = () => {
             key: 'github',
         },
         {
+            label: <SettingOutlined/>,
+            key: 'setting'
+        },
+        {
             label: <LanguageSwitcher/>,
             key: 'languageSwitch',
-        },
-        // {
-        //     label:'Setting',
-        //     key:'setting'
-        // }
+        }
     ];
     const navigate = useNavigate();
     const location = useLocation();

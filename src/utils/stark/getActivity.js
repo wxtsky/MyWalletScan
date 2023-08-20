@@ -13,7 +13,6 @@ const formatCallData = (callData) => {
     let result = "";
     if (!callData) return result;
     for (let i = 0; i < callData.length; i++) {
-        console.log(callData[i].length)
         if (!callData[i]) continue;
         if (callData[i].length === 66 || callData[i].length === 64 || callData[i].length === 65) {
             result = callData[i];

@@ -19,7 +19,7 @@ const EcosystemModal = (props) => {
             name: "Owlto",
             category: "Bridge",
             url: "https://owlto.finance/",
-            description: "Owlto is a decentralized Cross-Rollup bridge.",
+            description: "快速/便宜/安全/好用的跨链桥.",
         },
         {
             key: "3",
