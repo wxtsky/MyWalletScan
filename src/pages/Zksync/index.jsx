@@ -8,7 +8,7 @@ import {
     notification,
     Spin,
     Tag,
-    Popconfirm, Tooltip, Checkbox
+    Popconfirm, Tooltip
 } from 'antd';
 import {exportToExcel} from "@utils"
 import {useEffect, useState} from "react";
@@ -534,47 +534,47 @@ function Zksync() {
                 },
             ],
         },
-        {
-            title: (
-                <span>
-                    <Space>
-                    <span>Trustalabs</span>
-                    <Checkbox
-                        checked={isGetTustalabsData}
-                        onChange={(e) => {
-                            setIsGetTustalabsData(e.target.checked);
-                            localStorage.setItem('isGetTustalabsData', e.target.checked);
-                        }}/>
-                        </Space>
-                </span>
-            ),
-            key: 'trustData',
-            className: "trustData",
-            children: [
-                {
-                    title: t('score'),
-                    key: 'score',
-                    dataIndex: ['trustData', 'score'],
-                    align: 'center',
-                    sorter: (a, b) => a.trustData.score - b.trustData.score,
-                },
-                {
-                    title: t('rank'),
-                    key: 'rank',
-                    dataIndex: ['trustData', 'rank'],
-                    align: 'center',
-                    sorter: (a, b) => a.trustData.rank - b.trustData.rank,
-                },
-                {
-                    title: 'Top',
-                    key: 'top',
-                    dataIndex: ['trustData', 'top'],
-                    align: 'center',
-                    render: (text) => (text !== "-" && text ? text.toString() + "%" : text),
-                    sorter: (a, b) => a.trustData.top - b.trustData.top,
-                }
-            ]
-        },
+        // {
+        //     title: (
+        //         <span>
+        //             <Space>
+        //             <span>Trustalabs</span>
+        //             <Checkbox
+        //                 checked={isGetTustalabsData}
+        //                 onChange={(e) => {
+        //                     setIsGetTustalabsData(e.target.checked);
+        //                     localStorage.setItem('isGetTustalabsData', e.target.checked);
+        //                 }}/>
+        //                 </Space>
+        //         </span>
+        //     ),
+        //     key: 'trustData',
+        //     className: "trustData",
+        //     children: [
+        //         {
+        //             title: t('score'),
+        //             key: 'score',
+        //             dataIndex: ['trustData', 'score'],
+        //             align: 'center',
+        //             sorter: (a, b) => a.trustData.score - b.trustData.score,
+        //         },
+        //         {
+        //             title: t('rank'),
+        //             key: 'rank',
+        //             dataIndex: ['trustData', 'rank'],
+        //             align: 'center',
+        //             sorter: (a, b) => a.trustData.rank - b.trustData.rank,
+        //         },
+        //         {
+        //             title: 'Top',
+        //             key: 'top',
+        //             dataIndex: ['trustData', 'top'],
+        //             align: 'center',
+        //             render: (text) => (text !== "-" && text ? text.toString() + "%" : text),
+        //             sorter: (a, b) => a.trustData.top - b.trustData.top,
+        //         }
+        //     ]
+        // },
         {
             title: "NFT是否可领",
             key: "nft",
@@ -681,6 +681,14 @@ function Zksync() {
         return number === 0 ? '0' : number.toFixed(decimals);
     }
 
+    const centeredTextStyle = {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '100%',
+        width: '100%'
+    };
+
     const tableSummary = (pageData) => {
         let totalEthBalance = 0;
         let totalZkLiteEthBalance = 0;
@@ -706,58 +714,78 @@ function Zksync() {
             <Table.Summary>
                 <Table.Summary.Row>
                     <Table.Summary.Cell index={0}>
-                        <Text type={"danger"}>总计</Text>
+                        <div style={centeredTextStyle}>
+                            <Text type={"danger"}>总计</Text>
+                        </div>
                     </Table.Summary.Cell>
                     <Table.Summary.Cell index={1}/>
                     <Table.Summary.Cell index={2}/>
                     <Table.Summary.Cell index={3}/>
                     <Table.Summary.Cell index={4}>
-                        <Text type="danger">{formatNumber(totalEthBalance)}</Text></Table.Summary.Cell>
+                        <div style={centeredTextStyle}>
+                            <Text type="danger">{formatNumber(totalEthBalance)}</Text>
+                        </div>
+                    </Table.Summary.Cell>
                     <Table.Summary.Cell index={5}/>
                     <Table.Summary.Cell index={6}>
-                        <Text type="danger">
-                            {formatNumber(totalZkLiteEthBalance)}
-                        </Text>
+                        <div style={centeredTextStyle}>
+                            <Text type="danger">
+                                {formatNumber(totalZkLiteEthBalance)}
+                            </Text>
+                        </div>
                     </Table.Summary.Cell>
                     <Table.Summary.Cell index={7}/>
                     <Table.Summary.Cell index={8}/>
                     <Table.Summary.Cell index={9}>
-                        <Text type="danger">
-                            {formatNumber(totalZkEraEthBalance)}
-                        </Text>
+                        <div style={centeredTextStyle}>
+                            <Text type="danger">
+                                {formatNumber(totalZkEraEthBalance)}
+                            </Text>
+                        </div>
                     </Table.Summary.Cell>
                     <Table.Summary.Cell index={10}>
-                        <Text type="danger">
-                            {formatNumber(totalZkEraUsdcBalance, 2)}
-                        </Text>
+                        <div style={centeredTextStyle}>
+                            <Text type="danger">
+                                {formatNumber(totalZkEraUsdcBalance, 2)}
+                            </Text>
+                        </div>
                     </Table.Summary.Cell>
                     <Table.Summary.Cell index={11}/>
                     <Table.Summary.Cell index={12}/>
                     <Table.Summary.Cell index={13}/>
                     <Table.Summary.Cell index={14}/>
                     <Table.Summary.Cell index={15}>
-                        <Text type="danger">
-                            {formatNumber(totalL1Tol2Amount)}
-                        </Text>
-
+                        <div style={centeredTextStyle}>
+                            <Text type="danger">
+                                {formatNumber(totalL1Tol2Amount)}
+                            </Text>
+                        </div>
                     </Table.Summary.Cell>
                     <Table.Summary.Cell index={16}>
-                        <Text type="danger">
-                            {formatNumber(totalL2Tol1Amount)}
-                        </Text>
+                        <div style={centeredTextStyle}>
+                            <Text type="danger">
+                                {formatNumber(totalL2Tol1Amount)}
+                            </Text>
+                        </div>
                     </Table.Summary.Cell>
                     <Table.Summary.Cell index={17}/>
                     <Table.Summary.Cell index={18}/>
                     <Table.Summary.Cell index={19}/>
                     <Table.Summary.Cell index={20}/>
                     <Table.Summary.Cell index={21}>
-                        <Text type="danger">
-                            {formatNumber(totalAmount, 2)}
-                        </Text>
+                        <div style={centeredTextStyle}>
+                            <Text type="danger">
+                                {formatNumber(totalAmount, 2)}
+                            </Text>
+                        </div>
                     </Table.Summary.Cell>
-                    <Table.Summary.Cell index={22}><Text type="danger">
-                        {formatNumber(totalFee, 2)}</Text><
-                        /Table.Summary.Cell>
+                    <Table.Summary.Cell index={22}>
+                        <div style={centeredTextStyle}>
+                            <Text type="danger">
+                                {formatNumber(totalFee, 2)}
+                            </Text>
+                        </div>
+                    </Table.Summary.Cell>
                     <Table.Summary.Cell index={23}/>
                     <Table.Summary.Cell index={24}/>
                     <Table.Summary.Cell index={25}/>

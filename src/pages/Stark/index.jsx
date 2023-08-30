@@ -516,6 +516,13 @@ const Stark = () => {
         return number === 0 ? '0' : number.toFixed(decimals);
     }
 
+    const centeredTextStyle = {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '100%',
+        width: '100%'
+    };
     const tableSummary = (pageData) => {
         let totalEthBalance = 0;
         let totalUsdcBalance = 0;
@@ -543,50 +550,70 @@ const Stark = () => {
             <Table.Summary>
                 <Table.Summary.Row>
                     <Table.Summary.Cell index={0}>
-                        <Text type={"danger"}>总计</Text>
+                        <div style={centeredTextStyle}>
+                            <Text type={"danger"}>总计</Text>
+                        </div>
                     </Table.Summary.Cell>
                     <Table.Summary.Cell index={1}/>
                     <Table.Summary.Cell index={2}/>
                     <Table.Summary.Cell index={3}/>
                     <Table.Summary.Cell index={4}/>
                     <Table.Summary.Cell index={5}>
-                        <Text type="danger">{formatNumber(totalEthBalance)}</Text>
+                        <div style={centeredTextStyle}>
+                            <Text type="danger">{formatNumber(totalEthBalance)}</Text>
+                        </div>
                     </Table.Summary.Cell>
                     <Table.Summary.Cell index={6}>
-                        <Text type="danger">{formatNumber(totalUsdcBalance)}</Text>
+                        <div style={centeredTextStyle}>
+                            <Text type="danger">{formatNumber(totalUsdcBalance)}</Text>
+                        </div>
                     </Table.Summary.Cell>
                     <Table.Summary.Cell index={7}>
-                        <Text type="danger">{formatNumber(totalUsdtBalance)}</Text>
+                        <div style={centeredTextStyle}>
+                            <Text type="danger">{formatNumber(totalUsdtBalance)}</Text>
+                        </div>
                     </Table.Summary.Cell>
                     <Table.Summary.Cell index={8}>
-                        <Text type="danger">{formatNumber(totalDaiBalance)}</Text>
+                        <div style={centeredTextStyle}>
+                            <Text type="danger">{formatNumber(totalDaiBalance)}</Text>
+                        </div>
                     </Table.Summary.Cell>
                     <Table.Summary.Cell index={9}>
-                        <Text type="danger">{formatNumber(totalWBTCBalance)}</Text>
+                        <div style={centeredTextStyle}>
+                            <Text type="danger">{formatNumber(totalWBTCBalance)}</Text>
+                        </div>
                     </Table.Summary.Cell>
                     <Table.Summary.Cell index={10}/>
                     <Table.Summary.Cell index={11}/>
                     <Table.Summary.Cell index={12}/>
                     <Table.Summary.Cell index={13}/>
                     <Table.Summary.Cell index={14}>
-                        <Text type="danger">{formatNumber(totalL1Tol2Amount, 2)}</Text>
+                        <div style={centeredTextStyle}>
+                            <Text type="danger">{formatNumber(totalL1Tol2Amount, 2)}</Text>
+                        </div>
                     </Table.Summary.Cell>
                     <Table.Summary.Cell index={15}>
-                        <Text type="danger">{formatNumber(totalL2Tol1Amount, 2)}</Text>
+                        <div style={centeredTextStyle}>
+                            <Text type="danger">{formatNumber(totalL2Tol1Amount, 2)}</Text>
+                        </div>
                     </Table.Summary.Cell>
                     <Table.Summary.Cell index={16}/>
                     <Table.Summary.Cell index={17}/>
                     <Table.Summary.Cell index={18}/>
                     <Table.Summary.Cell index={19}/>
                     <Table.Summary.Cell index={20}>
-                        <Text type="danger">
-                            {formatNumber(totalAmount, 2)}
-                        </Text>
+                        <div style={centeredTextStyle}>
+                            <Text type="danger">
+                                {formatNumber(totalAmount, 2)}
+                            </Text>
+                        </div>
                     </Table.Summary.Cell>
                     <Table.Summary.Cell index={21}>
-                        <Text type="danger">
-                            {formatNumber(totalFee, 2)}
-                        </Text>
+                        <div style={centeredTextStyle}>
+                            <Text type="danger">
+                                {formatNumber(totalFee, 2)}
+                            </Text>
+                        </div>
                     </Table.Summary.Cell>
                     <Table.Summary.Cell index={22}/>
                     <Table.Summary.Cell index={23}/>
