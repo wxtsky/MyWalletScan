@@ -63,7 +63,7 @@ const getActivity = (address, transactions) => {
     })
     return {
         tx,
-        lastTx,
+        lastTx: lastTx ? lastTx : "-",
         fee: fee.toFixed(4),
         dayActivity: uniqueDays.size,
         weekActivity: uniqueWeeks.size,

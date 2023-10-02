@@ -334,7 +334,7 @@ const Stark = () => {
 
             for (let address of addresses) {
                 address = address.trim();
-                if (address.length !== 66 && address.length !== 64) {
+                if (address.length === 0) {
                     notification.error({
                         message: "错误",
                         description: "请输入正确的stark地址(64位)",
@@ -642,12 +642,12 @@ const Stark = () => {
                                     let errorLines = [];
                                     for (let i = 0; i < addresses.length; i++) {
                                         let address = addresses[i].trim();
-                                        if (!address.startsWith("0x") || (address.length !== 66 && address.length !== 64)) {
+                                        if (address.length === 0) {
                                             errorLines.push(i + 1);
                                         }
                                     }
                                     if (errorLines.length) {
-                                        return Promise.reject(`行 ${errorLines.join(", ")} 的地址格式错误，请输入正确的stark地址(64位)`);
+                                        return Promise.reject(`行 ${errorLines.join(", ")} 的地址格式错误，请输入正确的stark地址`);
                                     }
                                     return Promise.resolve();
                                 }

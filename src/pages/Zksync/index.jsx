@@ -686,7 +686,7 @@ function Zksync() {
         alignItems: 'center',
         justifyContent: 'center',
         height: '100%',
-        width: '100%'
+        width: '100%',
     };
 
     const tableSummary = (pageData) => {
@@ -789,9 +789,6 @@ function Zksync() {
                     <Table.Summary.Cell index={23}/>
                     <Table.Summary.Cell index={24}/>
                     <Table.Summary.Cell index={25}/>
-                    <Table.Summary.Cell index={26}/>
-                    <Table.Summary.Cell index={27}/>
-                    <Table.Summary.Cell index={28}/>
                 </Table.Summary.Row>
             </Table.Summary>
         );
