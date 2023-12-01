@@ -36,29 +36,29 @@ const MenuHeader = () => {
             label: 'zkInfo',
             key: 'zk_info',
         },
-        {
-            label: 'Stark',
-            key: 'stark',
-        },
-        {
-            label: 'StarkInfo',
-            key: 'stark_info',
-        },
+        // {
+        //     label: 'Stark',
+        //     key: 'stark',
+        // },
+        // {
+        //     label: 'StarkInfo',
+        //     key: 'stark_info',
+        // },
         {
             label: "Linea",
             key: 'linea',
         },
-        {
-            label: 'LayerZero',
-            key: 'layer',
-        },
+        // {
+        //     label: 'LayerZero',
+        //     key: 'layer',
+        // },
         {
             label: 'Coffee',
             key: 'coffee',
         },
         {
             label: (
-                <a href="https://twitter.com/jingluo0" target="_blank" rel="noopener noreferrer">
+                <a href="https://twitter.com/beibeieth" target="_blank" rel="noopener noreferrer">
                     <TwitterOutlined/>
                 </a>
             ),

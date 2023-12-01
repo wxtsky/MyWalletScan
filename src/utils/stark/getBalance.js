@@ -2,7 +2,7 @@ import axios from 'axios';
 
 export default async function getBalance(address) {
     try {
-        const url = "https://starkscan.stellate.sh/"
+        const url = "https://graphql.starkscancdn.com/"
         const data = {
             'query': 'query ERC20BalancesByOwnerAddressTableQuery(\n  $input: ERC20BalancesByOwnerAddressInput!\n) {\n  erc20BalancesByOwnerAddress(input: $input) {\n    id\n    ...ERC20BalancesByOwnerAddressTableRowFragment_erc20Balance\n  }\n}\n\nfragment ERC20BalancesByOwnerAddressTableRowFragment_erc20Balance on ERC20Balance {\n  id\n  contract_address\n  contract_erc20_identifier\n  contract_erc20_contract {\n    symbol\n    is_social_verified\n    icon_url\n    id\n  }\n  balance_display\n}\n',
             'variables': {
@@ -12,8 +12,12 @@ export default async function getBalance(address) {
             }
         }
         const headers = {
-            'authority': 'starkscan.stellate.sh',
+            'authority': 'graphql.starkscancdn.com',
+            'accept': 'application/json',
             'accept-language': 'zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6',
+            'content-type': 'application/json',
+            'origin': 'https://starkscan.co',
+            'referer': 'https://starkscan.co/',
         }
         const response = await axios.post(url, data, {headers: headers});
         let balance = {

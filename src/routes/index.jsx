@@ -24,22 +24,22 @@ const router = [
                 path: '/zk_info',
                 element: <ZkInfo/>
             },
-            {
-                path: '/stark',
-                element: <Stark/>,
-            },
-            {
-                path: '/stark_info',
-                element: <StarkInfo/>
-            },
+            // {
+            //     path: '/stark',
+            //     element: <Stark/>,
+            // },
+            // {
+            //     path: '/stark_info',
+            //     element: <StarkInfo/>
+            // },
             {
                 path: '/linea',
                 element: <Linea/>
             },
-            {
-                path: '/Layer',
-                element: <Layer/>,
-            },
+            // {
+            //     path: '/Layer',
+            //     element: <Layer/>,
+            // },
             {
                 path: '/coffee',
                 element: <Coffee/>,
