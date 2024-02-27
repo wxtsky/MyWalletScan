@@ -1,7 +1,7 @@
 import {Menu} from 'antd';
 import {useEffect, useState} from 'react';
 import {useLocation, useNavigate} from "react-router-dom";
-import {GithubOutlined, SettingOutlined, TwitterOutlined} from "@ant-design/icons";
+import {GithubOutlined, SettingOutlined} from "@ant-design/icons";
 import './index.css'
 import React from "react";
 import {useTranslation} from "react-i18next";
@@ -32,37 +32,17 @@ const MenuHeader = () => {
             label: 'zkSync',
             key: 'zksync',
         },
-        {
-            label: 'zkInfo',
-            key: 'zk_info',
-        },
         // {
-        //     label: 'Stark',
-        //     key: 'stark',
-        // },
-        // {
-        //     label: 'StarkInfo',
-        //     key: 'stark_info',
+        //     label: 'zkInfo',
+        //     key: 'zk_info',
         // },
         {
             label: "Linea",
             key: 'linea',
         },
-        // {
-        //     label: 'LayerZero',
-        //     key: 'layer',
-        // },
         {
             label: 'Coffee',
             key: 'coffee',
-        },
-        {
-            label: (
-                <a href="https://twitter.com/beibeieth" target="_blank" rel="noopener noreferrer">
-                    <TwitterOutlined/>
-                </a>
-            ),
-            key: 'twitter',
         },
         {
             label: (

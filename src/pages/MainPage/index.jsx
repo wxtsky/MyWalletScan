@@ -5,23 +5,23 @@ import {useEffect, useState} from "react";
 
 
 function MainPage() {
-    const [isModalVisible, setIsModalVisible] = useState(false);
-
-    useEffect(() => {
-        // 假设您有某种方式检测到了新版本，可以将下面这行代码放到相应的逻辑中
-        // 这里为了演示，我们直接在组件挂载后显示模态框
-        setIsModalVisible(true);
-    }, []);
-
-    const handleOk = () => {
-        // 处理确认操作，比如跳转到新版本的链接
-        window.location.href = 'https://addrtracker.xyz/';
-    };
-
-    const handleCancel = () => {
-        // 用户不想更新，关闭模态框
-        setIsModalVisible(false);
-    };
+    // const [isModalVisible, setIsModalVisible] = useState(false);
+    //
+    // useEffect(() => {
+    //     // 假设您有某种方式检测到了新版本，可以将下面这行代码放到相应的逻辑中
+    //     // 这里为了演示，我们直接在组件挂载后显示模态框
+    //     setIsModalVisible(true);
+    // }, []);
+    //
+    // const handleOk = () => {
+    //     // 处理确认操作，比如跳转到新版本的链接
+    //     window.location.href = 'https://addrtracker.xyz/';
+    // };
+    //
+    // const handleCancel = () => {
+    //     // 用户不想更新，关闭模态框
+    //     setIsModalVisible(false);
+    // };
 
     return (
         <div
@@ -61,19 +61,19 @@ function MainPage() {
                     </div>
                 </div>
             </Layout>
-            <Modal
-                title="版本更新"
-                open={isModalVisible}
-                onOk={handleOk}
-                onCancel={handleCancel}
-                okText="前往"
-                cancelText="取消"
-            >
-                <p>最新新版本</p>
-                <p>
-                    https://addrtracker.xyz/
-                </p>
-            </Modal>
+            {/*<Modal*/}
+            {/*    title="版本更新"*/}
+            {/*    open={isModalVisible}*/}
+            {/*    onOk={handleOk}*/}
+            {/*    onCancel={handleCancel}*/}
+            {/*    okText="前往"*/}
+            {/*    cancelText="取消"*/}
+            {/*>*/}
+            {/*    <p>最新新版本</p>*/}
+            {/*    <p>*/}
+            {/*        https://addrtracker.xyz/*/}
+            {/*    </p>*/}
+            {/*</Modal>*/}
         </div>
     );
 }
